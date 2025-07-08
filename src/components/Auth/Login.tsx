@@ -63,7 +63,7 @@ export default function Login() {
       if (response.status === 201) {
         localStorage.setItem("authToken", response.data.authToken);
         toast.success("Usuario logueado");
-        window.location.href = "/dashboard";
+        window.location.href = "/marcas-gt/dashboard";
       }
     } catch (error) {
       console.log(error);

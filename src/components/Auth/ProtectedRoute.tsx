@@ -1,28 +1,3 @@
-// import { Navigate } from "react-router-dom";
-// import { ReactNode } from "react";
-// import { useStore } from "@/Context/ContextSucursal";
-
-// interface ProtectedRouteProps {
-//   children: ReactNode;
-// }
-
-// export function ProtectedRoute({ children }: ProtectedRouteProps) {
-//   const isAuth = localStorage.getItem("authToken") !== null;
-//   const rolUser = useStore((state) => state.setRol);
-//   // Si no está autenticado, redirigir al login
-
-//   if (!rolUser) {
-//     console.log("No hay rol, no hay logueo");
-//     return <Navigate to={"/login"}></Navigate>;
-//   }
-
-//   if (!isAuth) {
-//     return <Navigate to="/login" />;
-//   }
-
-//   // Si está autenticado, renderizar el contenido
-//   return <>{children}</>;
-// }
 import { Navigate } from "react-router-dom";
 import { ReactNode, useEffect, useState } from "react";
 import { useStore } from "@/Context/ContextSucursal";
@@ -32,30 +7,36 @@ interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const isAuth = localStorage.getItem("authToken") !== null;
-  const rolUser = useStore((state) => state.userRol); // Obtener el rol correctamente
-  const [isLoading, setIsLoading] = useState(true);
+function LoadingScreen() {
+  return (
+    <div className="flex flex-col justify-center items-center h-screen gap-2">
+      <img src={gif} alt="Cargando..." className="w-16 h-16 object-contain" />
+      <p className="text-lg font-semibold text-gray-600">Cargando...</p>
+    </div>
+  );
+}
 
-  // Esperamos a que el rol esté disponible
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  // 1) ¿Está autenticado?
+  const isAuth = Boolean(localStorage.getItem("authToken"));
+  if (!isAuth) {
+    return <Navigate to="/marcas-gt/login" replace />;
+  }
+
+  // 2) Si está auth, esperamos a que el rol esté definido
+  const rolUser = useStore((state) => state.userRol);
+  const [loadingRol, setLoadingRol] = useState(true);
+
   useEffect(() => {
     if (rolUser !== undefined) {
-      setIsLoading(false);
+      setLoadingRol(false);
     }
   }, [rolUser]);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col justify-center items-center h-screen gap-2">
-        <img src={gif} alt="Cargando..." className="w-16 h-16 object-contain" />
-        <p className="text-lg font-semibold text-gray-600">Cargando...</p>
-      </div>
-    );
+  if (loadingRol) {
+    return <LoadingScreen />;
   }
 
-  if (!rolUser || !isAuth) {
-    return <Navigate to="/login" />;
-  }
-
+  // 3) Ya está autenticado y tenemos rol cargado, devolvemos los children
   return <>{children}</>;
 }

@@ -78,7 +78,7 @@ export default function CreateUser() {
         toast.success("Usuario creado");
         const { authToken } = response.data; // Asegúrate de que el backend retorna authToken
         localStorage.setItem("authToken", authToken);
-        navigate("/dashboard");
+        navigate("/marcas-gt/dashboard");
       }
     } catch (error) {
       console.error(error);
