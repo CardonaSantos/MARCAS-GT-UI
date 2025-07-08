@@ -38,9 +38,6 @@ export function ProtectedRouteAdmin({ children }: ProtectedRouteAdminProps) {
 
   if (isLoading) {
     return (
-      // <div className="flex justify-center items-center h-screen">
-      //   Cargando...
-      // </div>
       <div className="flex flex-col justify-center items-center h-screen gap-2">
         <img src={gif} alt="Cargando..." className="w-16 h-16 object-contain" />
         <p className="text-lg font-semibold text-gray-600">Cargando...</p>

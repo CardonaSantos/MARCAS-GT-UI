@@ -51,23 +51,47 @@ const adminGroups = [
     label: "Dashboard",
     items: [
       { icon: Home, label: "Página Principal", href: "/" },
-      { icon: PieChart, label: "Estadísticas y Gráficos", href: "/analisis" },
+      {
+        icon: PieChart,
+        label: "Estadísticas y Gráficos",
+        href: "/marcas-gt/analisis",
+      },
       {
         icon: FileSpreadsheet,
         label: "Informes y Reportes",
-        href: "/reportes",
+        href: "/marcas-gt/reportes",
       },
-      { icon: Wallet, label: "Balance de Cuentas", href: "/saldos" },
+      { icon: Wallet, label: "Balance de Cuentas", href: "/marcas-gt/saldos" },
     ],
   },
   {
     label: "Ventas y Clientes",
     items: [
-      { icon: ShoppingBag, label: "Nueva Venta", href: "/hacer-ventas" },
-      { icon: ClipboardList, label: "Historial de Ventas", href: "/ventas" },
-      { icon: Users, label: "Directorio de Clientes", href: "/clientes" },
-      { icon: UserPlus, label: "Registrar Cliente", href: "/crear-cliente" },
-      { icon: CreditCard, label: "Gestión de Créditos", href: "/creditos" },
+      {
+        icon: ShoppingBag,
+        label: "Nueva Venta",
+        href: "/marcas-gt/hacer-ventas",
+      },
+      {
+        icon: ClipboardList,
+        label: "Historial de Ventas",
+        href: "/marcas-gt/ventas",
+      },
+      {
+        icon: Users,
+        label: "Directorio de Clientes",
+        href: "/marcas-gt/clientes",
+      },
+      {
+        icon: UserPlus,
+        label: "Registrar Cliente",
+        href: "/marcas-gt/crear-cliente",
+      },
+      {
+        icon: CreditCard,
+        label: "Gestión de Créditos",
+        href: "/marcas-gt/creditos",
+      },
     ],
   },
   {
@@ -76,51 +100,83 @@ const adminGroups = [
       {
         icon: Calendar,
         label: "Registro de Prospectos",
-        href: "/historial-prospectos",
+        href: "/marcas-gt/historial-prospectos",
       },
       {
         icon: MapPin,
         label: "Registro de Visitas",
-        href: "/historial-visitas",
+        href: "/marcas-gt/historial-visitas",
       },
-      { icon: CalendarPlus, label: "Programar Visita", href: "/visita" },
-      { icon: UserPlus2, label: "Nuevo Prospecto", href: "/prospecto" },
+      {
+        icon: CalendarPlus,
+        label: "Programar Visita",
+        href: "/marcas-gt/visita",
+      },
+      {
+        icon: UserPlus2,
+        label: "Nuevo Prospecto",
+        href: "/marcas-gt/prospecto",
+      },
     ],
   },
   {
     label: "Empleados",
     items: [
-      { icon: UserCog, label: "Administración de Usuarios", href: "/usuarios" },
-      { icon: MapPinned, label: "Ubicación de Empleados", href: "/empleados" },
+      {
+        icon: UserCog,
+        label: "Administración de Usuarios",
+        href: "/marcas-gt/usuarios",
+      },
+      {
+        icon: MapPinned,
+        label: "Ubicación de Empleados",
+        href: "/marcas-gt/empleados",
+      },
       {
         icon: FileClock,
         label: "Control de Asistencia",
-        href: "/historial-empleados-check",
+        href: "/marcas-gt/historial-empleados-check",
       },
       {
         icon: Clock,
         label: "Registro de Jornada",
-        href: "/registrar-entrada-salida",
+        href: "/marcas-gt/registrar-entrada-salida",
       },
     ],
   },
   {
     label: "Inventario",
     items: [
-      { icon: Boxes, label: "Catálogo de Productos", href: "/ver-productos" },
-      { icon: PackagePlus, label: "Nuevo Producto", href: "/crear-productos" },
+      {
+        icon: Boxes,
+        label: "Catálogo de Productos",
+        href: "/marcas-gt/ver-productos",
+      },
+      {
+        icon: PackagePlus,
+        label: "Nuevo Producto",
+        href: "/marcas-gt/crear-productos",
+      },
       {
         icon: Tags,
         label: "Categorías de Productos",
-        href: "/crear-categoria",
+        href: "/marcas-gt/crear-categoria",
       },
       {
         icon: BarChart3,
         label: "Control de Inventario",
-        href: "/asignar-stock",
+        href: "/marcas-gt/asignar-stock",
       },
-      { icon: Truck, label: "Directorio de Proveedores", href: "/proveedor" },
-      { icon: Box, label: "Registro de Entregas", href: "/registro-entregas" },
+      {
+        icon: Truck,
+        label: "Directorio de Proveedores",
+        href: "/marcas-gt/proveedor",
+      },
+      {
+        icon: Box,
+        label: "Registro de Entregas",
+        href: "/marcas-gt/registro-entregas",
+      },
     ],
   },
   {
@@ -129,24 +185,32 @@ const adminGroups = [
       {
         icon: Building2,
         label: "Información Corporativa",
-        href: "/empresa-info",
+        href: "/marcas-gt/empresa-info",
       },
     ],
   },
 ];
 
 const vendedorRoutes = [
-  { icon: Home, label: "Inicio del Empleado", href: "/dashboard-empleado" },
-  { icon: ShoppingBag, label: "Realizar Venta", href: "/hacer-ventas" },
-  { icon: Users, label: "Gestión de Clientes", href: "/clientes" },
+  {
+    icon: Home,
+    label: "Inicio del Empleado",
+    href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: ShoppingBag,
+    label: "Realizar Venta",
+    href: "/marcas-gt/hacer-ventas",
+  },
+  { icon: Users, label: "Gestión de Clientes", href: "/marcas-gt/clientes" },
   {
     icon: CheckSquare,
     label: "Registro de Entrada/Salida",
-    href: "/registrar-entrada-salida",
+    href: "/marcas-gt/registrar-entrada-salida",
   },
-  { icon: MapPin, label: "Registrar Visita", href: "/visita" },
-  { icon: Star, label: "Registrar Prospecto", href: "/prospecto" },
-  { icon: ShoppingCart, label: "Mis Ventas", href: "/mis-ventas" },
+  { icon: MapPin, label: "Registrar Visita", href: "/marcas-gt/visita" },
+  { icon: Star, label: "Registrar Prospecto", href: "/marcas-gt/prospecto" },
+  { icon: ShoppingCart, label: "Mis Ventas", href: "/marcas-gt/mis-ventas" },
 ];
 
 export function AppSidebar() {

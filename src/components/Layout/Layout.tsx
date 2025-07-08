@@ -129,46 +129,82 @@ export default function Layout({ children }: LayoutProps) {
 
   const menuItems = [
     // { icon: Home, label: "Home", href: "/" },
-    { icon: ShoppingBag, label: "Hacer venta", href: "/hacer-ventas" },
-    { icon: Users, label: "Clientes", href: "/clientes" },
-    { icon: UserPlus, label: "Añadir cliente", href: "/crear-cliente" },
-    { icon: ShoppingCart, label: "Historial Ventas", href: "/ventas" },
-    { icon: FileText, label: "Historial Prospectos", href: "/historial-citas" },
+    {
+      icon: ShoppingBag,
+      label: "Hacer venta",
+      href: "/marcas-gt/hacer-ventas",
+    },
+    { icon: Users, label: "Clientes", href: "/marcas-gt/clientes" },
+    {
+      icon: UserPlus,
+      label: "Añadir cliente",
+      href: "/marcas-gt/crear-cliente",
+    },
+    {
+      icon: ShoppingCart,
+      label: "Historial Ventas",
+      href: "/marcas-gt/ventas",
+    },
+    {
+      icon: FileText,
+      label: "Historial Prospectos",
+      href: "/marcas-gt/historial-citas",
+    },
     {
       icon: ClipboardList,
       label: "Historial Visitas",
-      href: "/historial-visitas",
+      href: "/marcas-gt/historial-visitas",
     },
 
-    { icon: UserCheck, label: "Usuarios", href: "/usuarios" },
-    { icon: User, label: "Empleados", href: "/empleados" },
+    { icon: UserCheck, label: "Usuarios", href: "/marcas-gt/usuarios" },
+    { icon: User, label: "Empleados", href: "/marcas-gt/empleados" },
     {
       icon: ListCheck,
       label: "Check Empleados",
-      href: "/historial-empleados-check",
+      href: "/marcas-gt/historial-empleados-check",
     },
-    { icon: CheckSquare, label: "Check", href: "/registrar-entrada-salida" },
-    { icon: Shirt, label: "Productos", href: "/ver-productos" },
-    { icon: PlusSquare, label: "Crear productos", href: "/crear-productos" },
-    { icon: Grid, label: "Inventario", href: "/asignar-stock" },
-    { icon: Tags, label: "Categorias", href: "/crear-categoria" },
-    { icon: Package, label: "Proveedores", href: "/crear-proveedor" },
-    { icon: Box, label: "Registro de entregas", href: "/registro-entregas" },
-    { icon: MapPin, label: "Visita", href: "/visita" },
-    { icon: FileText, label: "Prospecto", href: "/prospecto" },
+    {
+      icon: CheckSquare,
+      label: "Check",
+      href: "/marcas-gt/registrar-entrada-salida",
+    },
+    { icon: Shirt, label: "Productos", href: "/marcas-gt/ver-productos" },
+    {
+      icon: PlusSquare,
+      label: "Crear productos",
+      href: "/marcas-gt/crear-productos",
+    },
+    { icon: Grid, label: "Inventario", href: "/marcas-gt/asignar-stock" },
+    { icon: Tags, label: "Categorias", href: "/marcas-gt/crear-categoria" },
+    { icon: Package, label: "Proveedores", href: "/marcas-gt/crear-proveedor" },
+    {
+      icon: Box,
+      label: "Registro de entregas",
+      href: "/marcas-gt/registro-entregas",
+    },
+    { icon: MapPin, label: "Visita", href: "/marcas-gt/visita" },
+    { icon: FileText, label: "Prospecto", href: "/marcas-gt/prospecto" },
   ];
 
   const vendedorMenuItems = [
-    { icon: Home, label: "Dashboard", href: "/dashboard-empleado" },
+    { icon: Home, label: "Dashboard", href: "/marcas-gt/dashboard-empleado" },
 
-    { icon: ShoppingBag, label: "Hacer venta", href: "/hacer-ventas" },
-    { icon: Users, label: "Clientes", href: "/clientes" },
-    { icon: CheckSquare, label: "Check", href: "/registrar-entrada-salida" },
+    {
+      icon: ShoppingBag,
+      label: "Hacer venta",
+      href: "/marcas-gt/hacer-ventas",
+    },
+    { icon: Users, label: "Clientes", href: "/marcas-gt/clientes" },
+    {
+      icon: CheckSquare,
+      label: "Check",
+      href: "/marcas-gt/registrar-entrada-salida",
+    },
 
     // { icon: UserPlus, label: "Añadir cliente", href: "/crear-cliente" },
-    { icon: MapPin, label: "Visita", href: "/visita" },
-    { icon: FileText, label: "Prospecto", href: "/prospecto" },
-    { icon: ShoppingCart, label: "Mis Ventas", href: "/mis-ventas" },
+    { icon: MapPin, label: "Visita", href: "/marcas-gt/visita" },
+    { icon: FileText, label: "Prospecto", href: "/marcas-gt/prospecto" },
+    { icon: ShoppingCart, label: "Mis Ventas", href: "/marcas-gt/mis-ventas" },
   ];
 
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);

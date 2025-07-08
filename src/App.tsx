@@ -62,16 +62,16 @@ function App() {
 
         <Routes>
           {/* Redirecciona a dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/" element={<Navigate to="/marcas-gt/dashboard" />} />
 
           {/* Rutas no protegidas */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<CreateUser />} />
+          <Route path="/marcas-gt/login" element={<Login />} />
+          <Route path="/marcas-gt/register" element={<CreateUser />} />
 
           {/* Rutas protegidas con Layout */}
           <Route element={<Layout2 />}>
             <Route
-              path="/dashboard"
+              path="/marcas-gt/dashboard"
               element={
                 <ProtectedRouteAdmin>
                   <Dashboard />
@@ -80,7 +80,7 @@ function App() {
             />
 
             <Route
-              path="/dashboard-empleado"
+              path="/marcas-gt/dashboard-empleado"
               element={
                 <ProtectedRoute>
                   <DashboardEmp />
@@ -89,7 +89,7 @@ function App() {
             />
 
             <Route
-              path="/clientes"
+              path="/marcas-gt/clientes"
               element={
                 <ProtectedRoute>
                   <Customers />
@@ -97,7 +97,7 @@ function App() {
               }
             />
             <Route
-              path="/usuarios"
+              path="/marcas-gt/usuarios"
               element={
                 <ProtectedRouteAdmin>
                   <Users />
@@ -105,7 +105,7 @@ function App() {
               }
             />
             <Route
-              path="/ventas"
+              path="/marcas-gt/ventas"
               element={
                 <ProtectedRouteAdmin>
                   <Sales />
@@ -113,7 +113,7 @@ function App() {
               }
             />
             <Route
-              path="/comprobante-venta"
+              path="/marcas-gt/comprobante-venta"
               element={
                 <ProtectedRoute>
                   <PdfPage />
@@ -122,7 +122,7 @@ function App() {
             />
 
             <Route
-              path="/empleados"
+              path="/marcas-gt/empleados"
               element={
                 <ProtectedRouteAdmin>
                   <Employees />
@@ -130,7 +130,7 @@ function App() {
               }
             />
             <Route
-              path="/historial-prospectos"
+              path="/marcas-gt/historial-prospectos"
               element={
                 <ProtectedRouteAdmin>
                   <ProspectoHistorial />
@@ -138,7 +138,7 @@ function App() {
               }
             />
             <Route
-              path="/historial-empleados-check"
+              path="/marcas-gt/historial-empleados-check"
               element={
                 <ProtectedRouteAdmin>
                   <SellerHistory />
@@ -146,7 +146,7 @@ function App() {
               }
             />
             <Route
-              path="/crear-productos"
+              path="/marcas-gt/crear-productos"
               element={
                 <ProtectedRouteAdmin>
                   <CreateProduct />
@@ -154,7 +154,7 @@ function App() {
               }
             />
             <Route
-              path="/asignar-stock"
+              path="/marcas-gt/asignar-stock"
               element={
                 <ProtectedRouteAdmin>
                   <StockPage />
@@ -162,7 +162,7 @@ function App() {
               }
             />
             <Route
-              path="/ver-productos"
+              path="/marcas-gt/ver-productos"
               element={
                 <ProtectedRouteAdmin>
                   <ViewProducts />
@@ -170,7 +170,7 @@ function App() {
               }
             />
             <Route
-              path="/hacer-ventas"
+              path="/marcas-gt/hacer-ventas"
               element={
                 <ProtectedRoute>
                   <MakeSale />
@@ -178,7 +178,7 @@ function App() {
               }
             />
             <Route
-              path="/historial-ventas"
+              path="/marcas-gt/historial-ventas"
               element={
                 <ProtectedRoute>
                   <HistorialVentas />
@@ -186,7 +186,7 @@ function App() {
               }
             />
             <Route
-              path="/registrar-entrada-salida"
+              path="/marcas-gt/registrar-entrada-salida"
               element={
                 <ProtectedRoute>
                   <CheckInCheckOut />
@@ -194,7 +194,7 @@ function App() {
               }
             />
             <Route
-              path="/crear-categoria"
+              path="/marcas-gt/crear-categoria"
               element={
                 <ProtectedRouteAdmin>
                   <CrearCategoria />
@@ -202,7 +202,7 @@ function App() {
               }
             />
             <Route
-              path="/proveedor"
+              path="/marcas-gt/proveedor"
               element={
                 <ProtectedRouteAdmin>
                   <CrearProveedor />
@@ -210,7 +210,7 @@ function App() {
               }
             />
             <Route
-              path="/crear-cliente"
+              path="/marcas-gt/crear-cliente"
               element={
                 <ProtectedRoute>
                   <CreateClient />
@@ -218,7 +218,7 @@ function App() {
               }
             />
             <Route
-              path="/registro-entregas"
+              path="/marcas-gt/registro-entregas"
               element={
                 <ProtectedRouteAdmin>
                   <StockDeliveryRecords />
@@ -227,7 +227,7 @@ function App() {
             />
 
             <Route
-              path="/prospecto"
+              path="/marcas-gt/prospecto"
               element={
                 <ProtectedRoute>
                   <ProspectoFormulario />
@@ -235,7 +235,7 @@ function App() {
               }
             />
             <Route
-              path="/prospecto-ubicacion"
+              path="/marcas-gt/prospecto-ubicacion"
               element={
                 <ProtectedRoute>
                   <ProspectoUbicacion />
@@ -251,7 +251,7 @@ function App() {
               }
             /> */}
             <Route
-              path="/editar-cliente/:id"
+              path="/marcas-gt/editar-cliente/:id"
               element={
                 <ProtectedRoute>
                   <EditCustomer />
@@ -260,7 +260,7 @@ function App() {
             />
 
             <Route
-              path="/mis-ventas"
+              path="/marcas-gt/mis-ventas"
               element={
                 <ProtectedRoute>
                   <MySales />
@@ -269,7 +269,7 @@ function App() {
             />
 
             <Route
-              path="/visita"
+              path="/marcas-gt/visita"
               element={
                 <ProtectedRoute>
                   <RegistroVisita />
@@ -278,7 +278,7 @@ function App() {
             />
 
             <Route
-              path="/historial-visitas"
+              path="/marcas-gt/historial-visitas"
               element={
                 <ProtectedRouteAdmin>
                   <VisitasTable />
@@ -287,7 +287,7 @@ function App() {
             />
 
             <Route
-              path="/historial-cliente-ventas/:id"
+              path="/marcas-gt/historial-cliente-ventas/:id"
               element={
                 <ProtectedRoute>
                   <CustomerSales />
@@ -296,7 +296,7 @@ function App() {
             />
 
             <Route
-              path="/comprobante-venta/:id"
+              path="/marcas-gt/comprobante-venta/:id"
               element={
                 <ProtectedRoute>
                   <VentaPdfPage />
@@ -305,7 +305,7 @@ function App() {
             />
 
             <Route
-              path="/empresa-info"
+              path="/marcas-gt/empresa-info"
               element={
                 <ProtectedRouteAdmin>
                   <EmpresaForm />
@@ -314,7 +314,7 @@ function App() {
             />
 
             <Route
-              path="/analisis"
+              path="/marcas-gt/analisis"
               element={
                 <ProtectedRouteAdmin>
                   <ChatsAnalytics />
@@ -323,7 +323,7 @@ function App() {
             />
 
             <Route
-              path="/reportes"
+              path="/marcas-gt/reportes"
               element={
                 <ProtectedRouteAdmin>
                   <Reportes />
@@ -341,7 +341,7 @@ function App() {
             /> */}
 
             <Route
-              path="/restablecer-contraseña"
+              path="/marcas-gt/restablecer-contraseña"
               element={
                 <ProtectedRoute>
                   <RestablecerContrasena />
@@ -350,7 +350,7 @@ function App() {
             />
 
             <Route
-              path="/saldos"
+              path="/marcas-gt/saldos"
               element={
                 <ProtectedRouteAdmin>
                   <Saldos />
@@ -359,7 +359,7 @@ function App() {
             />
 
             <Route
-              path="/comprobante-pago/:id"
+              path="/marcas-gt/comprobante-pago/:id"
               element={
                 <ProtectedRoute>
                   <PaymentCreditPage />
@@ -368,7 +368,7 @@ function App() {
             />
 
             <Route
-              path="/creditos"
+              path="/marcas-gt/creditos"
               element={
                 <ProtectedRouteAdmin>
                   <Creditos />
@@ -377,7 +377,7 @@ function App() {
             />
 
             <Route
-              path="/seguimiento-de-cancelaciones"
+              path="/marcas-gt/seguimiento-de-cancelaciones"
               element={
                 <ProtectedRoute>
                   <Cancelados />
