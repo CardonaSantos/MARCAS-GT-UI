@@ -80,7 +80,7 @@ export default function Layout2({ children }: LayoutProps) {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
-    window.location.href = "/login";
+    window.location.href = "/marcas-gt/login";
   };
 
   useEffect(() => {
