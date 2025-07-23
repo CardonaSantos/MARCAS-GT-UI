@@ -620,7 +620,7 @@ function Sales() {
                           </Dialog>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Link to={`/comprobante-venta/${venta.id}`}>
+                          <Link to={`/marcas-gt/comprobante-venta/${venta.id}`}>
                             <Button variant="outline">
                               <FileSpreadsheet className="w-4 h-4" />
                             </Button>
