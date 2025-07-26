@@ -1721,7 +1721,7 @@ export default function MakeSale() {
               <X className="mr-2 h-4 w-4" />
               Cerrar
             </Button>
-            <Link to={`/comprobante-venta/${saleMade?.id}`}>
+            <Link to={`/marcas-gt/comprobante-venta/${saleMade?.id}`}>
               <Button
                 variant="default"
                 className="inline-flex items-center w-full"
