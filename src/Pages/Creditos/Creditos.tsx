@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +44,6 @@ import {
   CreditCard,
   DeleteIcon,
   Eye,
-  FileText,
   MapPin,
   MessageSquare,
   Percent,
@@ -50,11 +51,13 @@ import {
   Search,
   Trash2,
   User,
+  Clock,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import type React from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
-
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import utc from "dayjs/plugin/utc";
@@ -77,13 +80,7 @@ dayjs.extend(utc);
 dayjs.extend(localizedFormat);
 dayjs.locale("es");
 
-const formatearFecha = (fecha: string) => {
-  // Formateo en UTC sin conversión a local
-  return dayjs(fecha).format("DD/MM/YYYY hh:mm A");
-};
-
-//TIPOS PARA LOS REGISTROS DE CREDITOS
-// Tipos
+// TIPOS
 type ClienteCredito = {
   id: number;
   nombre: string;
@@ -108,6 +105,15 @@ type VentaCredito = {
   vendedor: VendedorCredito;
 };
 
+type CuotaCredito = {
+  id: number;
+  montoEsperado: number;
+  montoPagado: number;
+  estado: "PENDIENTE" | "PAGADA" | "ATRASADA";
+  fechaVencimiento: string;
+  fechaPago: string | null;
+};
+
 type Credito = {
   id: number;
   ventaId: number;
@@ -123,6 +129,7 @@ type Credito = {
   montoTotalConInteres: number;
   saldoPendiente: number;
   fechaInicio: string;
+  diasEntrePagos: number;
   fechaContrato: string;
   dpi: string;
   testigos: Record<string, unknown>;
@@ -130,48 +137,104 @@ type Credito = {
   createdAt: string;
   updatedAt: string;
   cliente: ClienteCredito;
-  pagos: PagoCredito[];
+  cuotasCredito: CuotaCredito[];
   venta: VentaCredito;
-};
-
-type PagoCredito = {
-  id: number;
-  creditoId: number;
-  monto: number;
-  timestamp: string;
-  metodoPago: string;
 };
 
 type MetodoPago = "CONTADO" | "TARJETA" | "TRANSFERENCIA";
 
-interface nuevoPago {
+interface NuevoPago {
   creditoId: number | undefined;
+  cuotaId: number | undefined;
   monto: number | undefined;
   metodoPago: MetodoPago;
   ventaId: number | undefined;
 }
 
+// ESTADO INICIAL
+const initialPaymentState: NuevoPago = {
+  creditoId: undefined,
+  cuotaId: undefined,
+  monto: 0,
+  metodoPago: "CONTADO",
+  ventaId: undefined,
+};
+
 function Creditos() {
   const userId = useStore((state) => state.userId) ?? 0;
   const empresaId = useStore((state) => state.sucursalId) ?? 0;
+
+  // Estados principales
   const [creditos, setCreditos] = useState<Credito[]>([]);
-  const [passwordToDeletePayment, setPasswordToDeletePayment] = useState("");
-  const [openDeletePayment, setOpenDeletePayment] = useState(false);
-  const [pagoId, setPagoId] = useState(0);
   const [selectedCredit, setSelectedCredit] = useState<Credito | null>(null);
+  const [selectedCuota, setSelectedCuota] = useState<CuotaCredito | null>(null);
+
+  // Estados de diálogos
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-  const [newPayment, setNewPayment] = useState<nuevoPago>({
-    creditoId: selectedCredit?.id,
-    monto: 0,
-    metodoPago: "CONTADO",
-    ventaId: 0,
-  });
-  const [openDeletCredit, setOpenDeletCredit] = useState(false);
-  const [adminPassword, setAdminPasssword] = useState("");
-  const [creditIdToDelete, setCreditIdToDelete] = useState(0);
+  const [openDeleteCredit, setOpenDeleteCredit] = useState(false);
+  const [openDeletePayment, setOpenDeletePayment] = useState(false);
 
-  const getCreditos = async () => {
+  // Estados de formularios
+  const [newPayment, setNewPayment] = useState<NuevoPago>(initialPaymentState);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [passwordToDeletePayment, setPasswordToDeletePayment] = useState("");
+  const [creditIdToDelete, setCreditIdToDelete] = useState(0);
+  const [cuotaIdToDelete, setCuotaIdToDelete] = useState(0);
+
+  // Estados de filtros y paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [filtroVenta, setFiltroVenta] = useState("");
+
+  const itemsPerPage = 25;
+
+  // FUNCIONES AUXILIARES
+  const formatearFecha = (fecha: string) => {
+    return dayjs(fecha).format("DD/MM/YYYY hh:mm A");
+  };
+
+  const formatearMoneda = (cantidad: number) => {
+    return new Intl.NumberFormat("es-GT", {
+      style: "currency",
+      currency: "GTQ",
+    }).format(cantidad);
+  };
+
+  const isCuotaVencida = (fechaVencimiento: string, estado: string) => {
+    if (estado === "PAGADA") return false;
+    return dayjs().isAfter(dayjs(fechaVencimiento));
+  };
+
+  const getEstadoIcon = (estado: string) => {
+    switch (estado) {
+      case "PAGADA":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "ATRASADA":
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case "PENDIENTE":
+        return <Clock className="h-4 w-4 text-yellow-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getEstadoBadgeVariant = (estado: string) => {
+    switch (estado) {
+      case "PAGADA":
+        return "default";
+      case "ATRASADA":
+        return "destructive";
+      case "PENDIENTE":
+        return "secondary";
+      default:
+        return "outline";
+    }
+  };
+
+  // FUNCIONES DE DATOS
+  const getCreditos = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/credito`);
       if (response.status === 200) {
@@ -179,45 +242,77 @@ function Creditos() {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Error al conseguir creditos");
+      toast.error("Error al conseguir créditos");
     }
-  };
-
-  useEffect(() => {
-    getCreditos();
   }, []);
-  // Función para abrir el diálogo de detalles
-  const openDetailDialog = (credito: Credito) => {
+
+  // FUNCIONES DE DIÁLOGOS
+  const resetDialogStates = useCallback(() => {
+    setNewPayment(initialPaymentState);
+    setSelectedCuota(null);
+    setAdminPassword("");
+    setPasswordToDeletePayment("");
+    setCreditIdToDelete(0);
+    setCuotaIdToDelete(0);
+  }, []);
+
+  const openDetailDialog = useCallback((credito: Credito) => {
     setSelectedCredit(credito);
     setIsDetailOpen(true);
-  };
-  // Función para abrir el diálogo de pago
-  const openPaymentDialog = () => {
-    if (selectedCredit) {
+  }, []);
+
+  const closeDetailDialog = useCallback(() => {
+    setIsDetailOpen(false);
+    setSelectedCredit(null);
+    resetDialogStates();
+  }, [resetDialogStates]);
+
+  const openPaymentDialog = useCallback(
+    (cuota?: CuotaCredito) => {
+      if (!selectedCredit) return;
+
+      const cuotaAPagar =
+        cuota ||
+        selectedCredit.cuotasCredito.find((c) => c.estado === "PENDIENTE");
+
+      if (!cuotaAPagar) {
+        toast.info("No hay cuotas pendientes para pagar");
+        return;
+      }
+
+      setSelectedCuota(cuotaAPagar);
       setNewPayment({
         creditoId: selectedCredit.id,
-        monto: 0,
+        cuotaId: cuotaAPagar.id,
+        monto: cuotaAPagar.montoEsperado - cuotaAPagar.montoPagado,
         metodoPago: "CONTADO",
         ventaId: selectedCredit.ventaId,
       });
       setIsDetailOpen(false);
-
       setIsPaymentOpen(true);
-    }
-  };
+    },
+    [selectedCredit]
+  );
 
-  // Función para manejar el registro de pago
+  const closePaymentDialog = useCallback(() => {
+    setIsPaymentOpen(false);
+    resetDialogStates();
+    if (selectedCredit) {
+      setIsDetailOpen(true);
+    }
+  }, [selectedCredit, resetDialogStates]);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // FUNCIONES DE OPERACIONES CRUD
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica para registrar el pago en el backend
-    console.log("Nuevo pago:", newPayment);
-    // setIsPaymentOpen(false);
 
     if (
       !empresaId ||
       !newPayment.monto ||
       newPayment.monto <= 0 ||
-      !newPayment.metodoPago
+      !newPayment.metodoPago ||
+      !newPayment.cuotaId
     ) {
       toast.info("Faltan datos para el registro, intente de nuevo");
       return;
@@ -229,13 +324,13 @@ function Creditos() {
         monto: newPayment.monto,
         metodoPago: newPayment.metodoPago,
         creditoId: newPayment.creditoId,
+        cuotaId: newPayment.cuotaId,
         ventaId: newPayment.ventaId,
       });
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("Pago registrado");
-        getCreditos();
-        setIsPaymentOpen(false);
+        toast.success("Pago registrado correctamente");
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);
@@ -243,14 +338,13 @@ function Creditos() {
     }
   };
 
-  const formatearMoneda = (cantidad: number) => {
-    return new Intl.NumberFormat("es-GT", {
-      style: "currency",
-      currency: "GTQ",
-    }).format(cantidad);
-  };
-
   const handleDeleteCredit = async () => {
+    if (!adminPassword.trim()) {
+      toast.info("Ingrese la contraseña de administrador");
+      return;
+    }
+    setIsLoading(true);
+
     try {
       const response = await axios.post(
         `${API_URL}/credito/delete-credito-regist`,
@@ -263,90 +357,82 @@ function Creditos() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("Registro de credito eliminado");
-        setOpenDeletCredit(false);
-        setAdminPasssword("");
-        getCreditos();
+        toast.success("Registro de crédito eliminado");
+
+        // Recargar todos los créditos
+        await getCreditos();
+
+        // Cerrar diálogos y resetear estados
+        setOpenDeleteCredit(false);
+        closeDetailDialog();
       }
     } catch (error) {
       console.log(error);
-      toast.error("Error al registrar eliminación");
+      toast.error("Error al eliminar el crédito");
     }
   };
 
   const handleDeletePaymentRegist = async () => {
-    try {
-      if (!userId || !passwordToDeletePayment || !pagoId || !empresaId) {
-        toast.info("Faltand datos, intente de nuevo");
-        return;
-      }
+    if (!userId || !passwordToDeletePayment || !cuotaIdToDelete || !empresaId) {
+      toast.info("Faltan datos, intente de nuevo");
+      return;
+    }
 
+    try {
       const response = await axios.post(
         `${API_URL}/credito/delete-payment-regist`,
         {
           userId: userId,
           password: passwordToDeletePayment,
-          creditoId: pagoId,
+          cuotaId: cuotaIdToDelete,
           empresaId: empresaId,
+          creditoId: selectedCredit?.id ?? 0,
         }
       );
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Pago eliminado correctamente");
-        setOpenDeletePayment(false);
-        setPasswordToDeletePayment("");
-        setIsDetailOpen(false);
-        setSelectedCredit(null);
-        getCreditos();
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);
       toast.error("Error al eliminar pago");
     }
   };
-  //===============>
-  console.log("Los creditos del recurso son: ", creditos);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const [filtroVenta, setFiltroVenta] = useState("");
+  // EFECTOS
+  useEffect(() => {
+    getCreditos();
+  }, [getCreditos]);
 
-  const ventasFiltradas = creditos?.filter((venta) => {
-    const filtroNormalizado = filtroVenta.trim().toLocaleLowerCase();
-    const nombreCompleto = `${venta.cliente.nombre || ""} ${
-      venta.cliente.apellido || ""
+  // FILTROS Y PAGINACIÓN
+  const ventasFiltradas = creditos?.filter((credito) => {
+    const filtroNormalizado = filtroVenta.trim().toLowerCase();
+    const nombreCompleto = `${credito.cliente.nombre || ""} ${
+      credito.cliente.apellido || ""
     }`
       .trim()
-      .toLocaleLowerCase();
+      .toLowerCase();
 
     const cumpleTexto =
       nombreCompleto.includes(filtroNormalizado) ||
-      venta.cliente.telefono?.toLocaleLowerCase().includes(filtroNormalizado) ||
-      //   venta.cliente.correo?.toLocaleLowerCase().includes(filtroNormalizado) ||
-      venta.cliente.direccion
-        ?.toLocaleLowerCase()
-        .includes(filtroNormalizado) ||
-      venta.id.toString().includes(filtroNormalizado);
+      credito.cliente.telefono?.toLowerCase().includes(filtroNormalizado) ||
+      credito.cliente.direccion?.toLowerCase().includes(filtroNormalizado) ||
+      credito.id.toString().includes(filtroNormalizado);
 
     const cumpleFechas =
-      (!startDate || new Date(venta.fechaContrato) >= startDate) &&
-      (!endDate || new Date(venta.fechaContrato) <= endDate);
+      (!startDate || new Date(credito.fechaContrato) >= startDate) &&
+      (!endDate || new Date(credito.fechaContrato) <= endDate);
 
     return cumpleTexto && cumpleFechas;
   });
 
-  // PAGINACIÓN
   const totalPages = Math.ceil((ventasFiltradas?.length || 0) / itemsPerPage);
-  // Calcular el índice del último elemento de la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
-  // Calcular el índice del primer elemento de la página actual
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // Obtener los elementos de la página actual
   const currentItems =
     ventasFiltradas && ventasFiltradas.slice(indexOfFirstItem, indexOfLastItem);
-  // Cambiar de página
+
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -362,6 +448,8 @@ function Creditos() {
                 <h1 className="text-2xl font-bold">Gestión de Créditos</h1>
               </div>
             </CardHeader>
+
+            {/* Filtros */}
             <div className="bg-muted p-4 rounded-lg mb-4 shadow-lg">
               <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <div className="flex-1 relative">
@@ -372,18 +460,17 @@ function Creditos() {
                   <Input
                     id="search-sales"
                     type="search"
-                    placeholder="Buscar ventas..."
+                    placeholder="Buscar créditos..."
                     value={filtroVenta}
                     onChange={(e) => setFiltroVenta(e.target.value)}
                     className="w-full pl-10"
-                    aria-label="Buscar ventas"
+                    aria-label="Buscar créditos"
                   />
                 </div>
-
                 <div className="flex items-center gap-4">
                   <DatePicker
                     locale="es"
-                    selected={startDate || undefined} // Convierte null a undefined
+                    selected={startDate || undefined}
                     onChange={(date) => setStartDate(date)}
                     selectsStart
                     startDate={startDate || undefined}
@@ -395,7 +482,7 @@ function Creditos() {
                   <DatePicker
                     locale="es"
                     isClearable
-                    selected={endDate || undefined} // Convierte null a undefined
+                    selected={endDate || undefined}
                     onChange={(date) => setEndDate(date)}
                     selectsEnd
                     startDate={startDate || undefined}
@@ -408,6 +495,7 @@ function Creditos() {
               </div>
             </div>
 
+            {/* Tabla de Créditos */}
             <Table>
               <TableHeader>
                 <TableRow>
@@ -415,10 +503,10 @@ function Creditos() {
                   <TableHead>Cliente</TableHead>
                   <TableHead>Monto Total</TableHead>
                   <TableHead>Saldo Pagado</TableHead>
-
                   <TableHead>Saldo Pendiente</TableHead>
+                  <TableHead>Cuotas</TableHead>
+                  <TableHead>Próximo Vencimiento</TableHead>
                   <TableHead>Fecha de Registro</TableHead>
-
                   <TableHead>Estado</TableHead>
                   <TableHead>Acciones</TableHead>
                   <TableHead>Eliminar</TableHead>
@@ -426,51 +514,109 @@ function Creditos() {
               </TableHeader>
               <TableBody>
                 {currentItems &&
-                  currentItems.map((credito) => (
-                    <TableRow key={credito.id}>
-                      <TableCell>{credito.id}</TableCell>
-                      <TableCell>{`${credito.cliente.nombre} ${credito.cliente.apellido}`}</TableCell>
-                      <TableCell>
-                        {formatearMoneda(credito.montoTotalConInteres)}
-                      </TableCell>
-                      <TableCell>
-                        {formatearMoneda(credito.totalPagado)}
-                      </TableCell>
+                  currentItems.map((credito) => {
+                    const cuotasPagadas = credito.cuotasCredito.filter(
+                      (cuota) => cuota.estado === "PAGADA"
+                    ).length;
+                    const proximaCuota = credito.cuotasCredito.find(
+                      (c) => c.estado === "PENDIENTE"
+                    );
+                    const tieneVencidas = credito.cuotasCredito.some(
+                      (c) =>
+                        c.estado === "PENDIENTE" &&
+                        isCuotaVencida(c.fechaVencimiento, c.estado)
+                    );
 
-                      <TableCell>
-                        {formatearMoneda(credito.saldoPendiente)}
-                      </TableCell>
-                      <TableCell>
-                        {formatearFecha(credito.fechaContrato)}
-                      </TableCell>
-
-                      <TableCell>{credito.estado}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => openDetailDialog(credito)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => {
-                            setOpenDeletCredit(true);
-                            setCreditIdToDelete(credito.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                    return (
+                      <TableRow key={credito.id}>
+                        <TableCell>{credito.id}</TableCell>
+                        <TableCell>{`${credito.cliente.nombre} ${credito.cliente.apellido}`}</TableCell>
+                        <TableCell>
+                          {formatearMoneda(credito.montoTotalConInteres)}
+                        </TableCell>
+                        <TableCell>
+                          {formatearMoneda(credito.totalPagado)}
+                        </TableCell>
+                        <TableCell>
+                          {formatearMoneda(credito.saldoPendiente)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {cuotasPagadas} / {credito.numeroCuotas}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {proximaCuota ? (
+                            <div className="flex items-center gap-1">
+                              {isCuotaVencida(
+                                proximaCuota.fechaVencimiento,
+                                proximaCuota.estado
+                              ) && <XCircle className="h-3 w-3 text-red-500" />}
+                              <span
+                                className={`text-xs ${
+                                  isCuotaVencida(
+                                    proximaCuota.fechaVencimiento,
+                                    proximaCuota.estado
+                                  )
+                                    ? "text-red-600 font-semibold"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                {dayjs(proximaCuota.fechaVencimiento).format(
+                                  "DD/MM/YYYY"
+                                )}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-green-600">
+                              Completado
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {formatearFecha(credito.fechaContrato)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              tieneVencidas
+                                ? "destructive"
+                                : credito.estado === "ACTIVO"
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {tieneVencidas ? "VENCIDO" : credito.estado}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => openDetailDialog(credito)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              setOpenDeleteCredit(true);
+                              setCreditIdToDelete(credito.id);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
               </TableBody>
             </Table>
+
+            {/* Paginación */}
             <CardFooter className="flex items-center justify-center py-4">
               <div>
                 <Pagination>
@@ -493,8 +639,6 @@ function Creditos() {
                         <ChevronLeft className="h-4 w-4" />
                       </PaginationPrevious>
                     </PaginationItem>
-
-                    {/* Sistema de truncado */}
                     {currentPage > 3 && (
                       <>
                         <PaginationItem>
@@ -507,7 +651,6 @@ function Creditos() {
                         </PaginationItem>
                       </>
                     )}
-
                     {Array.from({ length: totalPages }, (_, index) => {
                       const page = index + 1;
                       if (
@@ -527,7 +670,6 @@ function Creditos() {
                       }
                       return null;
                     })}
-
                     {currentPage < totalPages - 2 && (
                       <>
                         <PaginationItem>
@@ -542,7 +684,6 @@ function Creditos() {
                         </PaginationItem>
                       </>
                     )}
-
                     <PaginationItem>
                       <PaginationNext
                         onClick={() =>
@@ -554,7 +695,6 @@ function Creditos() {
                     </PaginationItem>
                     <PaginationItem>
                       <Button
-                        // variant={"destructive"}
                         onClick={() => onPageChange(totalPages)}
                         disabled={currentPage === totalPages}
                         variant={
@@ -571,24 +711,17 @@ function Creditos() {
           </CardContent>
         </Card>
 
-        <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-          <DialogContent
-            className="
-    sm:max-w-[425px] sm:max-h-[75vh] 
-    md:max-w-[600px] md:max-h-[65vh] 
-    lg:max-w-[700px] lg:max-h-[97vh] 
-    max-h-[90vh] w-full
-    overflow-auto
-  "
-          >
+        {/* Dialog de Detalles del Crédito */}
+        <Dialog open={isDetailOpen} onOpenChange={closeDetailDialog}>
+          <DialogContent className="sm:max-w-[90%] sm:max-h-[75vh] md:max-w-[90%] md:max-h-[65vh] lg:max-w-[90%] lg:max-h-[97vh] max-h-[90vh] w-full overflow-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold">
-                Detalles del Crédito
+                Detalles del Crédito #{selectedCredit?.id}
               </DialogTitle>
             </DialogHeader>
             {selectedCredit && (
               <div className="">
-                {/* LA PARTE DE ARRIBA */}
+                {/* Información del Cliente y Financiera */}
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <Card>
                     <CardContent className="pt-6">
@@ -602,7 +735,6 @@ function Creditos() {
                           {selectedCredit.cliente.apellido}
                         </p>
                       </div>
-
                       <div className="mb-2">
                         <h3 className="text-sm font-semibold mb-2 flex items-center">
                           <Phone className="mr-2 w-4 h-4" /> Teléfono
@@ -611,7 +743,6 @@ function Creditos() {
                           {selectedCredit.cliente.telefono}
                         </p>
                       </div>
-
                       <div className="mb-2">
                         <h3 className="text-sm font-semibold mb-2 flex items-center">
                           <MapPin className="mr-2 w-4 h-4" /> Dirección
@@ -654,22 +785,25 @@ function Creditos() {
                 </div>
 
                 <Separator className="my-4" />
+
                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <p className="text-sm">
                       <span className="font-medium">Fecha de Inicio:</span>{" "}
-                      {new Date(
-                        selectedCredit.fechaInicio
-                      ).toLocaleDateString()}
+                      {dayjs(selectedCredit.fechaInicio).format("DD/MM/YYYY")}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CreditCard className="h-4 w-4 text-muted-foreground" />
                     <p className="text-sm">
                       <span className="font-medium">Cuotas:</span>{" "}
-                      {selectedCredit.pagos.length} de{" "}
-                      {selectedCredit.numeroCuotas}
+                      {
+                        selectedCredit.cuotasCredito.filter(
+                          (c) => c.estado === "PAGADA"
+                        ).length
+                      }{" "}
+                      de {selectedCredit.numeroCuotas}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -686,9 +820,17 @@ function Creditos() {
                       {formatearMoneda(selectedCredit.cuotaInicial)}
                     </p>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm">
+                      <span className="font-medium">Días entre pagos:</span>{" "}
+                      {selectedCredit.diasEntrePagos}
+                    </p>
+                  </div>
                 </div>
 
                 <Separator className="my-4" />
+
                 <div className="space-y-2 mb-2">
                   <h3 className="text-lg font-semibold flex items-center">
                     <MessageSquare className="mr-2 w-4 h-4" /> Comentario
@@ -698,67 +840,133 @@ function Creditos() {
                   </p>
                 </div>
 
-                <div className="w-full overflow-x-auto ">
+                {/* Tabla de Cuotas */}
+                <div className="w-full overflow-x-auto">
                   <Table>
-                    <TableCaption>
-                      Una lista de los pagos recibidos
-                    </TableCaption>
+                    <TableCaption>Cuotas programadas del crédito</TableCaption>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[100px]">No.</TableHead>
-                        <TableHead>Monto</TableHead>
-                        <TableHead>Metodo</TableHead>
-                        <TableHead className="text-right">Fecha</TableHead>
-
-                        <TableHead>Comprobante</TableHead>
-
-                        <TableHead>Acción</TableHead>
+                        <TableHead className="w-[80px]">Cuota</TableHead>
+                        <TableHead>Monto Esperado</TableHead>
+                        <TableHead>Monto Pagado</TableHead>
+                        <TableHead>Saldo</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Fecha Vencimiento</TableHead>
+                        <TableHead>Fecha Pago</TableHead>
+                        <TableHead>Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {selectedCredit.pagos.map((credit) => (
-                        <TableRow>
-                          <TableCell className="font-medium">
-                            {credit.id}
-                          </TableCell>
-                          <TableCell>{formatearMoneda(credit.monto)}</TableCell>
-                          <TableCell>{credit.metodoPago}</TableCell>
-                          <TableCell className="text-[13px]">
-                            {formatearFecha(credit.timestamp)}
-                          </TableCell>
+                      {selectedCredit.cuotasCredito.map((cuota, index) => {
+                        const saldoPendiente =
+                          cuota.montoEsperado - cuota.montoPagado;
+                        const estaVencida = isCuotaVencida(
+                          cuota.fechaVencimiento,
+                          cuota.estado
+                        );
 
-                          <TableCell className="flex justify-center items-center">
-                            <Link to={`/comprobante-pago/${credit.id}`}>
-                              <Button type="button" variant={"ghost"}>
-                                <FileText />
-                              </Button>
-                            </Link>
-                          </TableCell>
-
-                          {/* AJUSTAR LA VISTA PARA CERRAR EL DIALOG AL ELIMINAR EL PAGO O ACTUALIZAR EL DIALOG */}
-                          <TableCell>
-                            <Button
-                              onClick={() => {
-                                setOpenDeletePayment(true);
-                                setPagoId(credit.id);
-                              }}
-                              type="button"
-                              variant={"ghost"}
-                            >
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                        return (
+                          <TableRow
+                            key={cuota.id}
+                            className={estaVencida ? "bg-red-50" : ""}
+                          >
+                            <TableCell className="font-medium">
+                              {index + 1}
+                            </TableCell>
+                            <TableCell>
+                              {formatearMoneda(cuota.montoEsperado)}
+                            </TableCell>
+                            <TableCell>
+                              {formatearMoneda(cuota.montoPagado)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  saldoPendiente > 0 ? "destructive" : "default"
+                                }
+                              >
+                                {formatearMoneda(saldoPendiente)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {getEstadoIcon(
+                                  estaVencida && cuota.estado === "PENDIENTE"
+                                    ? "ATRASADA"
+                                    : cuota.estado
+                                )}
+                                <Badge
+                                  variant={getEstadoBadgeVariant(
+                                    estaVencida && cuota.estado === "PENDIENTE"
+                                      ? "ATRASADA"
+                                      : cuota.estado
+                                  )}
+                                >
+                                  {estaVencida && cuota.estado === "PENDIENTE"
+                                    ? "ATRASADA"
+                                    : cuota.estado}
+                                </Badge>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-[13px]">
+                              <span
+                                className={
+                                  estaVencida
+                                    ? "text-red-600 font-semibold"
+                                    : ""
+                                }
+                              >
+                                {dayjs(cuota.fechaVencimiento).format(
+                                  "DD/MM/YYYY"
+                                )}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-[13px]">
+                              {cuota.fechaPago
+                                ? dayjs(cuota.fechaPago).format(
+                                    "DD/MM/YYYY HH:mm"
+                                  )
+                                : "N/A"}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                {cuota.estado === "PENDIENTE" && (
+                                  <Button
+                                    onClick={() => openPaymentDialog(cuota)}
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                  >
+                                    <Coins className="h-3 w-3 mr-1" />
+                                    Pagar
+                                  </Button>
+                                )}
+                                {cuota.montoPagado > 0 && (
+                                  <Button
+                                    onClick={() => {
+                                      setOpenDeletePayment(true);
+                                      setCuotaIdToDelete(cuota.id);
+                                    }}
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                  >
+                                    <DeleteIcon className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </div>
 
-                <div className="mt-6 flex justify-end">
-                  {/* FUNCION PARA CREAR PAGO */}
-                  <Button onClick={openPaymentDialog}>
+                <div className="mt-6 flex justify-end gap-2">
+                  <Button onClick={() => openPaymentDialog()} variant="outline">
                     <Coins className="mr-2 h-4 w-4" />
-                    Registrar Pago
+                    Pagar Siguiente Cuota
                   </Button>
                 </div>
               </div>
@@ -766,7 +974,8 @@ function Creditos() {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={openDeletCredit} onOpenChange={setOpenDeletCredit}>
+        {/* Dialog para Eliminar Crédito */}
+        <Dialog open={openDeleteCredit} onOpenChange={setOpenDeleteCredit}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
@@ -784,7 +993,7 @@ function Creditos() {
               <Input
                 placeholder="Ingrese su contraseña de administrador"
                 value={adminPassword}
-                onChange={(e) => setAdminPasssword(e.target.value)}
+                onChange={(e) => setAdminPassword(e.target.value)}
                 type="password"
                 className="w-full"
               />
@@ -792,12 +1001,13 @@ function Creditos() {
             <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-3">
               <Button
                 variant="outline"
-                onClick={() => setOpenDeletCredit(false)}
+                onClick={() => setOpenDeleteCredit(false)}
                 className="w-full sm:w-1/2"
               >
                 Cancelar
               </Button>
               <Button
+                disabled={isLoading}
                 variant="destructive"
                 onClick={handleDeleteCredit}
                 className="w-full sm:w-1/2"
@@ -808,6 +1018,7 @@ function Creditos() {
           </DialogContent>
         </Dialog>
 
+        {/* Dialog para Eliminar Pago */}
         <Dialog open={openDeletePayment} onOpenChange={setOpenDeletePayment}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -848,93 +1059,147 @@ function Creditos() {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
+        {/* Dialog para Registrar Pago */}
+        <Dialog open={isPaymentOpen} onOpenChange={closePaymentDialog}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold flex items-center">
                 <Coins className="mr-2" />
-                Registrar Pago
+                Registrar Pago - Cuota{" "}
+                {selectedCuota &&
+                  (selectedCredit
+                    ? selectedCredit.cuotasCredito.findIndex(
+                        (c) => c.id === selectedCuota.id
+                      ) + 1 || ""
+                    : "")}
               </DialogTitle>
             </DialogHeader>
-            <form className="space-y-6">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="monto" className="text-sm font-medium">
-                        Monto
-                      </Label>
-                      <div className="relative">
-                        <Coins className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                        <Input
-                          id="monto"
-                          type="number"
-                          value={newPayment.monto}
-                          onChange={(e) =>
-                            setNewPayment({
-                              ...newPayment,
-                              monto: parseFloat(e.target.value),
-                            })
-                          }
-                          className="pl-10"
-                          required
-                        />
+            {selectedCuota && (
+              <div className="space-y-4">
+                {/* Información de la cuota */}
+                <Card>
+                  <CardContent className="pt-4">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Monto esperado:</span>
+                        <span className="font-semibold">
+                          {formatearMoneda(selectedCuota.montoEsperado)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Ya pagado:</span>
+                        <span className="font-semibold">
+                          {formatearMoneda(selectedCuota.montoPagado)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-t pt-2">
+                        <span>Saldo pendiente:</span>
+                        <span className="font-bold text-red-600">
+                          {formatearMoneda(
+                            selectedCuota.montoEsperado -
+                              selectedCuota.montoPagado
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Fecha vencimiento:</span>
+                        <span
+                          className={`font-semibold ${
+                            isCuotaVencida(
+                              selectedCuota.fechaVencimiento,
+                              selectedCuota.estado
+                            )
+                              ? "text-red-600"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {dayjs(selectedCuota.fechaVencimiento).format(
+                            "DD/MM/YYYY"
+                          )}
+                        </span>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="metodoPago"
-                        className="text-sm font-medium"
-                      >
-                        Método de Pago
-                      </Label>
-                      <Select
-                        value={newPayment.metodoPago}
-                        onValueChange={(value: MetodoPago) =>
-                          setNewPayment({ ...newPayment, metodoPago: value })
+                  </CardContent>
+                </Card>
+
+                <form className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="monto" className="text-sm font-medium">
+                      Monto a pagar
+                    </Label>
+                    <div className="relative">
+                      <Coins className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                      <Input
+                        id="monto"
+                        type="number"
+                        value={newPayment.monto}
+                        onChange={(e) =>
+                          setNewPayment({
+                            ...newPayment,
+                            monto: Number.parseFloat(e.target.value),
+                          })
                         }
-                      >
-                        <SelectTrigger id="metodoPago" className="w-full">
-                          <SelectValue placeholder="Seleccione el método de pago" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CONTADO">
-                            <span className="flex items-center">
-                              <Coins className="mr-2 h-4 w-4" />
-                              CONTADO
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="TARJETA">
-                            <span className="flex items-center">
-                              <CreditCard className="mr-2 h-4 w-4" />
-                              TARJETA
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="TRANSFERENCIA_BANCO">
-                            <span className="flex items-center">
-                              <Banknote className="mr-2 h-4 w-4" />
-                              TRANSFERENCIA
-                            </span>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                        className="pl-10"
+                        max={
+                          selectedCuota.montoEsperado -
+                          selectedCuota.montoPagado
+                        }
+                        min={0.01}
+                        step={0.01}
+                        required
+                      />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-              <Button
-                type="button"
-                onClick={handlePaymentSubmit}
-                className="w-full"
-              >
-                Registrar Pago
-              </Button>
-            </form>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="metodoPago" className="text-sm font-medium">
+                      Método de Pago
+                    </Label>
+                    <Select
+                      value={newPayment.metodoPago}
+                      onValueChange={(value: MetodoPago) =>
+                        setNewPayment({ ...newPayment, metodoPago: value })
+                      }
+                    >
+                      <SelectTrigger id="metodoPago" className="w-full">
+                        <SelectValue placeholder="Seleccione el método de pago" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CONTADO">
+                          <span className="flex items-center">
+                            <Coins className="mr-2 h-4 w-4" />
+                            CONTADO
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="TARJETA">
+                          <span className="flex items-center">
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            TARJETA
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="TRANSFERENCIA">
+                          <span className="flex items-center">
+                            <Banknote className="mr-2 h-4 w-4" />
+                            TRANSFERENCIA
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={handlePaymentSubmit}
+                    className="w-full"
+                  >
+                    Registrar Pago de {formatearMoneda(newPayment.monto || 0)}
+                  </Button>
+                </form>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* PAGINACION */}
     </div>
   );
 }

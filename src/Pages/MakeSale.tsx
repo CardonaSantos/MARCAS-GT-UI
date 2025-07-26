@@ -225,7 +225,6 @@ interface SummaryItemProps {
 export default function MakeSale() {
   // Este hook debe ir al inicio del componente
   const [cantidades, setCantidades] = useState<Record<number, number>>({});
-  // Agrega esto al inicio del componente si no está ya
   const [cantidadSeleccionada, setCantidadSeleccionada] = useState(1);
 
   const handleCantidadChange = (id: number, value: number) => {
@@ -501,10 +500,8 @@ export default function MakeSale() {
       if (
         !formateado.numeroCuotas ||
         formateado.numeroCuotas <= 0 ||
-        !formateado.interes ||
         !formateado.diasEntrePagos ||
-        formateado.diasEntrePagos < 0 ||
-        formateado.interes < 0
+        formateado.diasEntrePagos < 0
       ) {
         toast.info("Datos de crédito inválidos. Revisa cuotas e interés.");
         return;
@@ -605,8 +602,6 @@ export default function MakeSale() {
       if (
         !formateado.numeroCuotas ||
         formateado.numeroCuotas <= 0 ||
-        !formateado.interes ||
-        formateado.interes < 0 ||
         !formateado.diasEntrePagos ||
         formateado.diasEntrePagos < 0 ||
         !formateado.creditoInicial ||
@@ -1197,10 +1192,9 @@ export default function MakeSale() {
                       </label>
                       <Input
                         type="number"
-                        min="0"
-                        step="0.01"
+                        step="1"
                         placeholder="Ej: 10%"
-                        value={creditoInfo.interes || ""}
+                        value={creditoInfo.interes ?? ""}
                         onChange={(e) =>
                           setCreditoInfo((prev) => ({
                             ...prev,
@@ -1228,7 +1222,7 @@ export default function MakeSale() {
                         min="0"
                         step="0.01"
                         placeholder="Ej: 1000"
-                        value={creditoInfo.creditoInicial || ""}
+                        value={creditoInfo.creditoInicial ?? ""}
                         onChange={(e) =>
                           setCreditoInfo((prev) => ({
                             ...prev,
