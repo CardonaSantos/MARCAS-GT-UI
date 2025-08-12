@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import {
   Image,
   Text,
@@ -7,15 +7,19 @@ import {
   Document,
   StyleSheet,
 } from "@react-pdf/renderer";
-import logo from "../../../assets/images/logoEmpresa.png";
 import dayjs from "dayjs";
 import "dayjs/locale/es"; // Importa el idioma español
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
+// Asegúrate de que la ruta del logo sea correcta en tu proyecto
+// Para este ejemplo, usaremos un placeholder si no se proporciona.
+// import logo from "../../../assets/images/logoEmpresa.png";
+
 dayjs.extend(localizedFormat);
 dayjs.extend(customParseFormat);
 dayjs.locale("es");
+
 interface Empresa {
   id?: number;
   nombre: string;
@@ -27,14 +31,9 @@ interface Empresa {
 }
 
 const formatearFecha = (fecha: string) => {
-  let nueva_fecha = dayjs(fecha).format("DD MMMM YYYY, hh:mm:ss A");
+  const nueva_fecha = dayjs(fecha).format("DD MMMM YYYY, hh:mm:ss A");
   return nueva_fecha;
 };
-
-interface VentaProps {
-  venta: VentaTypePDF | undefined;
-  empresa: Empresa | undefined;
-}
 
 export interface VentaTypePDF {
   id: number;
@@ -63,11 +62,18 @@ export interface VentaTypePDF {
       id: number;
       nombre: string;
       descripcion: string;
+      codigoProducto: string;
     };
   }[];
 }
 
-const VentaPDF: React.FC<VentaProps> = ({ venta, empresa }) => {
+interface VentaProps {
+  venta: VentaTypePDF | undefined;
+  empresa: Empresa | undefined;
+  logoSrc?: string; // Añadir prop para el logo
+}
+
+const VentaPDF: React.FC<VentaProps> = ({ venta, empresa, logoSrc }) => {
   const styles = StyleSheet.create({
     page: {
       fontFamily: "Helvetica",
@@ -276,7 +282,12 @@ const VentaPDF: React.FC<VentaProps> = ({ venta, empresa }) => {
       borderRadius: 3,
       alignSelf: "flex-start",
       marginTop: 5,
-    },
+    }, //NUEVOS
+    colDesc: { width: "43%" }, // nombres suelen ser largos
+    colCode: { width: "12%", textAlign: "center" },
+    colPrice: { width: "15%", textAlign: "right" },
+    colQty: { width: "15%", textAlign: "center" },
+    colTotal: { width: "15%", textAlign: "right" },
   });
 
   if (!venta || !empresa) {
@@ -291,7 +302,8 @@ const VentaPDF: React.FC<VentaProps> = ({ venta, empresa }) => {
 
   const Header = () => (
     <View style={styles.header}>
-      <Image style={styles.logo} src={logo || "/placeholder.svg"} />
+      {/* Usa logoSrc si está disponible, de lo contrario, un placeholder */}
+      <Image style={styles.logo} src={logoSrc || "/placeholder.svg"} />
       <View style={styles.companyInfo}>
         <Text style={styles.companyName}>{empresa.nombre}</Text>
         <Text style={styles.companyDetails}>{empresa.direccion}</Text>
@@ -334,9 +346,11 @@ const VentaPDF: React.FC<VentaProps> = ({ venta, empresa }) => {
         <Text style={[styles.tableHeaderCell, styles.description]}>
           Producto
         </Text>
+        <Text style={[styles.tableHeaderCell, styles.colCode]}>Código</Text>
         <Text style={[styles.tableHeaderCell, styles.price]}>Precio</Text>
+
         <Text style={[styles.tableHeaderCell, styles.quantity]}>Cantidad</Text>
-        <Text style={[styles.tableHeaderCell, styles.amount]}>Total</Text>
+        <Text style={[styles.tableHeaderCell, styles.amount]}>Subtotal</Text>
       </View>
       {venta.productos.map((producto, index) => (
         <View
@@ -346,6 +360,11 @@ const VentaPDF: React.FC<VentaProps> = ({ venta, empresa }) => {
           <Text style={[styles.tableCell, styles.description]}>
             {producto.producto.nombre}
           </Text>
+
+          <Text style={[styles.tableCell, styles.colCode]}>
+            {producto.producto.codigoProducto}
+          </Text>
+
           <Text style={[styles.tableCell, styles.price]}>
             {new Intl.NumberFormat("es-GT", {
               style: "currency",
@@ -374,9 +393,7 @@ const VentaPDF: React.FC<VentaProps> = ({ venta, empresa }) => {
         0
       ) *
         (1 - (venta.descuento || 0) / 100);
-
     const descuento = venta.descuento || 0;
-
     return (
       <View style={styles.footer}>
         {descuento > 0 && (
