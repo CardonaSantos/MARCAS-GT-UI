@@ -1,0 +1,1525 @@
+/* ============================================================================
+   NOVA Sistemas — App Theme
+   CRM / ERP UI · React + Tailwind + App* components
+
+   Refactor limpio:
+   - Un solo :root y un solo .dark.
+   - Cascadia Code como fuente global por token.
+   - Tokens de dialog/confirm dialog con overlay blur y motion.
+   - Compatibilidad con aliases shadcn/Tailwind legacy.
+============================================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* ========================================================================
+     01. TYPOGRAPHY
+  ======================================================================== */
+  --app-font-sans:
+    "IBM Plex Sans Condensed", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --app-font-heading:
+    "IBM Plex Sans Condensed", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --app-font-mono:
+    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
+
+  --app-text-xs: 0.6875rem; /* 11px */
+  --app-text-sm: 0.75rem; /* 12px */
+  --app-text-md: 0.8125rem; /* 13px */
+  --app-text-lg: 0.9375rem; /* 15px */
+
+  --app-leading-tight: 1.12;
+  --app-leading-normal: 1.28;
+  --app-leading-relaxed: 1.45;
+
+  /* ========================================================================
+     02. RADIUS
+  ======================================================================== */
+  --app-radius-xs: 0.25rem;
+  --app-radius-sm: 0.375rem;
+  --app-radius-md: 0.5rem;
+  --app-radius-lg: 0.75rem;
+  --app-radius-xl: 1rem;
+  --app-radius-full: 9999px;
+
+  /* ========================================================================
+     03. BRAND + GLOBAL COLOR SYSTEM — LIGHT
+     Primary is the NOVA logo teal. The rest stays neutral/cool.
+  ======================================================================== */
+  --app-brand-teal: 163 72% 45%;
+  --app-brand-teal-hover: 163 74% 37%;
+  --app-brand-teal-active: 163 76% 32%;
+  --app-brand-mint: 163 62% 92%;
+  --app-brand-mint-strong: 163 50% 84%;
+  --app-brand-graphite: 210 18% 13%;
+
+  --app-background: 190 20% 98%;
+  --app-foreground: 210 18% 13%;
+
+  --app-surface: 0 0% 100%;
+  --app-surface-foreground: var(--app-foreground);
+
+  --app-popover: 0 0% 100%;
+  --app-popover-foreground: var(--app-foreground);
+
+  --app-primary: var(--app-brand-teal);
+  --app-primary-hover: var(--app-brand-teal-hover);
+  --app-primary-active: var(--app-brand-teal-active);
+  --app-primary-foreground: 0 0% 100%;
+
+  --app-secondary: 190 16% 94%;
+  --app-secondary-hover: 190 14% 90%;
+  --app-secondary-active: 190 14% 86%;
+  --app-secondary-foreground: 210 18% 13%;
+
+  --app-muted: 190 16% 95%;
+  --app-muted-hover: 190 14% 91%;
+  --app-muted-foreground: 190 8% 42%;
+
+  --app-border: 180 13% 86%;
+  --app-border-strong: 180 10% 72%;
+
+  --app-ring: var(--app-primary);
+  --app-ring-soft: 163 72% 45% / 0.24;
+  --app-focus-ring: 0 0 0 3px hsl(var(--app-ring-soft));
+
+  --app-disabled-opacity: 0.55;
+
+  /* Semantic colors. Success is intentionally different from brand teal. */
+  --app-success: 145 58% 39%;
+  --app-success-hover: 145 60% 33%;
+  --app-success-foreground: 0 0% 100%;
+
+  --app-warning: 38 92% 50%;
+  --app-warning-hover: 35 92% 44%;
+  --app-warning-foreground: 28 16% 12%;
+
+  --app-danger: 0 72% 51%;
+  --app-danger-hover: 0 74% 45%;
+  --app-danger-foreground: 0 0% 100%;
+
+  --app-info: 210 88% 54%;
+  --app-info-hover: 210 88% 48%;
+  --app-info-foreground: 0 0% 100%;
+
+  /* Shadcn/Tailwind compatibility aliases for legacy fallbacks. */
+  --background: var(--app-background);
+  --foreground: var(--app-foreground);
+  --card: var(--app-card-bg);
+  --card-foreground: var(--app-card-foreground);
+  --popover: var(--app-popover);
+  --popover-foreground: var(--app-popover-foreground);
+  --primary: var(--app-primary);
+  --primary-foreground: var(--app-primary-foreground);
+  --secondary: var(--app-secondary);
+  --secondary-foreground: var(--app-secondary-foreground);
+  --muted: var(--app-muted);
+  --muted-foreground: var(--app-muted-foreground);
+  --accent: var(--app-brand-mint);
+  --accent-foreground: 163 72% 25%;
+  --destructive: var(--app-danger);
+  --destructive-foreground: var(--app-danger-foreground);
+  --border: var(--app-border);
+  --input: var(--app-input-border);
+  --ring: var(--app-ring);
+
+  /* ========================================================================
+     04. MOTION
+  ======================================================================== */
+
+  --app-motion-duration-instant: 100ms;
+  --app-motion-duration-fast: 180ms;
+  --app-motion-duration-normal: 260ms;
+  --app-motion-duration-slow: 360ms;
+
+  --app-motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --app-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --app-motion-ease-in: cubic-bezier(0.32, 0, 0.67, 0);
+
+  --app-motion-scale-press: 0.985;
+  --app-motion-scale-hover: 1.012;
+
+  /* Dialog motion específico */
+  --app-dialog-overlay-duration-in: 220ms;
+  --app-dialog-overlay-duration-out: 180ms;
+
+  --app-dialog-content-duration-in: 340ms;
+  --app-dialog-content-duration-out: 260ms;
+
+  --app-dialog-content-scale-in: 0.982;
+  --app-dialog-content-scale-out: 0.988;
+
+  /* ========================================================================
+     05. SHADOWS
+     UI is border-led; shadows are reserved for overlays/elevated surfaces.
+  ======================================================================== */
+  --app-shadow-none: none;
+  --app-shadow-xs: 0 1px 1px rgb(15 23 42 / 0.03);
+  --app-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.05);
+  --app-shadow-md: 0 8px 22px -16px rgb(15 23 42 / 0.35);
+  --app-shadow-lg: 0 18px 48px -24px rgb(15 23 42 / 0.42);
+
+  /* ========================================================================
+     06. BUTTON
+  ======================================================================== */
+  --app-button-height-xs: 1.75rem;
+  --app-button-height-sm: 2rem;
+  --app-button-height-md: 2.25rem;
+  --app-button-height-lg: 2.625rem;
+
+  --app-button-px-xs: 0.5rem;
+  --app-button-px-sm: 0.625rem;
+  --app-button-px-md: 0.75rem;
+  --app-button-px-lg: 1rem;
+
+  --app-button-gap: 0.375rem;
+
+  --app-button-primary-bg: var(--app-primary);
+  --app-button-primary-bg-hover: var(--app-primary-hover);
+  --app-button-primary-bg-active: var(--app-primary-active);
+  --app-button-primary-foreground: var(--app-primary-foreground);
+  --app-button-primary-border: var(--app-primary);
+
+  --app-button-secondary-bg: var(--app-secondary);
+  --app-button-secondary-bg-hover: var(--app-secondary-hover);
+  --app-button-secondary-bg-active: var(--app-secondary-active);
+  --app-button-secondary-foreground: var(--app-secondary-foreground);
+  --app-button-secondary-border: var(--app-border);
+
+  --app-button-danger-bg: var(--app-danger);
+  --app-button-danger-bg-hover: var(--app-danger-hover);
+  --app-button-danger-foreground: var(--app-danger-foreground);
+  --app-button-danger-border: var(--app-danger);
+
+  --app-button-ghost-bg: transparent;
+  --app-button-ghost-bg-hover: 190 16% 94%;
+  --app-button-ghost-foreground: var(--app-foreground);
+  --app-button-ghost-border: transparent;
+
+  --app-button-focus-ring: var(--app-focus-ring);
+
+  /* ========================================================================
+     07. INPUT
+  ======================================================================== */
+  --app-input-height-xs: 1.75rem;
+  --app-input-height-sm: 2rem;
+  --app-input-height-md: 2.25rem;
+  --app-input-height-lg: 2.625rem;
+
+  --app-input-px-xs: 0.5rem;
+  --app-input-px-sm: 0.625rem;
+  --app-input-px-md: 0.75rem;
+  --app-input-px-lg: 0.875rem;
+
+  --app-input-icon-size: 0.875rem;
+  --app-input-icon-offset: 0.625rem;
+
+  --app-input-bg: 0 0% 100%;
+  --app-input-bg-hover: 0 0% 100%;
+  --app-input-bg-disabled: 190 16% 94%;
+
+  --app-input-foreground: var(--app-foreground);
+  --app-input-placeholder: var(--app-muted-foreground);
+
+  --app-input-border: var(--app-border);
+  --app-input-border-hover: var(--app-border-strong);
+  --app-input-border-focus: var(--app-ring);
+
+  --app-input-filled-bg: 190 16% 96%;
+  --app-input-filled-bg-hover: 190 16% 94%;
+
+  --app-input-ghost-bg: transparent;
+  --app-input-ghost-bg-hover: 190 16% 95%;
+
+  --app-input-invalid-border: var(--app-danger);
+  --app-input-invalid-ring: 0 72% 51% / 0.18;
+
+  /* ========================================================================
+     08. TEXTAREA
+  ======================================================================== */
+  --app-textarea-min-height-xs: 3.5rem;
+  --app-textarea-min-height-sm: 4.5rem;
+  --app-textarea-min-height-md: 5.5rem;
+  --app-textarea-min-height-lg: 7rem;
+
+  --app-textarea-px-xs: 0.5rem;
+  --app-textarea-px-sm: 0.625rem;
+  --app-textarea-px-md: 0.75rem;
+  --app-textarea-px-lg: 0.875rem;
+
+  --app-textarea-py-xs: 0.375rem;
+  --app-textarea-py-sm: 0.5rem;
+  --app-textarea-py-md: 0.625rem;
+  --app-textarea-py-lg: 0.75rem;
+
+  --app-textarea-bg: var(--app-input-bg);
+  --app-textarea-bg-hover: var(--app-input-bg-hover);
+  --app-textarea-foreground: var(--app-input-foreground);
+  --app-textarea-placeholder: var(--app-input-placeholder);
+  --app-textarea-border: var(--app-input-border);
+  --app-textarea-border-hover: var(--app-input-border-hover);
+  --app-textarea-border-focus: var(--app-input-border-focus);
+
+  /* ========================================================================
+     09. SWITCH
+  ======================================================================== */
+  --app-switch-width-xs: 1.75rem;
+  --app-switch-width-sm: 2rem;
+  --app-switch-width-md: 2.25rem;
+  --app-switch-width-lg: 2.75rem;
+
+  --app-switch-height-xs: 1rem;
+  --app-switch-height-sm: 1.125rem;
+  --app-switch-height-md: 1.25rem;
+  --app-switch-height-lg: 1.5rem;
+
+  --app-switch-thumb-xs: 0.75rem;
+  --app-switch-thumb-sm: 0.875rem;
+  --app-switch-thumb-md: 1rem;
+  --app-switch-thumb-lg: 1.25rem;
+
+  --app-switch-translate-xs: 0.75rem;
+  --app-switch-translate-sm: 0.875rem;
+  --app-switch-translate-md: 1rem;
+  --app-switch-translate-lg: 1.25rem;
+
+  --app-switch-bg: 190 10% 80%;
+  --app-switch-bg-hover: 190 10% 74%;
+  --app-switch-bg-checked: var(--app-primary);
+  --app-switch-bg-checked-hover: var(--app-primary-hover);
+  --app-switch-thumb-bg: 0 0% 100%;
+  --app-switch-thumb-bg-disabled: 190 10% 88%;
+
+  /* ========================================================================
+     10. CHECKBOX
+  ======================================================================== */
+  --app-checkbox-size-xs: 0.875rem;
+  --app-checkbox-size-sm: 1rem;
+  --app-checkbox-size-md: 1.125rem;
+  --app-checkbox-size-lg: 1.25rem;
+
+  --app-checkbox-icon-xs: 0.625rem;
+  --app-checkbox-icon-sm: 0.75rem;
+  --app-checkbox-icon-md: 0.875rem;
+  --app-checkbox-icon-lg: 1rem;
+
+  --app-checkbox-bg: 0 0% 100%;
+  --app-checkbox-bg-hover: 190 20% 98%;
+  --app-checkbox-border: 180 13% 82%;
+  --app-checkbox-border-hover: 180 10% 68%;
+
+  --app-checkbox-checked-bg: var(--app-primary);
+  --app-checkbox-checked-bg-hover: var(--app-primary-hover);
+  --app-checkbox-checked-foreground: var(--app-primary-foreground);
+
+  --app-checkbox-indeterminate-bg: var(--app-primary);
+  --app-checkbox-indeterminate-foreground: var(--app-primary-foreground);
+
+  /* ========================================================================
+     11. BADGE
+  ======================================================================== */
+  --app-badge-height-xs: 1rem;
+  --app-badge-height-sm: 1.25rem;
+  --app-badge-height-md: 1.5rem;
+  --app-badge-height-lg: 1.75rem;
+
+  --app-badge-px-xs: 0.375rem;
+  --app-badge-px-sm: 0.5rem;
+  --app-badge-px-md: 0.625rem;
+  --app-badge-px-lg: 0.75rem;
+
+  --app-badge-gap: 0.25rem;
+
+  --app-badge-dot-xs: 0.375rem;
+  --app-badge-dot-sm: 0.425rem;
+  --app-badge-dot-md: 0.5rem;
+  --app-badge-dot-lg: 0.55rem;
+
+  --app-badge-neutral-bg: 190 16% 94%;
+  --app-badge-neutral-bg-hover: 190 14% 90%;
+  --app-badge-neutral-foreground: var(--app-foreground);
+  --app-badge-neutral-border: var(--app-border);
+
+  --app-badge-primary-soft-bg: var(--app-brand-mint);
+  --app-badge-primary-soft-foreground: 163 72% 25%;
+
+  --app-badge-success-soft-bg: 145 58% 92%;
+  --app-badge-success-soft-foreground: 145 64% 24%;
+
+  --app-badge-warning-soft-bg: 42 95% 91%;
+  --app-badge-warning-soft-foreground: 32 88% 26%;
+
+  --app-badge-danger-soft-bg: 0 72% 94%;
+  --app-badge-danger-soft-foreground: 0 72% 36%;
+
+  --app-badge-info-soft-bg: 210 88% 93%;
+  --app-badge-info-soft-foreground: 210 88% 34%;
+
+  /* ========================================================================
+     12. STATUS DOT
+  ======================================================================== */
+  --app-status-dot-size-xs: 0.375rem;
+  --app-status-dot-size-sm: 0.5rem;
+  --app-status-dot-size-md: 0.625rem;
+  --app-status-dot-size-lg: 0.75rem;
+
+  --app-status-dot-ring-width: 0.1875rem;
+
+  --app-status-dot-neutral: var(--app-muted-foreground);
+  --app-status-dot-primary: var(--app-primary);
+  --app-status-dot-success: var(--app-success);
+  --app-status-dot-warning: var(--app-warning);
+  --app-status-dot-danger: var(--app-danger);
+  --app-status-dot-info: var(--app-info);
+
+  --app-status-dot-neutral-ring: var(--app-muted-foreground);
+  --app-status-dot-primary-ring: var(--app-primary);
+  --app-status-dot-success-ring: var(--app-success);
+  --app-status-dot-warning-ring: var(--app-warning);
+  --app-status-dot-danger-ring: var(--app-danger);
+  --app-status-dot-info-ring: var(--app-info);
+
+  /* ========================================================================
+     13. LOADER
+  ======================================================================== */
+  --app-loader-size-xs: 0.75rem;
+  --app-loader-size-sm: 0.875rem;
+  --app-loader-size-md: 1rem;
+  --app-loader-size-lg: 1.25rem;
+  --app-loader-size-xl: 1.5rem;
+
+  --app-loader-stroke-xs: 2;
+  --app-loader-stroke-sm: 2;
+  --app-loader-stroke-md: 2.25;
+  --app-loader-stroke-lg: 2.5;
+  --app-loader-stroke-xl: 2.75;
+
+  --app-loader-primary: var(--app-primary);
+  --app-loader-neutral: var(--app-muted-foreground);
+  --app-loader-success: var(--app-success);
+  --app-loader-warning: var(--app-warning);
+  --app-loader-danger: var(--app-danger);
+  --app-loader-info: var(--app-info);
+
+  /* ========================================================================
+     14. SELECT / REACT SELECT
+  ======================================================================== */
+  --app-select-menu-bg: var(--app-popover);
+  --app-select-menu-border: var(--app-border);
+  --app-select-menu-shadow: var(--app-shadow-md);
+  --app-select-menu-z-index: 80;
+  --app-select-menu-max-height: 15rem;
+
+  --app-select-option-bg: transparent;
+  --app-select-option-bg-focused: 163 45% 94%;
+  --app-select-option-bg-selected: var(--app-primary);
+  --app-select-option-bg-selected-hover: var(--app-primary-hover);
+
+  --app-select-option-foreground: var(--app-input-foreground);
+  --app-select-option-foreground-focused: var(--app-input-foreground);
+  --app-select-option-foreground-selected: var(--app-primary-foreground);
+
+  --app-select-value-foreground: var(--app-input-foreground);
+  --app-select-indicator: var(--app-input-placeholder);
+  --app-select-indicator-hover: var(--app-input-foreground);
+
+  --app-select-multi-value-bg: 163 45% 94%;
+  --app-select-multi-value-foreground: 163 72% 25%;
+  --app-select-multi-value-border: 163 40% 82%;
+  --app-select-multi-value-remove: var(--app-muted-foreground);
+  --app-select-multi-value-remove-hover: var(--app-danger);
+  --app-select-multi-value-remove-bg-hover: 0 72% 94%;
+
+  /* ========================================================================
+     15. CARD
+  ======================================================================== */
+  --app-card-bg: 0 0% 100%;
+  --app-card-foreground: var(--app-foreground);
+  --app-card-border: var(--app-border);
+  --app-card-border-strong: var(--app-border-strong);
+
+  --app-card-muted-bg: 190 20% 97%;
+  --app-card-muted-foreground: var(--app-muted-foreground);
+
+  --app-card-elevated-bg: 0 0% 100%;
+  --app-card-hover-bg: 190 20% 97%;
+
+  --app-card-selected-ring: var(--app-primary);
+
+  --app-card-danger-bg: 0 72% 97%;
+  --app-card-danger-border: 0 72% 86%;
+
+  --app-card-success-bg: 145 58% 96%;
+  --app-card-success-border: 145 58% 82%;
+
+  --app-card-warning-bg: 42 95% 96%;
+  --app-card-warning-border: 42 95% 82%;
+
+  --app-card-info-bg: 210 88% 97%;
+  --app-card-info-border: 210 88% 84%;
+
+  --app-card-padding-xs: 0.5rem;
+  --app-card-padding-sm: 0.75rem;
+  --app-card-padding-md: 1rem;
+  --app-card-padding-lg: 1.25rem;
+  --app-card-padding-xl: 1.5rem;
+
+  --app-card-gap-xs: 0.375rem;
+  --app-card-gap-sm: 0.5rem;
+  --app-card-gap-md: 0.75rem;
+  --app-card-gap-lg: 1rem;
+  --app-card-gap-xl: 1.25rem;
+
+  --app-card-title-xs: 0.75rem;
+  --app-card-title-sm: 0.8125rem;
+  --app-card-title-md: 0.9375rem;
+  --app-card-title-lg: 1.0625rem;
+  --app-card-title-xl: 1.1875rem;
+
+  --app-card-description-xs: 0.6875rem;
+  --app-card-description-sm: 0.75rem;
+  --app-card-description-md: 0.8125rem;
+  --app-card-description-lg: 0.875rem;
+  --app-card-description-xl: 0.9375rem;
+
+  --app-card-icon-box-xs: 1.375rem;
+  --app-card-icon-box-sm: 1.625rem;
+  --app-card-icon-box-md: 1.875rem;
+  --app-card-icon-box-lg: 2.125rem;
+  --app-card-icon-box-xl: 2.375rem;
+
+  --app-card-icon-xs: 0.75rem;
+  --app-card-icon-sm: 0.875rem;
+  --app-card-icon-md: 1rem;
+  --app-card-icon-lg: 1.125rem;
+  --app-card-icon-xl: 1.25rem;
+
+  --app-card-shadow-none: var(--app-shadow-none);
+  --app-card-shadow-xs: var(--app-shadow-xs);
+  --app-card-shadow-sm: var(--app-shadow-sm);
+  --app-card-shadow-md: var(--app-shadow-md);
+
+  /* ========================================================================
+     16. FIELD
+  ======================================================================== */
+  --app-field-gap-xs: 0.25rem;
+  --app-field-gap-sm: 0.375rem;
+  --app-field-gap-md: 0.5rem;
+  --app-field-gap-lg: 0.625rem;
+
+  --app-field-content-gap-xs: 0.25rem;
+  --app-field-content-gap-sm: 0.375rem;
+  --app-field-content-gap-md: 0.5rem;
+  --app-field-content-gap-lg: 0.625rem;
+
+  --app-field-label-size-xs: 0.6875rem;
+  --app-field-label-size-sm: 0.75rem;
+  --app-field-label-size-md: 0.8125rem;
+  --app-field-label-size-lg: 0.875rem;
+
+  --app-field-description-size-xs: 0.65625rem;
+  --app-field-description-size-sm: 0.6875rem;
+  --app-field-description-size-md: 0.75rem;
+  --app-field-description-size-lg: 0.8125rem;
+
+  --app-field-message-size-xs: 0.65625rem;
+  --app-field-message-size-sm: 0.6875rem;
+  --app-field-message-size-md: 0.75rem;
+  --app-field-message-size-lg: 0.8125rem;
+
+  --app-field-label-foreground: var(--app-foreground);
+  --app-field-description-foreground: var(--app-muted-foreground);
+  --app-field-hint-foreground: var(--app-muted-foreground);
+  --app-field-error-foreground: var(--app-danger);
+  --app-field-required-foreground: var(--app-danger);
+  --app-field-disabled-opacity: 0.6;
+
+  /* ========================================================================
+     17. SEPARATOR
+  ======================================================================== */
+  --app-separator-default: var(--app-border);
+  --app-separator-muted: 190 16% 92%;
+  --app-separator-strong: var(--app-border-strong);
+
+  --app-separator-primary: var(--app-primary);
+  --app-separator-success: var(--app-success);
+  --app-separator-warning: var(--app-warning);
+  --app-separator-danger: var(--app-danger);
+  --app-separator-info: var(--app-info);
+
+  --app-separator-spacing-xs: 0.375rem;
+  --app-separator-spacing-sm: 0.5rem;
+  --app-separator-spacing-md: 0.75rem;
+  --app-separator-spacing-lg: 1rem;
+
+  --app-separator-thickness-xs: 1px;
+  --app-separator-thickness-sm: 1px;
+  --app-separator-thickness-md: 2px;
+  --app-separator-thickness-lg: 3px;
+
+  /* ========================================================================
+     18. CONTAINER
+  ======================================================================== */
+  --app-container-max-xs: 24rem;
+  --app-container-max-sm: 36rem;
+  --app-container-max-md: 48rem;
+  --app-container-max-lg: 64rem;
+  --app-container-max-xl: 80rem;
+  --app-container-max-2xl: 96rem;
+
+  --app-container-padding-x-xs: clamp(0.5rem, 1vw, 0.75rem);
+  --app-container-padding-x-sm: clamp(0.75rem, 1.25vw, 1rem);
+  --app-container-padding-x-md: clamp(1rem, 1.5vw, 1.25rem);
+  --app-container-padding-x-lg: clamp(1.25rem, 2vw, 1.75rem);
+  --app-container-padding-x-xl: clamp(1.5rem, 2.5vw, 2rem);
+
+  --app-container-padding-y-xs: 0.375rem;
+  --app-container-padding-y-sm: 0.5rem;
+  --app-container-padding-y-md: 0.75rem;
+  --app-container-padding-y-lg: 1rem;
+  --app-container-padding-y-xl: 1.25rem;
+
+  /* ========================================================================
+     19. GRID / LAYOUT
+  ======================================================================== */
+  --app-grid-gap-none: 0rem;
+  --app-grid-gap-xs: 0.375rem;
+  --app-grid-gap-sm: 0.5rem;
+  --app-grid-gap-md: 0.75rem;
+  --app-grid-gap-lg: 1rem;
+  --app-grid-gap-xl: 1.25rem;
+  --app-grid-gap-2xl: 1.5rem;
+
+  --app-grid-auto-min-xs: 8rem;
+  --app-grid-auto-min-sm: 10rem;
+  --app-grid-auto-min-md: 12rem;
+  --app-grid-auto-min-lg: 14rem;
+  --app-grid-auto-min-xl: 16rem;
+
+  --app-layout-gap-none: 0rem;
+  --app-layout-gap-xs: 0.375rem;
+  --app-layout-gap-sm: 0.5rem;
+  --app-layout-gap-md: 0.75rem;
+  --app-layout-gap-lg: 1rem;
+  --app-layout-gap-xl: 1.25rem;
+  --app-layout-gap-2xl: 1.5rem;
+
+  --app-split-pane-min: 0rem;
+  --app-split-sticky-top: 0.75rem;
+
+  /* ========================================================================
+     20. SKELETON
+  ======================================================================== */
+  --app-skeleton-bg: 190 16% 90%;
+  --app-skeleton-bg-muted: 190 16% 94%;
+  --app-skeleton-bg-strong: 190 10% 80%;
+  --app-skeleton-highlight: 0 0% 100% / 0.55;
+
+  --app-skeleton-radius-xs: var(--app-radius-xs);
+  --app-skeleton-radius-sm: var(--app-radius-sm);
+  --app-skeleton-radius-md: var(--app-radius-md);
+  --app-skeleton-radius-lg: var(--app-radius-lg);
+  --app-skeleton-radius-full: var(--app-radius-full);
+
+  --app-skeleton-size-xs: 0.5rem;
+  --app-skeleton-size-sm: 0.75rem;
+  --app-skeleton-size-md: 1rem;
+  --app-skeleton-size-lg: 1.5rem;
+  --app-skeleton-size-xl: 2rem;
+  --app-skeleton-size-2xl: 2.5rem;
+
+  --app-skeleton-gap-xs: 0.25rem;
+  --app-skeleton-gap-sm: 0.375rem;
+  --app-skeleton-gap-md: 0.5rem;
+  --app-skeleton-gap-lg: 0.75rem;
+
+  --app-skeleton-card-padding-xs: 0.5rem;
+  --app-skeleton-card-padding-sm: 0.75rem;
+  --app-skeleton-card-padding-md: 1rem;
+
+  /* ========================================================================
+     21. ALERT
+  ======================================================================== */
+  --app-alert-bg-neutral: 190 20% 97%;
+  --app-alert-border-neutral: var(--app-border);
+  --app-alert-foreground-neutral: var(--app-foreground);
+  --app-alert-icon-neutral: var(--app-muted-foreground);
+
+  --app-alert-bg-info: 210 88% 97%;
+  --app-alert-border-info: 210 88% 84%;
+  --app-alert-foreground-info: 210 88% 28%;
+  --app-alert-icon-info: var(--app-info);
+
+  --app-alert-bg-success: 145 58% 96%;
+  --app-alert-border-success: 145 58% 82%;
+  --app-alert-foreground-success: 145 64% 24%;
+  --app-alert-icon-success: var(--app-success);
+
+  --app-alert-bg-warning: 42 95% 95%;
+  --app-alert-border-warning: 42 95% 80%;
+  --app-alert-foreground-warning: 32 88% 24%;
+  --app-alert-icon-warning: var(--app-warning);
+
+  --app-alert-bg-danger: 0 72% 97%;
+  --app-alert-border-danger: 0 72% 84%;
+  --app-alert-foreground-danger: 0 72% 34%;
+  --app-alert-icon-danger: var(--app-danger);
+
+  --app-alert-padding-xs: 0.5rem;
+  --app-alert-padding-sm: 0.625rem;
+  --app-alert-padding-md: 0.75rem;
+  --app-alert-padding-lg: 1rem;
+
+  --app-alert-gap-xs: 0.375rem;
+  --app-alert-gap-sm: 0.5rem;
+  --app-alert-gap-md: 0.625rem;
+  --app-alert-gap-lg: 0.75rem;
+
+  --app-alert-title-xs: 0.75rem;
+  --app-alert-title-sm: 0.8125rem;
+  --app-alert-title-md: 0.875rem;
+  --app-alert-title-lg: 0.9375rem;
+
+  --app-alert-description-xs: 0.6875rem;
+  --app-alert-description-sm: 0.75rem;
+  --app-alert-description-md: 0.8125rem;
+  --app-alert-description-lg: 0.875rem;
+
+  --app-alert-icon-xs: 0.875rem;
+  --app-alert-icon-sm: 1rem;
+  --app-alert-icon-md: 1.125rem;
+  --app-alert-icon-lg: 1.25rem;
+
+  /* ========================================================================
+     22. EMPTY STATE
+  ======================================================================== */
+  --app-empty-bg: transparent;
+  --app-empty-border: var(--app-border);
+  --app-empty-foreground: var(--app-foreground);
+  --app-empty-muted-foreground: var(--app-muted-foreground);
+
+  --app-empty-icon-bg-neutral: var(--app-muted);
+  --app-empty-icon-fg-neutral: var(--app-muted-foreground);
+
+  --app-empty-icon-bg-info: 210 88% 94%;
+  --app-empty-icon-fg-info: var(--app-info);
+
+  --app-empty-icon-bg-success: 145 58% 94%;
+  --app-empty-icon-fg-success: var(--app-success);
+
+  --app-empty-icon-bg-warning: 42 95% 92%;
+  --app-empty-icon-fg-warning: var(--app-warning);
+
+  --app-empty-icon-bg-danger: 0 72% 94%;
+  --app-empty-icon-fg-danger: var(--app-danger);
+
+  --app-empty-padding-xs: 1rem;
+  --app-empty-padding-sm: 1.25rem;
+  --app-empty-padding-md: 1.5rem;
+  --app-empty-padding-lg: 2rem;
+
+  --app-empty-gap-xs: 0.5rem;
+  --app-empty-gap-sm: 0.625rem;
+  --app-empty-gap-md: 0.75rem;
+  --app-empty-gap-lg: 1rem;
+
+  --app-empty-icon-box-xs: 2rem;
+  --app-empty-icon-box-sm: 2.5rem;
+  --app-empty-icon-box-md: 3rem;
+  --app-empty-icon-box-lg: 3.5rem;
+
+  --app-empty-icon-xs: 1rem;
+  --app-empty-icon-sm: 1.25rem;
+  --app-empty-icon-md: 1.5rem;
+  --app-empty-icon-lg: 1.75rem;
+
+  --app-empty-title-xs: 0.8125rem;
+  --app-empty-title-sm: 0.875rem;
+  --app-empty-title-md: 1rem;
+  --app-empty-title-lg: 1.125rem;
+
+  --app-empty-description-xs: 0.75rem;
+  --app-empty-description-sm: 0.8125rem;
+  --app-empty-description-md: 0.875rem;
+  --app-empty-description-lg: 0.9375rem;
+
+  --app-empty-max-xs: 18rem;
+  --app-empty-max-sm: 22rem;
+  --app-empty-max-md: 28rem;
+  --app-empty-max-lg: 34rem;
+
+  /* ========================================================================
+     23. SEARCH INPUT
+  ======================================================================== */
+  --app-search-icon: var(--app-input-placeholder);
+  --app-search-icon-active: var(--app-input-foreground);
+  --app-search-loading: var(--app-primary);
+
+  --app-search-min-width-xs: 10rem;
+  --app-search-min-width-sm: 12rem;
+  --app-search-min-width-md: 16rem;
+  --app-search-min-width-lg: 20rem;
+
+  /* ========================================================================
+     24. DATA STATE
+  ======================================================================== */
+  --app-data-state-bg: transparent;
+  --app-data-state-border: var(--app-border);
+
+  --app-data-state-padding-xs: 0.5rem;
+  --app-data-state-padding-sm: 0.75rem;
+  --app-data-state-padding-md: 1rem;
+  --app-data-state-padding-lg: 1.25rem;
+
+  --app-data-state-gap-xs: 0.5rem;
+  --app-data-state-gap-sm: 0.75rem;
+  --app-data-state-gap-md: 1rem;
+  --app-data-state-gap-lg: 1.25rem;
+
+  --app-data-state-min-height-xs: 6rem;
+  --app-data-state-min-height-sm: 10rem;
+  --app-data-state-min-height-md: 14rem;
+  --app-data-state-min-height-lg: 18rem;
+
+  /* ========================================================================
+     25. DIALOG / CONFIRM DIALOG
+======================================================================== */
+
+  /* Overlay */
+  --app-dialog-overlay-bg-soft: 210 18% 8% / 0.36;
+  --app-dialog-overlay-bg: 210 18% 8% / 0.48;
+  --app-dialog-overlay-bg-strong: 210 18% 8% / 0.62;
+
+  /* Blur del fondo del dialog */
+  --app-dialog-overlay-blur: 2px;
+
+  /* Dialog surface */
+  --app-dialog-bg: var(--app-popover);
+  --app-dialog-foreground: var(--app-popover-foreground);
+  --app-dialog-border: var(--app-border);
+  --app-dialog-muted-foreground: var(--app-muted-foreground);
+  --app-dialog-shadow: var(--app-shadow-lg);
+
+  /* Dialog motion */
+  --app-dialog-overlay-duration-in: 220ms;
+  --app-dialog-overlay-duration-out: 180ms;
+
+  --app-dialog-content-duration-in: 360ms;
+  --app-dialog-content-duration-out: 280ms;
+
+  --app-dialog-content-scale-in: 0.982;
+  --app-dialog-content-scale-out: 0.988;
+
+  /* Confirm dialog inherits regular dialog base */
+  --app-confirm-overlay-bg: var(--app-dialog-overlay-bg);
+  --app-confirm-bg: var(--app-dialog-bg);
+  --app-confirm-foreground: var(--app-dialog-foreground);
+  --app-confirm-border: var(--app-dialog-border);
+  --app-confirm-muted-foreground: var(--app-dialog-muted-foreground);
+  --app-confirm-shadow: var(--app-dialog-shadow);
+
+  /* Confirm spacing */
+  --app-confirm-padding-xs: 0.75rem;
+  --app-confirm-padding-sm: 1rem;
+  --app-confirm-padding-md: 1.25rem;
+  --app-confirm-padding-lg: 1.5rem;
+
+  --app-confirm-gap-xs: 0.5rem;
+  --app-confirm-gap-sm: 0.625rem;
+  --app-confirm-gap-md: 0.75rem;
+  --app-confirm-gap-lg: 1rem;
+
+  /* Confirm typography */
+  --app-confirm-title-xs: 0.875rem;
+  --app-confirm-title-sm: 1rem;
+  --app-confirm-title-md: 1.125rem;
+  --app-confirm-title-lg: 1.25rem;
+
+  --app-confirm-description-xs: 0.75rem;
+  --app-confirm-description-sm: 0.8125rem;
+  --app-confirm-description-md: 0.875rem;
+  --app-confirm-description-lg: 0.9375rem;
+
+  /* Confirm icon sizes */
+  --app-confirm-icon-box-xs: 2rem;
+  --app-confirm-icon-box-sm: 2.5rem;
+  --app-confirm-icon-box-md: 3rem;
+  --app-confirm-icon-box-lg: 3.5rem;
+
+  --app-confirm-icon-xs: 1rem;
+  --app-confirm-icon-sm: 1.25rem;
+  --app-confirm-icon-md: 1.5rem;
+  --app-confirm-icon-lg: 1.75rem;
+
+  /* Confirm icon tones */
+  --app-confirm-icon-bg-neutral: var(--app-muted);
+  --app-confirm-icon-fg-neutral: var(--app-muted-foreground);
+
+  --app-confirm-icon-bg-info: 210 88% 94%;
+  --app-confirm-icon-fg-info: var(--app-info);
+
+  --app-confirm-icon-bg-success: 145 58% 94%;
+  --app-confirm-icon-fg-success: var(--app-success);
+
+  --app-confirm-icon-bg-warning: 42 95% 92%;
+  --app-confirm-icon-fg-warning: var(--app-warning);
+
+  --app-confirm-icon-bg-danger: 0 72% 94%;
+  --app-confirm-icon-fg-danger: var(--app-danger);
+
+  /* Confirm embedded content card */
+  --app-confirm-content-card-bg: 190 20% 97%;
+  --app-confirm-content-card-border: var(--app-border);
+
+  /* ========================================================================
+     26. DATA TABLE
+  ======================================================================== */
+  --app-table-bg: 0 0% 100%;
+  --app-table-foreground: var(--app-foreground);
+  --app-table-border: var(--app-border);
+
+  --app-table-header-bg: 190 20% 97%;
+  --app-table-header-foreground: 190 8% 34%;
+
+  --app-table-row-selected-bg: 163 52% 88%;
+  --app-table-row-selected-foreground: 190 18% 13%;
+  --app-table-row-selected-muted: 190 10% 24%;
+  --app-table-row-selected-link: 163 72% 18%;
+  --app-table-row-selected-border: 163 42% 72%;
+
+  --app-table-pinned-bg: var(--app-table-row-bg);
+  --app-table-pinned-header-bg: var(--app-table-header-bg);
+  --app-table-pinned-shadow-left: 8px 0 10px -10px rgb(15 23 42 / 0.28);
+  --app-table-pinned-shadow-right: -8px 0 10px -10px rgb(15 23 42 / 0.28);
+
+  --app-table-cell-muted: var(--app-muted-foreground);
+  --app-table-ring: var(--app-ring);
+  --app-table-radius: var(--app-radius-md);
+
+  --app-table-cell-px-xs: 0.5rem;
+  --app-table-cell-px-sm: 0.625rem;
+  --app-table-cell-px-md: 0.75rem;
+
+  --app-table-cell-py-xs: 0.375rem;
+  --app-table-cell-py-sm: 0.5rem;
+  --app-table-cell-py-md: 0.625rem;
+
+  --app-table-font-xs: 0.75rem;
+  --app-table-font-sm: 0.8125rem;
+  --app-table-font-md: 0.875rem;
+
+  --app-table-header-height-xs: 2rem;
+  --app-table-header-height-sm: 2.25rem;
+  --app-table-header-height-md: 2.5rem;
+
+  --app-table-row-height-xs: 2.25rem;
+  --app-table-row-height-sm: 2.5rem;
+  --app-table-row-height-md: 2.875rem;
+
+  --app-table-toolbar-gap: 0.5rem;
+  --app-table-pagination-gap: 0.5rem;
+
+  --app-table-menu-bg: var(--app-popover);
+  --app-table-menu-border: var(--app-border);
+  --app-table-menu-foreground: var(--app-popover-foreground);
+  --app-table-menu-hover-bg: var(--app-table-row-hover-bg);
+
+  --app-table-bulk-bg: 163 62% 93%;
+  --app-table-bulk-foreground: 163 72% 25%;
+  --app-table-bulk-border: 163 45% 82%;
+
+  --app-table-card-row-bg: var(--app-card-bg);
+  --app-table-card-row-border: var(--app-border);
+  --app-table-shadow: var(--app-shadow-xs);
+
+  /* ========================================================================
+     27. SCROLLBAR + GLOBAL UTILITY TOKENS
+  ======================================================================== */
+  --app-scrollbar-thumb: 180 10% 72%;
+  --app-scrollbar-thumb-hover: 180 10% 62%;
+  --app-scrollbar-track: transparent;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* ========================================================================
+     01. GLOBAL COLORS — DARK
+  ======================================================================== */
+  --app-brand-teal: 163 68% 52%;
+  --app-brand-teal-hover: 163 68% 45%;
+  --app-brand-teal-active: 163 70% 39%;
+  --app-brand-mint: 163 55% 14%;
+  --app-brand-mint-strong: 163 44% 24%;
+  --app-brand-graphite: 190 16% 7%;
+
+  --app-background: 195 16% 7%;
+  --app-foreground: 170 16% 93%;
+
+  --app-surface: 195 15% 11%;
+  --app-surface-foreground: var(--app-foreground);
+
+  --app-popover: 195 15% 11%;
+  --app-popover-foreground: var(--app-foreground);
+
+  --app-primary: var(--app-brand-teal);
+  --app-primary-hover: var(--app-brand-teal-hover);
+  --app-primary-active: var(--app-brand-teal-active);
+  --app-primary-foreground: 195 18% 7%;
+
+  --app-secondary: 195 14% 15%;
+  --app-secondary-hover: 195 14% 19%;
+  --app-secondary-active: 195 14% 23%;
+  --app-secondary-foreground: var(--app-foreground);
+
+  --app-muted: 195 14% 15%;
+  --app-muted-hover: 195 14% 19%;
+  --app-muted-foreground: 175 9% 66%;
+
+  --app-border: 190 14% 22%;
+  --app-border-strong: 190 10% 36%;
+
+  --app-ring: var(--app-primary);
+  --app-ring-soft: 163 68% 52% / 0.22;
+
+  --app-success: 145 58% 45%;
+  --app-success-hover: 145 60% 38%;
+  --app-success-foreground: 195 18% 7%;
+
+  --app-warning: 38 92% 56%;
+  --app-warning-hover: 35 92% 49%;
+  --app-warning-foreground: 28 16% 10%;
+
+  --app-danger: 0 72% 58%;
+  --app-danger-hover: 0 72% 51%;
+  --app-danger-foreground: 0 0% 100%;
+
+  --app-info: 210 88% 63%;
+  --app-info-hover: 210 88% 56%;
+  --app-info-foreground: 195 18% 7%;
+
+  --background: var(--app-background);
+  --foreground: var(--app-foreground);
+  --card: var(--app-card-bg);
+  --card-foreground: var(--app-card-foreground);
+  --popover: var(--app-popover);
+  --popover-foreground: var(--app-popover-foreground);
+  --primary: var(--app-primary);
+  --primary-foreground: var(--app-primary-foreground);
+  --secondary: var(--app-secondary);
+  --secondary-foreground: var(--app-secondary-foreground);
+  --muted: var(--app-muted);
+  --muted-foreground: var(--app-muted-foreground);
+  --accent: var(--app-brand-mint);
+  --accent-foreground: 163 70% 78%;
+  --destructive: var(--app-danger);
+  --destructive-foreground: var(--app-danger-foreground);
+  --border: var(--app-border);
+  --input: var(--app-input-border);
+  --ring: var(--app-ring);
+
+  /* ========================================================================
+     02. SHADOWS — DARK
+  ======================================================================== */
+  --app-shadow-xs: 0 1px 1px rgb(0 0 0 / 0.22);
+  --app-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.28);
+  --app-shadow-md: 0 8px 24px -16px rgb(0 0 0 / 0.72);
+  --app-shadow-lg: 0 18px 54px -24px rgb(0 0 0 / 0.82);
+
+  /* ========================================================================
+     03. BUTTON — DARK
+  ======================================================================== */
+  --app-button-primary-bg: var(--app-primary);
+  --app-button-primary-bg-hover: var(--app-primary-hover);
+  --app-button-primary-bg-active: var(--app-primary-active);
+  --app-button-primary-foreground: var(--app-primary-foreground);
+  --app-button-primary-border: var(--app-primary);
+
+  --app-button-secondary-bg: var(--app-secondary);
+  --app-button-secondary-bg-hover: var(--app-secondary-hover);
+  --app-button-secondary-bg-active: var(--app-secondary-active);
+  --app-button-secondary-foreground: var(--app-secondary-foreground);
+  --app-button-secondary-border: var(--app-border);
+
+  --app-button-danger-bg: var(--app-danger);
+  --app-button-danger-bg-hover: var(--app-danger-hover);
+  --app-button-danger-foreground: var(--app-danger-foreground);
+  --app-button-danger-border: var(--app-danger);
+
+  --app-button-ghost-bg: transparent;
+  --app-button-ghost-bg-hover: 195 14% 15%;
+  --app-button-ghost-foreground: var(--app-foreground);
+  --app-button-ghost-border: transparent;
+
+  /* ========================================================================
+     04. INPUT / TEXTAREA — DARK
+  ======================================================================== */
+  --app-input-bg: 195 15% 10%;
+  --app-input-bg-hover: 195 15% 12%;
+  --app-input-bg-disabled: 195 14% 15%;
+
+  --app-input-foreground: var(--app-foreground);
+  --app-input-placeholder: var(--app-muted-foreground);
+
+  --app-input-border: var(--app-border);
+  --app-input-border-hover: var(--app-border-strong);
+  --app-input-border-focus: var(--app-ring);
+
+  --app-input-filled-bg: 195 14% 14%;
+  --app-input-filled-bg-hover: 195 14% 18%;
+
+  --app-input-ghost-bg: transparent;
+  --app-input-ghost-bg-hover: 195 14% 15%;
+
+  --app-input-invalid-border: var(--app-danger);
+  --app-input-invalid-ring: 0 72% 58% / 0.18;
+
+  --app-textarea-bg: var(--app-input-bg);
+  --app-textarea-bg-hover: var(--app-input-bg-hover);
+  --app-textarea-foreground: var(--app-input-foreground);
+  --app-textarea-placeholder: var(--app-input-placeholder);
+  --app-textarea-border: var(--app-input-border);
+  --app-textarea-border-hover: var(--app-input-border-hover);
+  --app-textarea-border-focus: var(--app-input-border-focus);
+
+  /* ========================================================================
+     05. SWITCH / CHECKBOX — DARK
+  ======================================================================== */
+  --app-switch-bg: 190 12% 28%;
+  --app-switch-bg-hover: 190 12% 34%;
+  --app-switch-bg-checked: var(--app-primary);
+  --app-switch-bg-checked-hover: var(--app-primary-hover);
+  --app-switch-thumb-bg: 0 0% 100%;
+  --app-switch-thumb-bg-disabled: 190 8% 48%;
+
+  --app-checkbox-bg: 195 15% 10%;
+  --app-checkbox-bg-hover: 195 14% 15%;
+  --app-checkbox-border: 190 14% 28%;
+  --app-checkbox-border-hover: 190 10% 40%;
+
+  --app-checkbox-checked-bg: var(--app-primary);
+  --app-checkbox-checked-bg-hover: var(--app-primary-hover);
+  --app-checkbox-checked-foreground: var(--app-primary-foreground);
+  --app-checkbox-indeterminate-bg: var(--app-primary);
+  --app-checkbox-indeterminate-foreground: var(--app-primary-foreground);
+
+  /* ========================================================================
+     06. BADGE / STATUS DOT / LOADER — DARK
+  ======================================================================== */
+  --app-badge-neutral-bg: 195 14% 15%;
+  --app-badge-neutral-bg-hover: 195 14% 19%;
+  --app-badge-neutral-foreground: var(--app-foreground);
+  --app-badge-neutral-border: var(--app-border);
+
+  --app-badge-primary-soft-bg: 163 55% 14%;
+  --app-badge-primary-soft-foreground: 163 70% 78%;
+
+  --app-badge-success-soft-bg: 145 58% 14%;
+  --app-badge-success-soft-foreground: 145 65% 76%;
+
+  --app-badge-warning-soft-bg: 38 92% 14%;
+  --app-badge-warning-soft-foreground: 42 95% 76%;
+
+  --app-badge-danger-soft-bg: 0 72% 14%;
+  --app-badge-danger-soft-foreground: 0 72% 78%;
+
+  --app-badge-info-soft-bg: 210 88% 15%;
+  --app-badge-info-soft-foreground: 210 88% 78%;
+
+  --app-status-dot-neutral: var(--app-muted-foreground);
+  --app-status-dot-primary: var(--app-primary);
+  --app-status-dot-success: var(--app-success);
+  --app-status-dot-warning: var(--app-warning);
+  --app-status-dot-danger: var(--app-danger);
+  --app-status-dot-info: var(--app-info);
+
+  --app-status-dot-neutral-ring: var(--app-muted-foreground);
+  --app-status-dot-primary-ring: var(--app-primary);
+  --app-status-dot-success-ring: var(--app-success);
+  --app-status-dot-warning-ring: var(--app-warning);
+  --app-status-dot-danger-ring: var(--app-danger);
+  --app-status-dot-info-ring: var(--app-info);
+
+  --app-loader-primary: var(--app-primary);
+  --app-loader-neutral: var(--app-muted-foreground);
+  --app-loader-success: var(--app-success);
+  --app-loader-warning: var(--app-warning);
+  --app-loader-danger: var(--app-danger);
+  --app-loader-info: var(--app-info);
+
+  /* ========================================================================
+     07. SELECT — DARK
+  ======================================================================== */
+  --app-select-menu-bg: var(--app-popover);
+  --app-select-menu-border: var(--app-border);
+  --app-select-menu-shadow: var(--app-shadow-md);
+
+  --app-select-option-bg: transparent;
+  --app-select-option-bg-focused: 195 14% 15%;
+  --app-select-option-bg-selected: var(--app-primary);
+  --app-select-option-bg-selected-hover: var(--app-primary-hover);
+
+  --app-select-option-foreground: var(--app-input-foreground);
+  --app-select-option-foreground-focused: var(--app-input-foreground);
+  --app-select-option-foreground-selected: var(--app-primary-foreground);
+
+  --app-select-value-foreground: var(--app-input-foreground);
+  --app-select-indicator: var(--app-input-placeholder);
+  --app-select-indicator-hover: var(--app-input-foreground);
+
+  --app-select-multi-value-bg: 163 55% 14%;
+  --app-select-multi-value-foreground: 163 70% 78%;
+  --app-select-multi-value-border: 163 44% 24%;
+  --app-select-multi-value-remove: var(--app-muted-foreground);
+  --app-select-multi-value-remove-hover: var(--app-danger);
+  --app-select-multi-value-remove-bg-hover: 0 72% 14%;
+
+  /* ========================================================================
+     08. CARD / FIELD / SEPARATOR — DARK
+  ======================================================================== */
+  --app-card-bg: 195 15% 11%;
+  --app-card-foreground: var(--app-foreground);
+  --app-card-border: var(--app-border);
+  --app-card-border-strong: var(--app-border-strong);
+
+  --app-card-muted-bg: 195 14% 13%;
+  --app-card-muted-foreground: var(--app-muted-foreground);
+
+  --app-card-elevated-bg: 195 14% 13%;
+  --app-card-hover-bg: 195 14% 15%;
+
+  --app-card-selected-ring: var(--app-primary);
+
+  --app-card-danger-bg: 0 72% 11%;
+  --app-card-danger-border: 0 72% 28%;
+
+  --app-card-success-bg: 145 58% 11%;
+  --app-card-success-border: 145 58% 28%;
+
+  --app-card-warning-bg: 38 92% 11%;
+  --app-card-warning-border: 38 92% 28%;
+
+  --app-card-info-bg: 210 88% 12%;
+  --app-card-info-border: 210 88% 30%;
+
+  --app-card-shadow-xs: var(--app-shadow-xs);
+  --app-card-shadow-sm: var(--app-shadow-sm);
+  --app-card-shadow-md: var(--app-shadow-md);
+
+  --app-field-label-foreground: var(--app-foreground);
+  --app-field-description-foreground: var(--app-muted-foreground);
+  --app-field-hint-foreground: var(--app-muted-foreground);
+  --app-field-error-foreground: var(--app-danger);
+  --app-field-required-foreground: var(--app-danger);
+
+  --app-separator-default: var(--app-border);
+  --app-separator-muted: 195 14% 18%;
+  --app-separator-strong: var(--app-border-strong);
+
+  --app-separator-primary: var(--app-primary);
+  --app-separator-success: var(--app-success);
+  --app-separator-warning: var(--app-warning);
+  --app-separator-danger: var(--app-danger);
+  --app-separator-info: var(--app-info);
+
+  /* ========================================================================
+     09. SKELETON / ALERT / EMPTY / DATA STATE — DARK
+  ======================================================================== */
+  --app-skeleton-bg: 195 14% 20%;
+  --app-skeleton-bg-muted: 195 14% 15%;
+  --app-skeleton-bg-strong: 190 10% 32%;
+  --app-skeleton-highlight: 170 16% 93% / 0.08;
+
+  --app-alert-bg-neutral: 195 14% 13%;
+  --app-alert-border-neutral: 190 14% 24%;
+  --app-alert-foreground-neutral: var(--app-foreground);
+  --app-alert-icon-neutral: var(--app-muted-foreground);
+
+  --app-alert-bg-info: 210 88% 12%;
+  --app-alert-border-info: 210 88% 30%;
+  --app-alert-foreground-info: 210 88% 78%;
+  --app-alert-icon-info: var(--app-info);
+
+  --app-alert-bg-success: 145 58% 11%;
+  --app-alert-border-success: 145 58% 28%;
+  --app-alert-foreground-success: 145 65% 76%;
+  --app-alert-icon-success: var(--app-success);
+
+  --app-alert-bg-warning: 38 92% 11%;
+  --app-alert-border-warning: 38 92% 28%;
+  --app-alert-foreground-warning: 42 95% 76%;
+  --app-alert-icon-warning: var(--app-warning);
+
+  --app-alert-bg-danger: 0 72% 11%;
+  --app-alert-border-danger: 0 72% 30%;
+  --app-alert-foreground-danger: 0 72% 78%;
+  --app-alert-icon-danger: var(--app-danger);
+
+  --app-empty-bg: transparent;
+  --app-empty-border: var(--app-border);
+  --app-empty-foreground: var(--app-foreground);
+  --app-empty-muted-foreground: var(--app-muted-foreground);
+
+  --app-empty-icon-bg-neutral: 195 14% 15%;
+  --app-empty-icon-fg-neutral: var(--app-muted-foreground);
+
+  --app-empty-icon-bg-info: 210 88% 14%;
+  --app-empty-icon-fg-info: var(--app-info);
+
+  --app-empty-icon-bg-success: 145 58% 14%;
+  --app-empty-icon-fg-success: var(--app-success);
+
+  --app-empty-icon-bg-warning: 38 92% 14%;
+  --app-empty-icon-fg-warning: var(--app-warning);
+
+  --app-empty-icon-bg-danger: 0 72% 14%;
+  --app-empty-icon-fg-danger: var(--app-danger);
+
+  --app-data-state-bg: transparent;
+  --app-data-state-border: var(--app-border);
+
+  /* ========================================================================
+   10. DIALOG / CONFIRM DIALOG — DARK
+======================================================================== */
+
+  /* Overlay */
+  --app-dialog-overlay-bg-soft: 195 20% 4% / 0.58;
+  --app-dialog-overlay-bg: 195 20% 4% / 0.72;
+  --app-dialog-overlay-bg-strong: 195 20% 4% / 0.84;
+
+  /* Blur del fondo del dialog */
+  --app-dialog-overlay-blur: 2px;
+
+  /* Dialog surface */
+  --app-dialog-bg: var(--app-popover);
+  --app-dialog-foreground: var(--app-popover-foreground);
+  --app-dialog-border: var(--app-border);
+  --app-dialog-muted-foreground: var(--app-muted-foreground);
+  --app-dialog-shadow: var(--app-shadow-lg);
+
+  /* Dialog motion */
+  --app-dialog-overlay-duration-in: 220ms;
+  --app-dialog-overlay-duration-out: 180ms;
+
+  --app-dialog-content-duration-in: 360ms;
+  --app-dialog-content-duration-out: 280ms;
+
+  --app-dialog-content-scale-in: 0.982;
+  --app-dialog-content-scale-out: 0.988;
+
+  /* Confirm dialog inherits regular dialog base */
+  --app-confirm-overlay-bg: var(--app-dialog-overlay-bg);
+  --app-confirm-bg: var(--app-dialog-bg);
+  --app-confirm-foreground: var(--app-dialog-foreground);
+  --app-confirm-border: var(--app-dialog-border);
+  --app-confirm-muted-foreground: var(--app-dialog-muted-foreground);
+  --app-confirm-shadow: var(--app-dialog-shadow);
+
+  /* Confirm icon tones */
+  --app-confirm-icon-bg-neutral: 195 14% 15%;
+  --app-confirm-icon-fg-neutral: var(--app-muted-foreground);
+
+  --app-confirm-icon-bg-info: 210 88% 14%;
+  --app-confirm-icon-fg-info: var(--app-info);
+
+  --app-confirm-icon-bg-success: 145 58% 14%;
+  --app-confirm-icon-fg-success: var(--app-success);
+
+  --app-confirm-icon-bg-warning: 38 92% 14%;
+  --app-confirm-icon-fg-warning: var(--app-warning);
+
+  --app-confirm-icon-bg-danger: 0 72% 14%;
+  --app-confirm-icon-fg-danger: var(--app-danger);
+
+  /* Confirm embedded content card */
+  --app-confirm-content-card-bg: 195 14% 13%;
+  --app-confirm-content-card-border: var(--app-border);
+
+  /* ========================================================================
+     11. DATA TABLE — DARK
+  ======================================================================== */
+  --app-table-bg: 195 15% 11%;
+  --app-table-foreground: var(--app-foreground);
+  --app-table-border: var(--app-border);
+
+  --app-table-header-bg: 195 14% 13%;
+  --app-table-header-foreground: 175 9% 74%;
+
+  --app-table-row-selected-bg: 163 34% 20%;
+  --app-table-row-selected-foreground: 170 18% 96%;
+  --app-table-row-selected-muted: 170 14% 84%;
+  --app-table-row-selected-link: 163 76% 82%;
+  --app-table-row-selected-border: 163 36% 30%;
+
+  --app-table-pinned-bg: var(--app-table-row-bg);
+  --app-table-pinned-header-bg: var(--app-table-header-bg);
+
+  --app-table-menu-bg: var(--app-popover);
+  --app-table-menu-border: var(--app-border);
+  --app-table-menu-foreground: var(--app-popover-foreground);
+  --app-table-menu-hover-bg: var(--app-table-row-hover-bg);
+
+  --app-table-bulk-bg: 163 55% 14%;
+  --app-table-bulk-foreground: 163 70% 78%;
+  --app-table-bulk-border: 163 44% 24%;
+
+  --app-table-card-row-bg: var(--app-card-bg);
+  --app-table-card-row-border: var(--app-border);
+  --app-table-shadow: var(--app-shadow-xs);
+
+  /* ========================================================================
+     12. SCROLLBAR — DARK
+  ======================================================================== */
+  --app-scrollbar-thumb: 190 10% 36%;
+  --app-scrollbar-thumb-hover: 190 10% 46%;
+  --app-scrollbar-track: transparent;
+}
+
+/* ============================================================================
+   28. KEYFRAMES
+============================================================================ */
+@keyframes app-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes app-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes app-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes app-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes app-slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes app-slide-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-0.375rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes app-dialog-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes app-dialog-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes app-dialog-content-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(var(--app-dialog-content-scale-in));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes app-dialog-content-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(var(--app-dialog-content-scale-out));
+  }
+}
+
+/* ============================================================================
+   29. GLOBAL FONT APPLICATION
+============================================================================ */
+html,
+body,
+#root {
+  font-family: var(--app-font-sans) !important;
+}
+
+body {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body * {
+  font-family: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.font-sans {
+  font-family: var(--app-font-sans) !important;
+}
+
+.font-heading,
+[data-app-page-title],
+.app-page-title {
+  font-family: var(--app-font-heading) !important;
+}
+
+.font-mono,
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--app-font-mono) !important;
+}
