@@ -70,7 +70,7 @@ function getPosDashboardUrl() {
     return null;
   }
 
-  return \`\${posUrl.replace(/\/$/, "")}/dashboard\`;
+  return `${posUrl.replace(/\/$/, "")}/dashboard`;
 }
 
 function MarcasLayoutContent() {

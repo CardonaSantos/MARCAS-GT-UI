@@ -8,7 +8,7 @@ import {
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
 function normalizeEndpoint(endpoint: string) {
-  return endpoint.startsWith("/") ? endpoint : \`/\${endpoint}\`;
+  return endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
 }
 
 export function createApiHooks(client: AxiosInstance) {

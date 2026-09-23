@@ -37,7 +37,7 @@ import {
 function normalizeHref(href?: string) {
   if (!href) return "/marcas-gt/dashboard";
 
-  return href.startsWith("/") ? href : \`/\${href}\`;
+  return href.startsWith("/") ? href : `/${href}`;
 }
 
 function isRouteActive(pathname: string, href?: string) {
@@ -45,7 +45,7 @@ function isRouteActive(pathname: string, href?: string) {
 
   const routePath = normalizeHref(href).split(/[?#]/)[0];
 
-  return pathname === routePath || pathname.startsWith(\`\${routePath}/\`);
+  return pathname === routePath || pathname.startsWith(`${routePath}/`);
 }
 
 function hasActiveChild(pathname: string, item: MarcasRoute) {
