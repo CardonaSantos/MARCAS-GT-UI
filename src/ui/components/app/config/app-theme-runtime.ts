@@ -1,5 +1,5 @@
-export const APP_ACCENT_STORAGE_KEY = "nova:app-accent-color";
-export const APP_APPEARANCE_STORAGE_KEY = "nova:app-appearance";
+export const APP_ACCENT_STORAGE_KEY = "marcas:app-accent-color";
+export const APP_APPEARANCE_STORAGE_KEY = "marcas:app-appearance";
 
 export type AppAppearance = "light" | "dark" | "system";
 

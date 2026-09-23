@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Check, Moon, Monitor, RotateCcw, Sun } from "lucide-react";
 
-import { AppButton } from "@/components/app/primitives/app-button";
-import { AppInline } from "@/components/app/primitives/app-inline";
-import { AppStack } from "@/components/app/primitives/app-stack";
+import { AppButton } from "@/ui/components/app/primitives/app-button";
+import { AppInline } from "@/ui/components/app/primitives/app-inline";
+import { AppStack } from "@/ui/components/app/primitives/app-stack";
 import { useAppTheme } from "./app-theme-provider";
 import { normalizeHexColor, type AppAppearance } from "./app-theme-runtime";
 

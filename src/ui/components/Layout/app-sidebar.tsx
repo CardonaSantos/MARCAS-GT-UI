@@ -1,8 +1,13 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 
-import { useStoreCrm } from "@/Crm/ZustandCrm/ZustandCrmContext";
+import { useStore } from "@/Context/ContextSucursal";
 import { cn } from "@/lib/utils";
 
 import {
@@ -23,29 +28,27 @@ import {
   AppSidebarMobileOverlay,
   useAppSidebar,
 } from "../app/primitives/app-sidebar-shell";
-import { getCrmRoutesByRole, Route } from "./crm-sidebar-routes";
+
+import {
+  getMarcasRoutesByRole,
+  type MarcasRoute,
+} from "./marcas-sidebar-routes";
 
 function normalizeHref(href?: string) {
-  if (!href) return "/";
+  if (!href) return "/marcas-gt/dashboard";
 
-  return href.startsWith("/") ? href : `/${href}`;
-}
-
-function getPathWithoutQuery(href?: string) {
-  return normalizeHref(href).split(/[?#]/)[0];
+  return href.startsWith("/") ? href : \`/\${href}\`;
 }
 
 function isRouteActive(pathname: string, href?: string) {
-  const routePath = getPathWithoutQuery(href);
+  if (!href) return false;
 
-  if (routePath === "/crm") {
-    return pathname === "/crm";
-  }
+  const routePath = normalizeHref(href).split(/[?#]/)[0];
 
-  return pathname === routePath || pathname.startsWith(`${routePath}/`);
+  return pathname === routePath || pathname.startsWith(\`\${routePath}/\`);
 }
 
-function hasActiveChild(pathname: string, item: Route) {
+function hasActiveChild(pathname: string, item: MarcasRoute) {
   if (item.href && isRouteActive(pathname, item.href)) {
     return true;
   }
@@ -72,7 +75,6 @@ function SidebarTooltip({
   return (
     <span className="group/tooltip relative block">
       {children}
-
       <span className={appSidebarTooltipVariants()}>{label}</span>
     </span>
   );
@@ -82,13 +84,16 @@ function RouteIcon({
   icon: Icon,
   size = "root",
 }: {
-  icon: Route["icon"];
+  icon: MarcasRoute["icon"];
   size?: "root" | "sub";
 }) {
   return (
     <Icon
       aria-hidden="true"
-      className={cn("shrink-0", size === "root" ? "h-4 w-4" : "h-3.5 w-3.5")}
+      className={cn(
+        "shrink-0",
+        size === "root" ? "h-4 w-4" : "h-3.5 w-3.5",
+      )}
     />
   );
 }
@@ -119,26 +124,22 @@ function SidebarLabel({
   );
 }
 
-type SidebarItemProps = {
-  item: Route;
-  active: boolean;
-  collapsed: boolean;
-  onNavigate: () => void;
-  level?: "root" | "sub";
-};
-
 function SidebarItem({
   item,
   active,
   collapsed,
   onNavigate,
   level = "root",
-}: SidebarItemProps) {
-  const href = normalizeHref(item.href);
-
+}: {
+  item: MarcasRoute;
+  active: boolean;
+  collapsed: boolean;
+  onNavigate: () => void;
+  level?: "root" | "sub";
+}) {
   const content = (
     <Link
-      to={href}
+      to={normalizeHref(item.href)}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
@@ -166,22 +167,19 @@ function SidebarItem({
   );
 }
 
-type SidebarGroupItemProps = {
-  item: Route;
-  pathname: string;
-  collapsed: boolean;
-  onNavigate: () => void;
-};
-
 function SidebarGroupItem({
   item,
   pathname,
   collapsed,
   onNavigate,
-}: SidebarGroupItemProps) {
+}: {
+  item: MarcasRoute;
+  pathname: string;
+  collapsed: boolean;
+  onNavigate: () => void;
+}) {
   const active = hasActiveChild(pathname, item);
-
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(active);
 
   useEffect(() => {
     if (active) {
@@ -189,24 +187,20 @@ function SidebarGroupItem({
     }
   }, [active]);
 
-  const toggleOpen = () => {
-    setOpen((current) => !current);
-  };
-
   if (collapsed) {
     return (
       <div className="space-y-1">
         <SidebarTooltip label={item.label}>
           <button
             type="button"
-            onClick={toggleOpen}
+            onClick={() => setOpen((current) => !current)}
             aria-expanded={open}
             aria-label={item.label}
             title={item.label}
             className={cn(
               appSidebarGroupTriggerVariants({
                 active,
-                collapsed: false,
+                collapsed: true,
               }),
               "overflow-hidden",
             )}
@@ -237,7 +231,7 @@ function SidebarGroupItem({
     <div className="space-y-1">
       <button
         type="button"
-        onClick={toggleOpen}
+        onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
         className={cn(
           appSidebarGroupTriggerVariants({
@@ -247,6 +241,8 @@ function SidebarGroupItem({
           "overflow-hidden",
         )}
       >
+        <RouteIcon icon={item.icon} />
+
         <SidebarLabel collapsed={false} className="flex-1 truncate text-left">
           {item.label}
         </SidebarLabel>
@@ -290,9 +286,8 @@ export function AppSidebar() {
     closeMobile,
   } = useAppSidebar();
 
-  const rol = useStoreCrm((state) => state.rol);
-
-  const displayedRoutes = getCrmRoutesByRole(rol);
+  const role = useStore((state) => state.userRol);
+  const displayedRoutes = getMarcasRoutesByRole(role);
 
   const handleNavigate = useCallback(() => {
     closeMobile();
@@ -318,7 +313,7 @@ export function AppSidebar() {
 
         <div className={appSidebarContentVariants()}>
           {!collapsed ? (
-            <p className={appSidebarSectionLabelVariants()}>Secciones</p>
+            <p className={appSidebarSectionLabelVariants()}>Marcas GT</p>
           ) : (
             <div className="mb-2 h-4" />
           )}

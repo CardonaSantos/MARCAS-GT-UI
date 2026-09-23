@@ -1,6 +1,7 @@
 import { createApiClient } from "./createApiClient";
-import { createApiHooks } from "./useQueryHooks";
-const baseUrl = import.meta.env.VITE_MARCAS_URL;
-const crmClient = createApiClient(baseUrl);
+import { createApiHooks } from "./createApiHooks";
 
-export const API = createApiHooks(crmClient);
+const baseUrl = import.meta.env.VITE_API_URL;
+
+export const marcasApi = createApiClient(baseUrl);
+export const API = createApiHooks(marcasApi);

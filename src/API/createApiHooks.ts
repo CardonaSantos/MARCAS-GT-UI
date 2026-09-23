@@ -1,17 +1,17 @@
 import {
-  QueryKey,
   useMutation,
-  UseMutationOptions,
   useQuery,
-  UseQueryOptions,
+  type QueryKey,
+  type UseMutationOptions,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
-export function createApiHooks(client: AxiosInstance) {
-  function normalize(endpoint: string) {
-    return endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  }
+function normalizeEndpoint(endpoint: string) {
+  return endpoint.startsWith("/") ? endpoint : \`/\${endpoint}\`;
+}
 
+export function createApiHooks(client: AxiosInstance) {
   return {
     useQueryApi<TData, TError = Error>(
       key: QueryKey,
@@ -22,14 +22,18 @@ export function createApiHooks(client: AxiosInstance) {
       return useQuery<TData, TError>({
         queryKey: key,
         queryFn: async () => {
-          const { data } = await client.get<TData>(normalize(endpoint), config);
+          const { data } = await client.get<TData>(
+            normalizeEndpoint(endpoint),
+            config,
+          );
+
           return data;
         },
         ...options,
       });
     },
 
-    useMutationApi<TData, TVariables = unknown, TError = unknown>(
+    useMutationApi<TData, TVariables = unknown, TError = Error>(
       method: "post" | "put" | "patch" | "delete",
       endpoint: string,
       config?: AxiosRequestConfig,
@@ -38,7 +42,7 @@ export function createApiHooks(client: AxiosInstance) {
       return useMutation<TData, TError, TVariables>({
         mutationFn: async (variables) => {
           const { data } = await client.request<TData>({
-            url: normalize(endpoint),
+            url: normalizeEndpoint(endpoint),
             method,
             data: variables,
             ...config,

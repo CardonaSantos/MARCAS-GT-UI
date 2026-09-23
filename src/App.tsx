@@ -37,7 +37,7 @@ import MySales from "./Pages/EmployePages/MySales";
 import RegistroVisita from "./Pages/RegistroVisita";
 import VisitasTable from "./Pages/Dates/VisitasTable";
 import CustomerSales from "./Pages/CustomerSales/CustomerSales";
-import Layout2 from "./components/Layout/Layout2";
+import { MarcasLayout } from "./ui/components/Layout/layout-marcas";
 import VentaPdfPage from "./components/PDF/VentasPDF/VentaPdfPage";
 import EmpresaForm from "./Pages/Empresa/EmpresaForm";
 import ChatsAnalytics from "./Pages/Analytics/ChatsAnalytics";
@@ -69,7 +69,7 @@ function App() {
           <Route path="/marcas-gt/register" element={<CreateUser />} />
 
           {/* Rutas protegidas con Layout */}
-          <Route element={<Layout2 />}>
+          <Route element={<MarcasLayout />}>
             <Route
               path="/marcas-gt/dashboard"
               element={

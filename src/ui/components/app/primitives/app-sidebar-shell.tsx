@@ -25,7 +25,7 @@ const AppSidebarContext = React.createContext<AppSidebarContextValue | null>(
   null,
 );
 
-const STORAGE_KEY = "app-sidebar-collapsed";
+const STORAGE_KEY = "marcas:sidebar-collapsed";
 const MOBILE_QUERY = "(max-width: 767px)";
 
 export function AppSidebarProvider({

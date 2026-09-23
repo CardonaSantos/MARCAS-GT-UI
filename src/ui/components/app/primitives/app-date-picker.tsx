@@ -137,8 +137,6 @@ function buildDateMeta(
       boundary,
     };
   }
-  console.log(outputFormat);
-
   const parsed = dayjs(inputValue);
 
   if (!parsed.isValid()) {
