@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   AlertCircle,
+  ArrowUpRight,
   Bell,
+  BellRing,
+  CircleUserRound,
   Clock,
   LogOut,
   Mail,
@@ -73,18 +76,25 @@ export function MarcasTopbar({
 }: MarcasTopbarProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const posDashboardUrl = getPosDashboardUrl();
+  const hasNotifications = notifications.length > 0;
+  const NotificationIcon = hasNotifications ? BellRing : Bell;
 
   return (
-    <header className="z-40 flex h-16 shrink-0 items-center border-b border-[hsl(var(--app-border))] bg-[hsl(var(--app-background)/0.96)] px-3 backdrop-blur md:px-5">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+    <header className="z-40 flex h-12 shrink-0 items-center border-b border-[hsl(var(--app-border))] bg-[hsl(var(--app-background)/0.98)] px-2.5 backdrop-blur md:px-4">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         <AppSidebarTrigger />
+
+        <span
+          aria-hidden="true"
+          className="hidden h-5 w-px bg-[hsl(var(--app-border))] sm:block"
+        />
 
         <Link
           to="/marcas-gt/dashboard"
-          className="flex min-w-0 items-center gap-2.5"
+          className="flex min-w-0 items-center gap-2 rounded-[var(--app-radius-sm)] outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[hsl(var(--app-ring))]"
           aria-label="Ir al dashboard de Marcas GT"
         >
-          <span className="flex h-9 w-14 shrink-0 items-center justify-start overflow-hidden">
+          <span className="flex h-7 w-9 shrink-0 items-center justify-start overflow-hidden">
             <img
               className="h-full w-full object-contain object-left"
               src={logo}
@@ -92,28 +102,25 @@ export function MarcasTopbar({
             />
           </span>
 
-          <span className="hidden min-w-0 sm:block">
-            <span className="block truncate text-sm font-semibold leading-none">
-              Marcas GT
-            </span>
-            <span className="mt-1 block text-[10px] leading-none text-[hsl(var(--app-muted-foreground))]">
-              Gestión comercial
-            </span>
+          <span className="hidden truncate text-xs font-semibold tracking-tight sm:block">
+            Marcas GT
           </span>
         </Link>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+      <div className="flex shrink-0 items-center gap-1">
         {posDashboardUrl ? (
           <AppButton
             asChild
             variant="ghost"
-            size="sm"
-            className="hidden sm:inline-flex"
+            size="xs"
+            radius="md"
+            className="hidden h-7 px-2 text-[11px] sm:inline-flex"
           >
             <a href={posDashboardUrl} className="flex items-center gap-1.5">
               <Store className="h-3.5 w-3.5" />
-              Caballeros Boutique
+              <span className="hidden lg:inline">Caballeros Boutique</span>
+              <ArrowUpRight className="h-3 w-3 opacity-60" />
             </a>
           </AppButton>
         ) : null}
@@ -128,15 +135,17 @@ export function MarcasTopbar({
             <AppDialogTrigger asChild>
               <AppButton
                 variant="outline"
-                size="iconSm"
+                size="iconXs"
+                radius="md"
                 className="relative"
                 aria-label="Abrir notificaciones"
+                title="Notificaciones"
               >
-                <Bell className="h-4 w-4" />
+                <NotificationIcon className="h-3.5 w-3.5" />
 
-                {notifications.length > 0 ? (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[hsl(var(--app-danger))] px-1 text-[9px] font-bold text-white">
-                    {notifications.length}
+                {hasNotifications ? (
+                  <span className="absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[hsl(var(--app-danger))] px-0.5 text-[8px] font-bold leading-none text-white">
+                    {notifications.length > 99 ? "99+" : notifications.length}
                   </span>
                 ) : null}
               </AppButton>
@@ -145,7 +154,7 @@ export function MarcasTopbar({
             <AppDialogContent size="md">
               <AppDialogHeader divider>
                 <AppDialogTitle className="flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
+                  <NotificationIcon className="h-4 w-4" />
                   Notificaciones
                 </AppDialogTitle>
               </AppDialogHeader>
@@ -228,10 +237,12 @@ export function MarcasTopbar({
           <AppDropdownMenuTrigger asChild>
             <AppButton
               variant="outline"
-              size="iconSm"
+              size="iconXs"
+              radius="md"
               aria-label="Abrir menú de usuario"
+              title="Cuenta"
             >
-              <User className="h-4 w-4" />
+              <CircleUserRound className="h-3.5 w-3.5" />
             </AppButton>
           </AppDropdownMenuTrigger>
 

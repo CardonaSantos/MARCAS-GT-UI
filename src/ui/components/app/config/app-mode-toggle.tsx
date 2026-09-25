@@ -1,11 +1,14 @@
 "use client";
+
 import { Check, Laptop, Moon, Sun } from "lucide-react";
+
 import {
   AppDropdownMenu,
   AppDropdownMenuContent,
   AppDropdownMenuItem,
   AppDropdownMenuTrigger,
 } from "../primitives/app-dropdown-menu";
+import { AppButton } from "../primitives/app-button";
 import { useAppTheme } from "./app-theme-provider";
 import type { AppAppearance } from "./app-theme-runtime";
 
@@ -32,10 +35,10 @@ const APPEARANCE_OPTIONS: Array<{
 ];
 
 function getAppearanceIcon(appearance: AppAppearance) {
-  if (appearance === "dark") return <Moon size={15} />;
-  if (appearance === "system") return <Laptop size={15} />;
+  if (appearance === "dark") return <Moon className="h-3.5 w-3.5" />;
+  if (appearance === "system") return <Laptop className="h-3.5 w-3.5" />;
 
-  return <Sun size={15} />;
+  return <Sun className="h-3.5 w-3.5" />;
 }
 
 export function AppModeToggle() {
@@ -43,21 +46,16 @@ export function AppModeToggle() {
 
   return (
     <AppDropdownMenu>
-      <AppDropdownMenuTrigger
-        className={[
-          "relative inline-flex h-8 w-8 items-center justify-center rounded-[var(--app-radius-md)]",
-          "border border-[hsl(var(--app-border,var(--border)))]",
-          "bg-[hsl(var(--app-background,var(--background)))]",
-          "text-[hsl(var(--app-muted-foreground,var(--muted-foreground)))]",
-          "transition-colors hover:bg-[hsl(var(--app-muted,var(--muted))/0.55)]",
-          "hover:text-[hsl(var(--app-foreground,var(--foreground)))]",
-          "focus-visible:outline-none focus-visible:ring-2",
-          "focus-visible:ring-[hsl(var(--app-ring,var(--ring)))]",
-        ].join(" ")}
-        aria-label="Cambiar apariencia"
-        title="Cambiar apariencia"
-      >
-        {getAppearanceIcon(appearance)}
+      <AppDropdownMenuTrigger asChild>
+        <AppButton
+          variant="outline"
+          size="iconXs"
+          radius="md"
+          aria-label="Cambiar apariencia"
+          title="Cambiar apariencia"
+        >
+          {getAppearanceIcon(appearance)}
+        </AppButton>
       </AppDropdownMenuTrigger>
 
       <AppDropdownMenuContent
