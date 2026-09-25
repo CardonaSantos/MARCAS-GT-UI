@@ -2,14 +2,14 @@ import { cva } from "class-variance-authority";
 
 export const appSidebarRootVariants = cva(
   [
-    "fixed inset-y-0 left-0 z-[60] flex min-h-0 flex-col",
+    "fixed inset-y-0 left-0 z-[60] flex h-dvh max-h-dvh min-h-0 shrink-0 flex-col overflow-hidden",
     "border-r border-[hsl(var(--app-border,var(--border)))]",
     "bg-[hsl(var(--app-background,var(--background)))]",
     "text-[hsl(var(--app-foreground,var(--foreground)))]",
     "will-change-[width,transform]",
     "transition-[width,transform] duration-300 ease-[cubic-bezier(.22,1,.36,1)]",
     "w-[248px]",
-    "md:static md:z-0 md:translate-x-0",
+    "md:static md:z-0 md:h-dvh md:max-h-dvh md:translate-x-0",
   ],
   {
     variants: {
@@ -67,7 +67,7 @@ export const appSidebarMobileHeaderVariants = cva([
 ]);
 
 export const appSidebarContentVariants = cva([
-  "min-h-0 flex-1 overflow-y-auto px-2 py-3",
+  "min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-3 [scrollbar-gutter:stable]",
 ]);
 
 export const appSidebarSectionLabelVariants = cva([
