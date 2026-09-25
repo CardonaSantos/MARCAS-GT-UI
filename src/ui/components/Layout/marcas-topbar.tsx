@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import {
   AlertCircle,
   Bell,
-  CircleUserRound,
   Clock,
   LogOut,
   Mail,
   Store,
   Trash2,
   User,
+  UserRound,
   X,
 } from "lucide-react";
 
@@ -105,7 +105,7 @@ export function MarcasTopbar({
         </Link>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1">
         {posDashboardUrl ? (
           <AppButton
             asChild
@@ -126,7 +126,9 @@ export function MarcasTopbar({
           className="mx-0.5 hidden h-5 w-px bg-[hsl(var(--app-border))] sm:block"
         />
 
-        <AppModeToggle />
+        <div className="flex [&>button]:h-8 [&>button]:w-8 [&>button]:shrink-0 [&>button]:rounded-full [&>button]:border-transparent [&>button]:text-[hsl(var(--app-muted-foreground))] [&>button:hover]:text-[hsl(var(--app-foreground))] [&>button>svg]:h-[17px] [&>button>svg]:w-[17px]">
+          <AppModeToggle />
+        </div>
 
         {user ? (
           <AppDialog
@@ -135,17 +137,17 @@ export function MarcasTopbar({
           >
             <AppDialogTrigger asChild>
               <AppButton
-                variant="outline"
+                variant="ghost"
                 size="iconSm"
-                radius="md"
-                className="relative"
+                radius="full"
+                className="relative h-8 w-8 shrink-0 text-[hsl(var(--app-muted-foreground))] hover:text-[hsl(var(--app-foreground))]"
                 aria-label="Abrir notificaciones"
                 title="Notificaciones"
               >
-                <Bell className="h-4 w-4" />
+                <Bell className="h-[17px] w-[17px]" />
 
                 {hasNotifications ? (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full border-2 border-[hsl(var(--app-background))] bg-[hsl(var(--app-danger))] px-0.5 text-[9px] font-bold leading-none text-white">
+                  <span className="pointer-events-none absolute right-0 top-0 flex h-3.5 min-w-3.5 translate-x-[35%] -translate-y-[35%] items-center justify-center rounded-full border border-[hsl(var(--app-background))] bg-[hsl(var(--app-danger))] px-0.5 text-[8px] font-bold tabular-nums leading-none text-white shadow-sm">
                     {notifications.length > 99 ? "99+" : notifications.length}
                   </span>
                 ) : null}
@@ -237,13 +239,14 @@ export function MarcasTopbar({
         <AppDropdownMenu>
           <AppDropdownMenuTrigger asChild>
             <AppButton
-              variant="outline"
+              variant="ghost"
               size="iconSm"
-              radius="md"
+              radius="full"
+              className="h-8 w-8 shrink-0 text-[hsl(var(--app-muted-foreground))] hover:text-[hsl(var(--app-foreground))]"
               aria-label="Abrir menú de usuario"
               title="Cuenta"
             >
-              <CircleUserRound className="h-4 w-4" />
+              <UserRound className="h-[17px] w-[17px]" />
             </AppButton>
           </AppDropdownMenuTrigger>
 
