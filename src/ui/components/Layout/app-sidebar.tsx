@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 
@@ -90,10 +85,7 @@ function RouteIcon({
   return (
     <Icon
       aria-hidden="true"
-      className={cn(
-        "shrink-0",
-        size === "root" ? "h-4 w-4" : "h-3.5 w-3.5",
-      )}
+      className={cn("shrink-0", size === "root" ? "h-4 w-4" : "h-3.5 w-3.5")}
     />
   );
 }
@@ -179,8 +171,7 @@ function SidebarGroupItem({
   onNavigate: () => void;
 }) {
   const active = hasActiveChild(pathname, item);
-  const [open, setOpen] = useState(active);
-
+  const [open, setOpen] = useState(true);
   useEffect(() => {
     if (active) {
       setOpen(true);
