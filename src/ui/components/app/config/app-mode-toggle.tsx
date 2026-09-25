@@ -35,10 +35,10 @@ const APPEARANCE_OPTIONS: Array<{
 ];
 
 function getAppearanceIcon(appearance: AppAppearance) {
-  if (appearance === "dark") return <Moon className="h-3.5 w-3.5" />;
-  if (appearance === "system") return <Laptop className="h-3.5 w-3.5" />;
+  if (appearance === "dark") return <Moon className="h-4 w-4" />;
+  if (appearance === "system") return <Laptop className="h-4 w-4" />;
 
-  return <Sun className="h-3.5 w-3.5" />;
+  return <Sun className="h-4 w-4" />;
 }
 
 export function AppModeToggle() {
@@ -49,7 +49,7 @@ export function AppModeToggle() {
       <AppDropdownMenuTrigger asChild>
         <AppButton
           variant="outline"
-          size="iconXs"
+          size="iconSm"
           radius="md"
           aria-label="Cambiar apariencia"
           title="Cambiar apariencia"
