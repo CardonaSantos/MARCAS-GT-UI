@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
 
 import logoEmpresa from "@/assets/images/logoEmpresa.png";
@@ -10,6 +9,7 @@ import message1 from "@/assets/Sounds/message1.mp3";
 import { useStore } from "@/Context/ContextSucursal";
 import { useSocket } from "@/Context/SocketProvider ";
 import { getApiErrorMessage } from "@/lib/api-error";
+
 import {
   notificationKeys,
   useClearNotifications,
@@ -22,34 +22,31 @@ import { AppSidebarProvider } from "../app/primitives/app-sidebar-shell";
 import { AppSidebar } from "./app-sidebar";
 import { MarcasTopbar } from "./marcas-topbar";
 
-type UserTokenInfo = {
-  nombre: string;
-  correo: string;
-  rol: string;
-  sub: number;
-  activo: boolean;
-  empresaId: number;
-};
-
 function MarcasLayoutContent() {
   const socket = useSocket();
   const queryClient = useQueryClient();
 
+  /**
+   * Sesión centralizada en Zustand.
+   *
+   * Ya no decodificamos el JWT aquí ni reconstruimos
+   * manualmente la información del usuario.
+   */
   const userId = useStore((state) => state.userId);
   const userRole = useStore((state) => state.userRol);
+  const userNombre = useStore((state) => state.userNombre);
+  const userCorreo = useStore((state) => state.userCorreo);
 
-  const setUserNombre = useStore((state) => state.setUserNombre);
-  const setUserCorreo = useStore((state) => state.setUserCorreo);
-  const setRole = useStore((state) => state.setRol);
-  const setUserId = useStore((state) => state.setUserId);
-  const setEmpresaId = useStore((state) => state.setSucursalId);
   const clearAuth = useStore((state) => state.clearAuth);
 
-  const [tokenUser, setTokenUser] = useState<UserTokenInfo | null>(null);
+  /**
+   * Notificaciones
+   */
+  const notificationsQuery = useNotifications(userId ?? undefined);
 
-  const notificationsQuery = useNotifications(tokenUser?.sub);
-  const markNotificationAsRead = useMarkNotificationAsRead(tokenUser?.sub);
-  const clearNotifications = useClearNotifications(tokenUser?.sub);
+  const markNotificationAsRead = useMarkNotificationAsRead(userId ?? undefined);
+
+  const clearNotifications = useClearNotifications(userId ?? undefined);
 
   const notifications = useMemo(
     () =>
@@ -60,38 +57,17 @@ function MarcasLayoutContent() {
     [notificationsQuery.data],
   );
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-
-    if (!token) {
-      return;
-    }
-
-    try {
-      const decodedToken = jwtDecode<UserTokenInfo>(token);
-
-      setTokenUser(decodedToken);
-      setUserNombre(decodedToken.nombre);
-      setUserCorreo(decodedToken.correo);
-      setRole(decodedToken.rol);
-      setUserId(Number(decodedToken.sub));
-      setEmpresaId(decodedToken.empresaId);
-    } catch (error) {
-      console.error("No se pudo decodificar el token de sesión", error);
-    }
-  }, [
-    setEmpresaId,
-    setRole,
-    setUserCorreo,
-    setUserId,
-    setUserNombre,
-  ]);
-
+  /**
+   * Tracking del vendedor.
+   *
+   * Por ahora conservamos el funcionamiento actual:
+   * únicamente un usuario VENDEDOR envía geolocalización.
+   */
   useEffect(() => {
     if (
       !navigator.geolocation ||
       !socket ||
-      !userId ||
+      userId === null ||
       userRole !== "VENDEDOR"
     ) {
       return;
@@ -120,16 +96,16 @@ function MarcasLayoutContent() {
     };
   }, [socket, userId, userRole]);
 
+  /**
+   * Notificaciones en tiempo real.
+   */
   useEffect(() => {
-    if (!socket || !userId) {
+    if (!socket || userId === null) {
       return;
     }
 
     const handleNotification = (notification: MarcasNotification) => {
-      if (
-        notification.targetUserId &&
-        notification.targetUserId !== userId
-      ) {
+      if (notification.targetUserId && notification.targetUserId !== userId) {
         return;
       }
 
@@ -161,6 +137,7 @@ function MarcasLayoutContent() {
       }
 
       const audio = new Audio(message1);
+
       void audio.play().catch(() => undefined);
     };
 
@@ -171,16 +148,28 @@ function MarcasLayoutContent() {
     };
   }, [queryClient, socket, userId]);
 
+  /**
+   * Logout.
+   *
+   * clearAuth limpia la sesión de Zustand y,
+   * al estar usando persist, actualiza también
+   * el almacenamiento persistente.
+   */
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
     clearAuth();
     queryClient.clear();
+
     window.location.href = "/marcas-gt/login";
   };
 
+  /**
+   * Marcar notificación como leída.
+   */
   const handleMarkAsRead = (notificationId: number) => {
     markNotificationAsRead.mutate(
-      { notificationId },
+      {
+        notificationId,
+      },
       {
         onSuccess: () => {
           toast.success("Notificación eliminada");
@@ -192,6 +181,9 @@ function MarcasLayoutContent() {
     );
   };
 
+  /**
+   * Limpiar todas las notificaciones.
+   */
   const handleClearNotifications = () => {
     clearNotifications.mutate(undefined, {
       onSuccess: () => {
@@ -203,20 +195,24 @@ function MarcasLayoutContent() {
     });
   };
 
+  /**
+   * Usuario que consume únicamente la Topbar.
+   */
+  const topbarUser =
+    userId !== null && userNombre && userCorreo
+      ? {
+          nombre: userNombre,
+          correo: userCorreo,
+        }
+      : null;
+
   return (
     <div className="flex h-dvh min-h-0 overflow-hidden bg-[hsl(var(--app-background))] text-[hsl(var(--app-foreground))]">
       <AppSidebar />
 
       <div className="flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <MarcasTopbar
-          user={
-            tokenUser
-              ? {
-                  nombre: tokenUser.nombre,
-                  correo: tokenUser.correo,
-                }
-              : null
-          }
+          user={topbarUser}
           notifications={notifications}
           notificationsLoading={notificationsQuery.isLoading}
           markingNotificationId={

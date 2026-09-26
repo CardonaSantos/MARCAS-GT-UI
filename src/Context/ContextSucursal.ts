@@ -1,40 +1,77 @@
-// useStore.ts
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface StoreState {
   authToken: string | null;
+
   sucursalId: number | null;
+
   userNombre: string | null;
   userCorreo: string | null;
   userId: number | null;
   userRol: string | null;
   userActivo: boolean | null;
 
-  setUserNombre: (usernombre: string) => void;
-  setUserCorreo: (usercorreo: string) => void;
-  setUserId: (userid: number) => void;
-  setActivo: (activo: boolean) => void;
-  setRol: (rol: string) => void;
+  setAuthSession: (data: {
+    authToken: string;
+    usuario: {
+      id: number;
+      nombre: string;
+      correo: string;
+      rol: string;
+      activo: boolean;
+    };
+  }) => void;
+
   setSucursalId: (id: number) => void;
+
   clearAuth: () => void;
-  setAuthToken: (token: string) => void;
 }
 
-export const useStore = create<StoreState>((set) => ({
-  authToken: null,
-  sucursalId: null,
-  userNombre: null,
-  userCorreo: null,
-  userId: null,
-  userRol: null,
-  userActivo: null,
+export const useStore = create<StoreState>()(
+  persist(
+    (set) => ({
+      authToken: null,
 
-  setUserNombre: (usernombre) => set({ userNombre: usernombre }),
-  setUserCorreo: (usercorreo) => set({ userCorreo: usercorreo }),
-  setUserId: (userid) => set({ userId: userid }),
-  setActivo: (activo) => set({ userActivo: activo }),
-  setRol: (rol) => set({ userRol: rol }),
-  setSucursalId: (id) => set({ sucursalId: id }),
-  clearAuth: () => set({ authToken: null, sucursalId: null }),
-  setAuthToken: (token) => set({ authToken: token }),
-}));
+      sucursalId: null,
+
+      userNombre: null,
+      userCorreo: null,
+      userId: null,
+      userRol: null,
+      userActivo: null,
+
+      setAuthSession: ({ authToken, usuario }) =>
+        set({
+          authToken,
+
+          userId: usuario.id,
+          userNombre: usuario.nombre,
+          userCorreo: usuario.correo,
+          userRol: usuario.rol,
+          userActivo: usuario.activo,
+        }),
+
+      setSucursalId: (id) =>
+        set({
+          sucursalId: id,
+        }),
+
+      clearAuth: () =>
+        set({
+          authToken: null,
+          sucursalId: null,
+
+          userNombre: null,
+          userCorreo: null,
+          userId: null,
+          userRol: null,
+          userActivo: null,
+        }),
+    }),
+
+    {
+      name: "marcas-auth",
+    },
+  ),
+);

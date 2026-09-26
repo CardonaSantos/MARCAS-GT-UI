@@ -35,6 +35,7 @@ import {
   AppDropdownMenuTrigger,
 } from "../app/primitives/app-dropdown-menu";
 import { AppSidebarTrigger } from "../app/primitives/app-sidebar-shell";
+import { useStore } from "@/Context/ContextSucursal";
 
 export type MarcasTopbarUser = {
   nombre: string;
@@ -75,6 +76,10 @@ export function MarcasTopbar({
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const posDashboardUrl = getPosDashboardUrl();
   const hasNotifications = notifications.length > 0;
+
+  const token = useStore((state) => state.authToken);
+
+  console.log("El token es:", token);
 
   return (
     <header className="z-40 flex h-12 shrink-0 items-center border-b border-[hsl(var(--app-border))] bg-[hsl(var(--app-background)/0.98)] px-2.5 backdrop-blur md:px-4">
