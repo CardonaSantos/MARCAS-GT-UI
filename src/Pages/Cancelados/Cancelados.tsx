@@ -1,7 +1,7 @@
 import { useStore } from "@/Context/ContextSucursal";
 
 function Cancelados() {
-  const userId = useStore((state) => state.sucursalId) ?? 0;
+  const userId = useStore((state) => state.empresaId) ?? 0;
 
   console.log("El id de mi USUARIO LOGUEADO ES: ", userId);
 

@@ -7,6 +7,7 @@ export interface Venta {
   timestamp: string;
   usuarioId: number;
   clienteId: number;
+  referenciaPago: string | null;
   citaId: number | null;
   cliente: Cliente;
   productos: ProductoVenta[]; // Cambié a ProductoVenta

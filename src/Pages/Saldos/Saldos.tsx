@@ -55,7 +55,7 @@ function formatCurrency(amount: number | null | undefined): string {
 }
 
 function Saldos() {
-  const empresaId = useStore((state) => state.sucursalId) ?? 0;
+  const empresaId = useStore((state) => state.empresaId) ?? 0;
 
   const [saldos, setSaldos] = useState<SaldosInterface | null>(null);
   const [empresaINFO, setEmpresaINFO] = useState<IEmpresa | null>(null);
@@ -69,7 +69,7 @@ function Saldos() {
       const getInfoEmpresa = async () => {
         try {
           const response = await axios.get(
-            `${API_URL}/empresa/get-empresa-info/${empresaId}`
+            `${API_URL}/empresa/get-empresa-info/${empresaId}`,
           );
           if (response.status == 200 || response.status == 201) {
             setEmpresaINFO(response.data);
@@ -91,7 +91,7 @@ function Saldos() {
       const getSaldos = async () => {
         try {
           const response = await axios.get(
-            `${API_URL}/saldos/init-saldos/${empresaId}`
+            `${API_URL}/saldos/init-saldos/${empresaId}`,
           );
           if (response.status == 200 || response.status == 201) {
             setSaldos(response.data);

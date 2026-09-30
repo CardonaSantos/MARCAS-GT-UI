@@ -128,11 +128,11 @@ export type CreditoArray = CreditoItem[];
 
 function Creditos() {
   const userId = useStore((state) => state.userId) ?? 0;
-  const empresaId = useStore((state) => state.sucursalId) ?? 0;
+  const empresaId = useStore((state) => state.empresaId) ?? 0;
 
   const [creditos, setCreditos] = useState<CreditoItem[]>([]);
   const [selectedCredit, setSelectedCredit] = useState<CreditoItem | null>(
-    null
+    null,
   );
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -177,7 +177,7 @@ function Creditos() {
           userId: userId,
           adminPassword: adminPassword.trim(),
           empresaId: empresaId,
-        }
+        },
       );
 
       if (response.status === 200 || response.status === 201) {

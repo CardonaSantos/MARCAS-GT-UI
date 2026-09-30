@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 interface StoreState {
   authToken: string | null;
 
-  sucursalId: number | null;
+  empresaId: number | null;
 
   userNombre: string | null;
   userCorreo: string | null;
@@ -20,10 +20,11 @@ interface StoreState {
       correo: string;
       rol: string;
       activo: boolean;
+      empresaId: number;
     };
   }) => void;
 
-  setSucursalId: (id: number) => void;
+  setEmpresaId: (id: number) => void;
 
   clearAuth: () => void;
 }
@@ -33,7 +34,7 @@ export const useStore = create<StoreState>()(
     (set) => ({
       authToken: null,
 
-      sucursalId: null,
+      empresaId: null,
 
       userNombre: null,
       userCorreo: null,
@@ -45,6 +46,8 @@ export const useStore = create<StoreState>()(
         set({
           authToken,
 
+          empresaId: usuario.empresaId,
+
           userId: usuario.id,
           userNombre: usuario.nombre,
           userCorreo: usuario.correo,
@@ -52,15 +55,15 @@ export const useStore = create<StoreState>()(
           userActivo: usuario.activo,
         }),
 
-      setSucursalId: (id) =>
+      setEmpresaId: (id) =>
         set({
-          sucursalId: id,
+          empresaId: id,
         }),
 
       clearAuth: () =>
         set({
           authToken: null,
-          sucursalId: null,
+          empresaId: null,
 
           userNombre: null,
           userCorreo: null,
@@ -69,7 +72,6 @@ export const useStore = create<StoreState>()(
           userActivo: null,
         }),
     }),
-
     {
       name: "marcas-auth",
     },
