@@ -9,15 +9,18 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+
 import { Button } from "../ui/button";
 import { Link, Outlet } from "react-router-dom";
 import { ModeToggle } from "../mode-toggle";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+
 import {
   Dialog,
   DialogContent,
@@ -27,81 +30,86 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { Separator } from "@/components/ui/separator";
 
 import logo from "../../assets/images/logoEmpresa.png";
-import { jwtDecode } from "jwt-decode";
+import logoEmpresa from "../../assets/images/logoEmpresa.png";
+
 import { useSocket } from "../../Context/SocketProvider ";
 import axios from "axios";
 import { toast } from "sonner";
+
 import { AppSidebar } from "./app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
+
 import { useStore } from "@/Context/ContextSucursal";
-import { Separator } from "@radix-ui/react-select";
+
 import message1 from "../../assets/Sounds/message1.mp3";
-import logoEmpresa from "../../assets/images/logoEmpresa.png";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface LayoutProps {
   children?: React.ReactNode;
 }
 
-interface UserTokenInfo {
-  nombre: string;
-  correo: string;
-  rol: string;
-  sub: number;
-  activo: boolean;
-  empresaId: number;
-}
-interface Notification {
-  id: number; // El ID de la notificación en la base de datos
-  mensaje: string; // El mensaje de la notificación
-  leido: boolean; // Estado de la notificación (si ha sido leída o no)
-  remitenteId?: number; // El ID del remitente (opcional)
-  creadoEn: Date; // Fecha de creación de la notificación
+interface AppNotification {
+  id: number;
+  mensaje: string;
+  leido: boolean;
+  remitenteId?: number;
+  creadoEn: Date | string;
   targetUserId: number;
 }
 
 export default function Layout2({ children }: LayoutProps) {
-  const socket = useSocket(); // Hook que retorna la instancia del WebSocket
-  // const userRol = useStore((state) => state.userRol);
-  const userId = useStore((state) => state.userId) ?? 0;
+  const socket = useSocket();
+
+  // ============================================================
+  // SESIÓN GLOBAL - ZUSTAND
+  // ============================================================
+
+  const authToken = useStore((state) => state.authToken);
+
+  const userId = useStore((state) => state.userId);
+  const userNombre = useStore((state) => state.userNombre);
+  const userCorreo = useStore((state) => state.userCorreo);
   const userRol = useStore((state) => state.userRol);
-  const [tokenUser, setTokenUser] = useState<UserTokenInfo | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const userActivo = useStore((state) => state.userActivo);
+
+  const clearAuth = useStore((state) => state.clearAuth);
+
+  // ============================================================
+  // ESTADOS LOCALES
+  // ============================================================
+
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Funciones para la store global
-  const setUserNombre = useStore((state) => state.setUserNombre);
-  const setUserCorreo = useStore((state) => state.setUserCorreo);
-  const setRol = useStore((state) => state.setRol);
-  const setUserId = useStore((state) => state.setUserId);
-  const setEmpresaId = useStore((state) => state.setSucursalId);
+  const isAuthenticated = Boolean(authToken && userId && userActivo !== false);
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
+    clearAuth();
+
     window.location.href = "/marcas-gt/login";
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      try {
-        const decodedToken = jwtDecode<UserTokenInfo>(token);
-        setTokenUser(decodedToken);
-        setUserNombre(decodedToken.nombre);
-        setUserCorreo(decodedToken.correo);
-        setRol(decodedToken.rol);
-        setUserId(Number(decodedToken.sub));
-        setEmpresaId(decodedToken.empresaId);
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-    }
-  }, []);
+  // ============================================================
+  // GEOLOCALIZACIÓN DEL VENDEDOR
+  // ============================================================
 
   useEffect(() => {
-    if (!navigator.geolocation || !socket || userRol !== "VENDEDOR") return;
+    if (
+      !navigator.geolocation ||
+      !socket ||
+      !userId ||
+      userRol !== "VENDEDOR"
+    ) {
+      return;
+    }
 
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -110,38 +118,64 @@ export default function Layout2({ children }: LayoutProps) {
           longitud: position.coords.longitude,
           usuarioId: userId,
         };
+
         socket.emit("sendLocation", locationData);
       },
-      (error) => console.error("Error obteniendo ubicación", error),
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+
+      (error) => {
+        console.error("Error obteniendo ubicación:", error);
+      },
+
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000,
+      },
     );
 
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [socket, userId]);
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, [socket, userId, userRol]);
+
+  // ============================================================
+  // OBTENER NOTIFICACIONES
+  // ============================================================
 
   const getNoti = async () => {
-    if (tokenUser) {
-      try {
-        const response = await axios.get(
-          `${API_URL}/notifications/notifications/for-admin/${tokenUser.sub}`
-        );
-        if (response.status === 200) {
-          setNotifications(response.data);
-        }
-      } catch (error) {
-        console.log(error);
+    if (!userId) {
+      setNotifications([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/notifications/notifications/for-admin/${userId}`,
+      );
+
+      if (response.status === 200) {
+        setNotifications(response.data);
       }
+    } catch (error) {
+      console.error("Error al obtener notificaciones:", error);
     }
   };
 
   useEffect(() => {
+    if (!userId) return;
+
     getNoti();
-  }, [tokenUser]);
+  }, [userId]);
+
+  // ============================================================
+  // NOTIFICACIONES EN TIEMPO REAL
+  // ============================================================
 
   useEffect(() => {
     if (!socket || !userId) return;
 
-    const handleAdminNotification = (newNotification: Notification) => {
+    const handleAdminNotification = (newNotification: AppNotification) => {
+      // Si viene dirigida a otro usuario, ignorarla.
       if (
         newNotification.targetUserId &&
         newNotification.targetUserId !== userId
@@ -150,94 +184,172 @@ export default function Layout2({ children }: LayoutProps) {
       }
 
       setNotifications((prev) => [...prev, newNotification]);
+
       toast.message(newNotification.mensaje);
 
-      if (Notification.permission !== "granted") {
-        Notification.requestPermission();
+      // ========================================================
+      // NOTIFICACIÓN DEL NAVEGADOR
+      // ========================================================
+
+      if ("Notification" in window) {
+        if (window.Notification.permission === "granted") {
+          new window.Notification("Nueva Notificación", {
+            body: newNotification.mensaje,
+            icon: logoEmpresa,
+            badge: logoEmpresa,
+          });
+        } else if (window.Notification.permission === "default") {
+          window.Notification.requestPermission()
+            .then((permission) => {
+              if (permission === "granted") {
+                new window.Notification("Nueva Notificación", {
+                  body: newNotification.mensaje,
+                  icon: logoEmpresa,
+                  badge: logoEmpresa,
+                });
+              }
+            })
+            .catch((error) => {
+              console.error(
+                "Error solicitando permiso de notificaciones:",
+                error,
+              );
+            });
+        }
       }
 
-      if (Notification.permission === "granted") {
-        new Notification("Nueva Notificación", {
-          body: newNotification.mensaje,
-          icon: logoEmpresa,
-          badge: logoEmpresa,
-        });
-      }
+      // ========================================================
+      // SONIDO
+      // ========================================================
 
       const audioNotificacion = new Audio(message1);
-      audioNotificacion.play();
+
+      audioNotificacion.play().catch((error) => {
+        console.warn("No se pudo reproducir el sonido de notificación:", error);
+      });
     };
 
     socket.on("newNotification", handleAdminNotification);
+
     return () => {
       socket.off("newNotification", handleAdminNotification);
     };
   }, [socket, userId]);
 
+  // ============================================================
+  // MARCAR / ELIMINAR NOTIFICACIÓN
+  // ============================================================
+
   const handleVisto = async (notificationId: number) => {
+    if (!userId) {
+      return;
+    }
+
     try {
       const response = await axios.patch(
         `${API_URL}/notifications/update-notify/${notificationId}`,
         {
-          usuarioId: tokenUser?.sub,
-        }
+          usuarioId: userId,
+        },
       );
 
       if (response.status === 200) {
         toast.success("Notificación eliminada");
-        getNoti();
+
+        await getNoti();
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error al actualizar notificación:", error);
+
+      toast.error("Error al actualizar la notificación");
     }
   };
 
+  // ============================================================
+  // ELIMINAR TODAS LAS NOTIFICACIONES
+  // ============================================================
+
   const handleDeleteAllNotifications = async () => {
+    if (!userId) {
+      return;
+    }
+
     try {
       const response = await axios.get(
-        `${API_URL}/notifications/delete-all-notifications-admin/${tokenUser?.sub}`
+        `${API_URL}/notifications/delete-all-notifications-admin/${userId}`,
       );
+
       if (response.status === 200) {
         toast.success("Notificaciones eliminadas");
-        getNoti();
+
+        await getNoti();
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error al eliminar notificaciones:", error);
+
       toast.error("Error al eliminar notificaciones");
     }
   };
+
+  // ============================================================
+  // CAMBIO ENTRE MARCAS GT / POS
+  // ============================================================
+
   const origin = window.location.origin;
 
-  // Si corro en 5173 (Marcas‑GT), origin === VITE_MARCAS_URL → isMarcas = true
   const isMarcas = origin === import.meta.env.VITE_MARCAS_URL;
 
-  // Define el href completo según dónde estés
   const switchLink = isMarcas
     ? `${import.meta.env.VITE_POS_URL}/dashboard`
     : `${import.meta.env.VITE_MARCAS_URL}/marcas-gt/dashboard`;
 
-  // Y el texto también
   const switchLabel = isMarcas ? "CABALLEROS BOUTIQUE" : "MARCAS GT";
+
+  // ============================================================
+  // RENDER
+  // ============================================================
 
   return (
     <div className="flex min-h-screen">
       <SidebarProvider>
+        {/* =====================================================
+            SIDEBAR
+        ====================================================== */}
+
         <AppSidebar />
 
-        {/* Contenedor principal para el toolbar y el contenido */}
+        {/* =====================================================
+            CONTENIDO PRINCIPAL
+        ====================================================== */}
+
         <div className="flex flex-col w-full">
-          {/* Toolbar */}
+          {/* ===================================================
+              TOPBAR
+          ==================================================== */}
+
           <div className="sticky top-0 z-10 h-16 w-full bg-background border-b border-border shadow-sm flex items-center justify-between">
             <div className="mx-auto flex h-16 max-w-7xl w-full items-center px-4 sm:px-6 lg:px-8 justify-between">
-              {/* Sección izquierda: Logo y nombre de la sucursal */}
+              {/* ===============================================
+                  IZQUIERDA - LOGO
+              ================================================ */}
+
               <div className="flex items-center space-x-2">
-                <Link to={"/"}>
-                  <img className="h-20 w-28" src={logo} alt="Logo" />
+                <Link to="/marcas-gt/dashboard">
+                  <img
+                    className="h-20 w-28 object-contain"
+                    src={logo}
+                    alt="Logo"
+                  />
                 </Link>
               </div>
 
-              {/* Sección derecha: Toggle de modo, notificaciones y menú de usuario */}
+              {/* ===============================================
+                  DERECHA
+              ================================================ */}
+
               <div className="flex items-center space-x-3">
+                {/* CAMBIAR SISTEMA */}
+
                 <Button
                   asChild
                   variant="link"
@@ -246,20 +358,28 @@ export default function Layout2({ children }: LayoutProps) {
                   <Link to={switchLink}>{switchLabel}</Link>
                 </Button>
 
+                {/* TEMA */}
+
                 <ModeToggle />
 
-                {tokenUser && (
+                {/* =============================================
+                    NOTIFICACIONES
+                ============================================== */}
+
+                {isAuthenticated && (
                   <Dialog open={isOpen} onOpenChange={setIsOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="relative">
                         <Bell className="h-4 w-4" />
+
                         {notifications.length > 0 && (
-                          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                          <span className="absolute -top-1 -right-1 flex h-5 min-w-5 px-1 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                             {notifications.length}
                           </span>
                         )}
                       </Button>
                     </DialogTrigger>
+
                     <DialogContent className="sm:max-w-[500px] w-full">
                       <DialogHeader>
                         <DialogTitle className="text-xl font-semibold flex items-center">
@@ -267,14 +387,20 @@ export default function Layout2({ children }: LayoutProps) {
                           Notificaciones
                         </DialogTitle>
                       </DialogHeader>
+
                       <Separator className="my-2" />
+
+                      {/* =======================================
+                          LISTA DE NOTIFICACIONES
+                      ======================================== */}
+
                       <div className="max-h-[60vh] overflow-y-auto space-y-3 py-2 px-1">
-                        {notifications && notifications.length > 0 ? (
-                          notifications
+                        {notifications.length > 0 ? (
+                          [...notifications]
                             .sort(
                               (a, b) =>
                                 new Date(b.creadoEn).getTime() -
-                                new Date(a.creadoEn).getTime()
+                                new Date(a.creadoEn).getTime(),
                             )
                             .map((not) => (
                               <div
@@ -282,13 +408,16 @@ export default function Layout2({ children }: LayoutProps) {
                                 className="flex items-start space-x-3 p-3 bg-card rounded-md shadow-sm hover:shadow transition-shadow duration-200 border border-border"
                               >
                                 <AlertCircle className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
+
                                 <div className="flex-1 space-y-2">
                                   <p className="text-sm text-card-foreground leading-relaxed">
                                     {not.mensaje}
                                   </p>
+
                                   <div className="flex justify-between items-center text-xs text-muted-foreground">
                                     <span className="flex items-center">
                                       <Clock className="mr-1 h-3 w-3" />
+
                                       {not.creadoEn
                                         ? new Date(not.creadoEn).toLocaleString(
                                             "es-GT",
@@ -296,22 +425,22 @@ export default function Layout2({ children }: LayoutProps) {
                                               dateStyle: "short",
                                               timeStyle: "short",
                                               hour12: true,
-                                            }
+                                            },
                                           )
                                         : ""}
                                     </span>
-                                    {tokenUser && (
-                                      <Button
-                                        onClick={() =>
-                                          handleVisto(Number(not.id))
-                                        }
-                                        size="sm"
-                                        variant="ghost"
-                                        className="h-6 w-6 p-0 bg-red-500 text-white"
-                                      >
-                                        <X className="h-4 w-4" />
-                                      </Button>
-                                    )}
+
+                                    <Button
+                                      type="button"
+                                      onClick={() =>
+                                        handleVisto(Number(not.id))
+                                      }
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 w-6 p-0 bg-red-500 hover:bg-red-600 text-white hover:text-white"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
                                   </div>
                                 </div>
                               </div>
@@ -322,55 +451,79 @@ export default function Layout2({ children }: LayoutProps) {
                           </p>
                         )}
                       </div>
-                      {notifications &&
-                        notifications.length >= 1 &&
-                        tokenUser && (
-                          <>
-                            <Separator className="my-2" />
-                            <DialogFooter>
-                              <Button
-                                onClick={handleDeleteAllNotifications}
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Limpiar notificaciones
-                              </Button>
-                            </DialogFooter>
-                          </>
-                        )}
+
+                      {/* =======================================
+                          LIMPIAR NOTIFICACIONES
+                      ======================================== */}
+
+                      {notifications.length >= 1 && (
+                        <>
+                          <Separator className="my-2" />
+
+                          <DialogFooter>
+                            <Button
+                              type="button"
+                              onClick={handleDeleteAllNotifications}
+                              variant="outline"
+                              size="sm"
+                              className="w-full"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Limpiar notificaciones
+                            </Button>
+                          </DialogFooter>
+                        </>
+                      )}
                     </DialogContent>
                   </Dialog>
                 )}
 
+                {/* =============================================
+                    USUARIO
+                ============================================== */}
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="">
+                    <Button variant="outline">
                       <User className="h-4 w-4" />
+
                       <span className="sr-only">Menú de usuario</span>
                     </Button>
                   </DropdownMenuTrigger>
+
                   <DropdownMenuContent align="end" className="w-48">
+                    {/* NOMBRE */}
+
                     <DropdownMenuItem className="flex items-center py-1.5">
                       <User className="mr-2 h-3 w-3" />
-                      <span className="font-medium text-sm">
-                        {tokenUser?.nombre}
+
+                      <span className="font-medium text-sm truncate">
+                        {userNombre || "Usuario"}
                       </span>
                     </DropdownMenuItem>
+
                     <Separator className="my-1" />
+
+                    {/* CORREO */}
+
                     <DropdownMenuItem className="flex items-center py-1.5">
-                      <MailIcon className="mr-2 h-3 w-3" />
+                      <MailIcon className="mr-2 h-3 w-3 flex-shrink-0" />
+
                       <span className="truncate text-xs">
-                        {tokenUser?.correo}
+                        {userCorreo || "Sin correo"}
                       </span>
                     </DropdownMenuItem>
+
                     <Separator className="my-1" />
+
+                    {/* LOGOUT */}
+
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="flex items-center text-red-500 focus:text-red-500 py-1.5"
+                      className="flex items-center text-red-500 focus:text-red-500 py-1.5 cursor-pointer"
                     >
                       <LogOut className="mr-2 h-3 w-3" />
+
                       <span className="text-sm">Cerrar Sesión</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -379,16 +532,23 @@ export default function Layout2({ children }: LayoutProps) {
             </div>
           </div>
 
-          {/* Contenido principal */}
+          {/* ===================================================
+              CONTENIDO DE LAS RUTAS
+          ==================================================== */}
+
           <main className="flex-1 overflow-y-auto p-1 lg:p-8">
             <SidebarTrigger />
+
             {children || <Outlet />}
           </main>
 
-          {/* Footer */}
+          {/* ===================================================
+              FOOTER
+          ==================================================== */}
+
           <footer className="bg-background py-4 text-center text-sm text-muted-foreground border-t border-border">
             <p>
-              &copy;{new Date().getFullYear()} Marcas Guatemala. Todos los
+              &copy; {new Date().getFullYear()} Marcas Guatemala. Todos los
               derechos reservados
             </p>
           </footer>

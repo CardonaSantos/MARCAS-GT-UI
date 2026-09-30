@@ -171,16 +171,33 @@ interface Visita2 {
   usuarioId: number;
   ventaId: number | null;
 }
+type MetodoPagoVenta =
+  | "CONTADO"
+  | "TARJETA"
+  | "TRANSFERENCIA_BANCO"
+  | "CREDITO";
+
+const METODOS_CON_REFERENCIA: MetodoPagoVenta[] = [
+  "TARJETA",
+  "TRANSFERENCIA_BANCO",
+];
+
 type SaleData = {
   // Base de la venta
   monto: number;
   montoConDescuento: number;
-  metodoPago: "CONTADO" | "TARJETA" | "TRANSFERENCIA_BANCO" | "CREDITO";
-  empresaId: number;
-  descuento?: number;
+  metodoPago: MetodoPagoVenta;
+  referenciaPago?: string;
+  empresaId?: number;
+  descuento: number;
   clienteId?: number;
   vendedorId?: number;
-  productos: { productoId: number; cantidad: number; precio: number }[];
+  productos: {
+    productoId: number;
+    codigoProducto: string;
+    cantidad: number;
+    precio: number;
+  }[];
 
   // Solo para CREDITO (opcionales)
   comentario?: string;
@@ -193,7 +210,8 @@ type Venta = {
   monto: number;
   montoConDescuento: number;
   descuento: number;
-  metodoPago: "CONTADO" | "CREDITO"; // Agrega otros métodos de pago si existen
+  metodoPago: MetodoPagoVenta;
+  referenciaPago?: string | null;
   timestamp: string; // ISO 8601 timestamp
   usuarioId: number;
   clienteId: number | null; // Puede ser `null`
@@ -206,6 +224,12 @@ type CreditoInfo = {
   fechaInicio: string | null;
   fechaFin: string | null;
 };
+
+const getInitialCreditoInfo = (): CreditoInfo => ({
+  comentario: null,
+  fechaInicio: dayjs().format("YYYY-MM-DD"),
+  fechaFin: dayjs().add(1, "month").format("YYYY-MM-DD"),
+});
 
 interface ProductImageCarouselProps {
   images: { url: string }[];
@@ -221,23 +245,35 @@ export default function MakeSale() {
       ...prev,
       [id]: Math.max(
         1,
-        Math.min(value, products.find((p) => p.id === id)?.stock?.cantidad || 1)
+        Math.min(
+          value,
+          products.find((p) => p.id === id)?.stock?.cantidad || 1,
+        ),
       ),
     }));
   };
 
-  const userId = useStore((state) => state.userId) ?? 0;
-  const empresaId = useStore((state) => state.sucursalId) ?? 0;
+  const userId = useStore((state) => state.userId);
+  const empresaId = useStore((state) => state.empresaId);
   // Estados
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedMetodPago, setSelectedMetodPago] = useState("CONTADO");
+  const [selectedMetodPago, setSelectedMetodPago] =
+    useState<MetodoPagoVenta>("CONTADO");
+  const [referenciaPago, setReferenciaPago] = useState("");
+  const [creditoInfo, setCreditoInfo] = useState<CreditoInfo>(
+    getInitialCreditoInfo(),
+  );
+  const [registroAbierto, setRegistroAbierto] = useState<Visita2 | null>(null);
+
+  const requiereReferenciaPago =
+    METODOS_CON_REFERENCIA.includes(selectedMetodPago);
   const [cart, setCart] = useState<(Producto & { quantity: number })[]>([]); // Agregamos `quantity` al estado del carrito
   const [selectedCustomer, setSelectedCustomer] = useState<Cliente | null>(
-    null
+    null,
   );
   const [selectedDiscount, setSelectedDiscount] = useState<Descuento | null>(
-    null
+    null,
   );
   const [descuento, setDescuento] = useState<number>();
   const [nota, setNota] = useState<string>("");
@@ -260,15 +296,21 @@ export default function MakeSale() {
   const cancelToken = axios.CancelToken;
   let cancel: any;
 
-  const fetchProducts = async (newPage: number) => {
+  const fetchProducts = async (
+    newPage: number,
+    filters?: { query?: string; category?: string },
+  ) => {
+    const query = filters?.query ?? searchTerm;
+    const category = filters?.category ?? selectedCategory;
+
     setIsFetching(true);
     try {
       if (cancel) cancel();
 
       const resp = await axios.get(`${API_URL}/product/search`, {
         params: {
-          query: searchTerm.trim(),
-          categoria: selectedCategory,
+          query: query.trim(),
+          categoria: category,
           page: newPage,
           limit: itemsPerPage,
         },
@@ -284,7 +326,7 @@ export default function MakeSale() {
           }
           // páginas >1: sólo añade no-duplicados
           const toAdd = fetched.filter(
-            (fp) => !prev.some((p) => p.id === fp.id)
+            (fp) => !prev.some((p) => p.id === fp.id),
           );
           return [...prev, ...toAdd];
         });
@@ -324,7 +366,7 @@ export default function MakeSale() {
           setPage((prev) => prev + 1);
         }
       },
-      { root: viewportRef.current, rootMargin: "200px", threshold: 0.1 }
+      { root: viewportRef.current, rootMargin: "200px", threshold: 0.1 },
     );
 
     observer.observe(sentinelRef.current);
@@ -334,7 +376,7 @@ export default function MakeSale() {
     const getCustomers = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/customers/all-customers-with-discount`
+          `${API_URL}/customers/all-customers-with-discount`,
         );
         if (response.status === 200) {
           setCustomers(response.data);
@@ -391,8 +433,8 @@ export default function MakeSale() {
     if (newQuantity <= 0) return; // Evitar cantidades negativas
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
-      )
+        item.id === productId ? { ...item, quantity: newQuantity } : item,
+      ),
     );
   };
 
@@ -400,7 +442,7 @@ export default function MakeSale() {
   const calculateTotalConDescuento = () => {
     const subtotal = cart.reduce(
       (total, item) => total + item.precio * item.quantity,
-      0
+      0,
     );
     const discountPercentage = selectedDiscount
       ? selectedDiscount.porcentaje / 100
@@ -411,28 +453,32 @@ export default function MakeSale() {
   const calculateTotal = () => {
     const subtotal = cart.reduce(
       (total, item) => total + item.precio * item.quantity,
-      0
+      0,
     );
 
     return subtotal;
   };
 
   const formatoCartData = (
-    cart: (Producto & { quantity: number })[]
+    cart: (Producto & { quantity: number })[],
   ): SaleData => {
     const base: SaleData = {
       monto: calculateTotal(),
       montoConDescuento: calculateTotalConDescuento(),
-      metodoPago: selectedMetodPago as SaleData["metodoPago"],
-      empresaId,
-      descuento: selectedDiscount?.porcentaje,
+      metodoPago: selectedMetodPago,
+      empresaId: empresaId ?? undefined,
+      descuento: selectedDiscount?.porcentaje ?? 0,
       clienteId: selectedCustomer?.id,
-      vendedorId: userId,
+      vendedorId: userId ?? undefined,
       productos: cart.map((item) => ({
         productoId: item.id,
+        codigoProducto: item.codigoProducto,
         cantidad: item.quantity,
         precio: item.precio,
       })),
+      ...(requiereReferenciaPago && referenciaPago.trim()
+        ? { referenciaPago: referenciaPago.trim().toUpperCase() }
+        : {}),
     };
 
     if (selectedMetodPago === "CREDITO") {
@@ -449,28 +495,55 @@ export default function MakeSale() {
   };
 
   const clearCart = () => {
-    setCart([]); // Asume que estás usando `setCart` para actualizar el carrito
+    setCart([]);
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [saleMade, setSaleMade] = useState<Venta>();
-  const [openDialogSaleMade, setOpenDialogSaleMade] = useState<boolean>(false);
+  const [openDialogSaleMade, setOpenDialogSaleMade] = useState(false);
 
   const formatearMoneda = (cantidad: number | undefined): string => {
     if (cantidad === undefined) {
-      return "N/A"; // Puedes devolver un valor predeterminado o manejarlo de otra forma
+      return "N/A";
     }
+
     return new Intl.NumberFormat("es-GT", {
       style: "currency",
       currency: "GTQ",
     }).format(cantidad);
   };
 
-  const sendCartData = async (cart: (Producto & { quantity: number })[]) => {
-    const formateado: SaleData = formatoCartData(cart);
+  const resetSaleForm = () => {
+    clearCart();
 
-    // ✅ Validaciones mínimas comunes
+    // En una visita activa el cliente pertenece a la visita y se conserva.
+    if (!registroAbierto) {
+      setSelectedCustomer(null);
+    }
+
+    setSelectedDiscount(null);
+    setDescuento(undefined);
+    setNota("");
+
+    setSelectedMetodPago("CONTADO");
+    setReferenciaPago("");
+    setCreditoInfo(getInitialCreditoInfo());
+
+    setCantidades({});
+    setCantidadSeleccionada(1);
+
+    setSearchTerm("");
+    setSelectedCategory("");
+
+    setShowCartModal(false);
+    setConfirmSale(false);
+
+    setPage(1);
+    setHasMore(true);
+    setProducts([]);
+  };
+
+  const validateSaleData = (formateado: SaleData): boolean => {
     if (
       !formateado.clienteId ||
       !formateado.vendedorId ||
@@ -478,49 +551,65 @@ export default function MakeSale() {
       !formateado.metodoPago ||
       typeof formateado.monto !== "number" ||
       typeof formateado.montoConDescuento !== "number" ||
-      !formateado.productos?.length
+      !formateado.productos.length
     ) {
       toast.info("Faltan campos sin llenar");
-      return;
+      return false;
     }
 
-    // ✅ Reglas específicas para CREDITO (fechas opcionales coherentes)
-    if (formateado.metodoPago === "CREDITO") {
-      if (
-        formateado.fechaInicio &&
-        formateado.fechaFin &&
-        formateado.fechaFin < formateado.fechaInicio // 'YYYY-MM-DD' compara bien
-      ) {
-        toast.info("La fecha fin no puede ser menor que la fecha inicio");
-        return;
-      }
+    if (requiereReferenciaPago && !formateado.referenciaPago?.trim()) {
+      toast.info("Ingresa la referencia del pago");
+      return false;
+    }
+
+    if (
+      formateado.metodoPago === "CREDITO" &&
+      formateado.fechaInicio &&
+      formateado.fechaFin &&
+      formateado.fechaFin < formateado.fechaInicio
+    ) {
+      toast.info("La fecha fin no puede ser menor que la fecha inicio");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSuccessfulSale = async (venta: Venta) => {
+    // Guardamos la respuesta antes de reiniciar el formulario.
+    setSaleMade(venta);
+
+    // La limpieza ocurre únicamente después de que el servidor respondió con éxito.
+    resetSaleForm();
+
+    // Recarga el catálogo sin depender de estados que React aún no haya actualizado.
+    await fetchProducts(1, { query: "", category: "" });
+
+    toast.success("Venta creada");
+
+    setTimeout(() => {
+      setOpenDialogSaleMade(true);
+    }, 300);
+  };
+
+  const sendCartData = async (cart: (Producto & { quantity: number })[]) => {
+    const formateado = formatoCartData(cart);
+
+    console.log("Payload venta:", formateado);
+
+    if (!validateSaleData(formateado)) {
+      return;
     }
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post(`${API_URL}/sale`, formateado);
 
-      if (response.status === 200 || response.status === 201) {
-        setSaleMade(response.data);
-        toast.success("Venta creada");
+      const response = await axios.post<Venta>(`${API_URL}/sale`, formateado);
 
-        // Limpieza de estado
-        clearCart();
-        setSelectedCustomer(null);
-        setShowCartModal(false);
-        setConfirmSale(false);
-        setCantidades({});
-        setCantidadSeleccionada(1);
-        setSearchTerm("");
-
-        setPage(1);
-        setProducts([]);
-        fetchProducts(1);
-
-        setTimeout(() => setOpenDialogSaleMade(true), 1500);
-      }
+      await handleSuccessfulSale(response.data);
     } catch (error) {
-      console.log(error);
+      console.error("Error al crear venta:", error);
+      // No se limpia el formulario cuando el envío falla.
       toast.error("Error al crear venta");
     } finally {
       setIsSubmitting(false);
@@ -528,14 +617,12 @@ export default function MakeSale() {
   };
 
   //----------------
-  const [registroAbierto, setRegistroAbierto] = useState<Visita2 | null>(null);
-
   useEffect(() => {
     const getRegistOpen = async () => {
       if (userId) {
         try {
           const response = await axios.get(
-            `${API_URL}/date/regist-open/${userId}`
+            `${API_URL}/date/regist-open/${userId}`,
           );
 
           if (response.status === 200) {
@@ -569,70 +656,39 @@ export default function MakeSale() {
   }, [userId]);
 
   async function realizarVentaConVisita(
-    cart: (Producto & { quantity: number })[]
+    cart: (Producto & { quantity: number })[],
   ) {
     const formateado = formatoCartData(cart);
 
-    // ✅ Validaciones mínimas comunes
-    if (
-      !formateado.clienteId ||
-      !formateado.vendedorId ||
-      !formateado.empresaId ||
-      !formateado.metodoPago ||
-      typeof formateado.monto === "undefined" ||
-      typeof formateado.montoConDescuento === "undefined" ||
-      !formateado.productos?.length
-    ) {
-      toast.info("Faltan campos sin llenar");
+    if (!registroAbierto?.id) {
+      toast.info("No hay una visita activa para vincular la venta");
       return;
     }
 
-    // ✅ Reglas específicas para CREDITO (solo cliente y fechas opcionales coherentes)
-    if (formateado.metodoPago === "CREDITO") {
-      // si mandas fechas desde el front, valida coherencia
-      if (
-        formateado.fechaInicio &&
-        formateado.fechaFin &&
-        formateado.fechaFin < formateado.fechaInicio // 'YYYY-MM-DD' compara bien
-      ) {
-        toast.info("La fecha fin no puede ser menor que la fecha inicio");
-        return;
-      }
+    if (!validateSaleData(formateado)) {
+      return;
     }
+
+    const payload = {
+      ...formateado,
+      registroVisitaId: registroAbierto.id,
+      visita: true,
+    };
+
+    console.log("Payload venta con visita:", payload);
 
     try {
       setIsSubmitting(true);
 
-      const payload = {
-        ...formateado,
-        registroVisitaId: registroAbierto?.id,
-        visita: true,
-      };
-
-      const response = await axios.post(
+      const response = await axios.post<Venta>(
         `${API_URL}/sale/sale-for-regis`,
-        payload
+        payload,
       );
 
-      if (response.status === 200 || response.status === 201) {
-        setSaleMade(response.data);
-        toast.success("Venta creada");
-
-        // Limpiar estado
-        clearCart();
-        setShowCartModal(false);
-        setConfirmSale(false);
-        setCantidades({});
-        setCantidadSeleccionada(1);
-        setPage(1);
-        setProducts([]);
-        fetchProducts(1);
-        setSearchTerm("");
-
-        setTimeout(() => setOpenDialogSaleMade(true), 1500);
-      }
+      await handleSuccessfulSale(response.data);
     } catch (error) {
-      console.log(error);
+      console.error("Error al crear venta con visita:", error);
+      // No se limpia el formulario cuando el envío falla.
       toast.error("Error al crear venta");
     } finally {
       setIsSubmitting(false);
@@ -653,7 +709,7 @@ export default function MakeSale() {
           usuarioId: userId, // ID del usuario/vendedor
           descuentoSolicitado: Number(descuento), // Porcentaje del descuento solicitado
           motivo: nota || "Sin motivo adicional", // Motivo adicional
-        }
+        },
       );
 
       if (response.status == 200 || response.status == 201) {
@@ -679,14 +735,6 @@ export default function MakeSale() {
     label: `${desc.porcentaje.toString()}`,
   }));
 
-  const [creditoInfo, setCreditoInfo] = useState<CreditoInfo>({
-    comentario: null,
-    fechaInicio: dayjs().format("YYYY-MM-DD"),
-    fechaFin: dayjs().add(1, "month").format("YYYY-MM-DD"), // o .add(30, 'day')
-  });
-
-  console.log("El credito info es: ", creditoInfo);
-
   useEffect(() => {
     if (!creditoInfo.fechaInicio) return;
     const nuevaFin = dayjs(creditoInfo.fechaInicio)
@@ -694,7 +742,7 @@ export default function MakeSale() {
       .format("YYYY-MM-DD");
 
     setCreditoInfo((prev) =>
-      prev.fechaFin === nuevaFin ? prev : { ...prev, fechaFin: nuevaFin }
+      prev.fechaFin === nuevaFin ? prev : { ...prev, fechaFin: nuevaFin },
     );
   }, [creditoInfo.fechaInicio]);
 
@@ -778,24 +826,26 @@ export default function MakeSale() {
                         }`,
                       }
                     : selectedCustomer
-                    ? {
-                        value: selectedCustomer.id,
-                        label: `${selectedCustomer.nombre} ${
-                          selectedCustomer.apellido || ""
-                        }`,
-                      }
-                    : null
+                      ? {
+                          value: selectedCustomer.id,
+                          label: `${selectedCustomer.nombre} ${
+                            selectedCustomer.apellido || ""
+                          }`,
+                        }
+                      : null
                 }
                 onChange={(selectedOption) => {
                   if (!registroAbierto) {
                     if (selectedOption === null) {
                       setSelectedCustomer(null);
+                      setSelectedDiscount(null);
                     } else {
                       const selectedCustomer =
                         customers.find(
-                          (customer) => customer.id === selectedOption.value
+                          (customer) => customer.id === selectedOption.value,
                         ) || null;
                       setSelectedCustomer(selectedCustomer);
+                      setSelectedDiscount(null);
                     }
                   }
                 }}
@@ -827,7 +877,7 @@ export default function MakeSale() {
                         setSelectedDiscount(null);
                       } else {
                         const discount = selectedCustomer?.descuentos.find(
-                          (desc) => desc.id === selectedOption.value
+                          (desc) => desc.id === selectedOption.value,
                         );
                         setSelectedDiscount(discount || null);
                       }
@@ -891,39 +941,104 @@ export default function MakeSale() {
         </Card>
       </div>
 
-      {/* Método de Pago y Carrito */}
+      {/* Método de pago / resumen del carrito */}
       <div className="w-full p-4">
-        <Card className="mb-1 shadow-sm bg-white dark:bg-gray-800">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-semibold mb-6 text-gray-800 dark:text-gray-200">
-              Método de Pago
-            </h3>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card className="shadow-sm bg-white dark:bg-gray-800">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <CreditCard className="h-5 w-5" />
+                Método de pago
+              </CardTitle>
+            </CardHeader>
 
-            <Select
-              value={selectedMetodPago}
-              onValueChange={setSelectedMetodPago}
-            >
-              <SelectTrigger className="w-full mb-4">
-                <SelectValue placeholder="Seleccione método de pago" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CONTADO">CONTADO</SelectItem>
-                <SelectItem value="TARJETA">TARJETA</SelectItem>
-                <SelectItem value="TRANSFERENCIA_BANCO">
-                  TRANSFERENCIA BANCARIA
-                </SelectItem>
-                <SelectItem value="CREDITO">CRÉDITO</SelectItem>
-              </SelectContent>
-            </Select>
+            <CardContent className="space-y-4">
+              <Select
+                value={selectedMetodPago}
+                onValueChange={(value) => {
+                  const metodo = value as MetodoPagoVenta;
+                  setSelectedMetodPago(metodo);
 
-            <Button
-              onClick={() => setShowCartModal(true)}
-              className="bg-red-500 w-full  text-white"
-            >
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Ver Carrito ({cart.length})
-            </Button>
+                  if (!METODOS_CON_REFERENCIA.includes(metodo)) {
+                    setReferenciaPago("");
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccione método de pago" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CONTADO">CONTADO</SelectItem>
+                  <SelectItem value="TARJETA">TARJETA</SelectItem>
+                  <SelectItem value="TRANSFERENCIA_BANCO">
+                    TRANSFERENCIA BANCARIA
+                  </SelectItem>
+                  <SelectItem value="CREDITO">CRÉDITO</SelectItem>
+                </SelectContent>
+              </Select>
 
+              {requiereReferenciaPago && (
+                <div className="space-y-2 rounded-lg border p-4">
+                  <Label htmlFor="referenciaPago">
+                    Referencia de pago <span className="text-red-500">*</span>
+                  </Label>
+
+                  <Input
+                    id="referenciaPago"
+                    type="text"
+                    maxLength={100}
+                    autoComplete="off"
+                    value={referenciaPago}
+                    onChange={(e) => setReferenciaPago(e.target.value)}
+                    placeholder={
+                      selectedMetodPago === "TRANSFERENCIA_BANCO"
+                        ? "Ej. número de transferencia o boleta"
+                        : "Ej. número de autorización o voucher"
+                    }
+                  />
+
+                  <p className="text-xs text-muted-foreground">
+                    {selectedMetodPago === "TRANSFERENCIA_BANCO"
+                      ? "Ingresa la referencia proporcionada por el banco."
+                      : "Ingresa la referencia o autorización de la transacción."}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm bg-white dark:bg-gray-800">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <ShoppingCart className="h-5 w-5" />
+                Resumen del carrito
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-lg border p-3">
+                  <p className="text-muted-foreground">Productos</p>
+                  <p className="text-lg font-semibold">{cart.length}</p>
+                </div>
+
+                <div className="rounded-lg border p-3">
+                  <p className="text-muted-foreground">Total</p>
+                  <p className="text-lg font-semibold">
+                    {formatearMoneda(calculateTotalConDescuento())}
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => setShowCartModal(true)}
+                className="w-full bg-red-500 text-white hover:bg-red-600"
+              >
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Ver carrito ({cart.length})
+              </Button>
+            </CardContent>
             <Dialog open={showCartModal} onOpenChange={setShowCartModal}>
               <DialogContent className="sm:max-w-[425px] md:max-w-[600px] lg:max-w-[700px] h-[90vh] max-h-[800px] flex flex-col">
                 <DialogHeader className="flex-shrink-0">
@@ -1030,12 +1145,25 @@ export default function MakeSale() {
                       <CreditCard className="w-4 h-4" />
                       Método de pago: {selectedMetodPago}
                     </p>
+                    {requiereReferenciaPago && (
+                      <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Referencia: {referenciaPago.trim() || "Pendiente"}
+                      </p>
+                    )}
                   </div>
 
                   <DialogFooter className="flex flex-col sm:flex-row gap-2">
                     <Button
                       variant="default"
-                      onClick={() => setConfirmSale(true)}
+                      onClick={() => {
+                        if (requiereReferenciaPago && !referenciaPago.trim()) {
+                          toast.info("Ingresa la referencia del pago");
+                          return;
+                        }
+
+                        setConfirmSale(true);
+                      }}
                       disabled={isSubmitting || cart.length === 0}
                       className="w-full lg:w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
                     >
@@ -1052,8 +1180,8 @@ export default function MakeSale() {
                 </div>
               </DialogContent>
             </Dialog>
-          </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
 
       {/* DONDE METER INFO DEL CREDITO */}
@@ -1271,7 +1399,7 @@ export default function MakeSale() {
                           onChange={(e) =>
                             handleCantidadChange(
                               product.id,
-                              parseInt(e.target.value) || 1
+                              parseInt(e.target.value) || 1,
                             )
                           }
                           className="w-16 text-center"
@@ -1428,9 +1556,9 @@ export default function MakeSale() {
                             1,
                             Math.min(
                               parseInt(e.target.value) || 1,
-                              product.stock?.cantidad || 1
-                            )
-                          )
+                              product.stock?.cantidad || 1,
+                            ),
+                          ),
                         )
                       }
                       className="w-24 text-center"
@@ -1572,6 +1700,15 @@ export default function MakeSale() {
                 Método de pago:{" "}
                 <span className="font-semibold ml-1">{selectedMetodPago}</span>
               </p>
+              {requiereReferenciaPago && (
+                <p className="flex items-center justify-center text-sm text-muted-foreground">
+                  <FileText className="w-4 h-4 mr-2 text-primary" />
+                  Referencia:{" "}
+                  <span className="font-semibold ml-1">
+                    {referenciaPago.trim()}
+                  </span>
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter className="mt-6 flex flex-col sm:flex-row-reverse gap-3">

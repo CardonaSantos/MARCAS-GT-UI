@@ -15,8 +15,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 import logo from "../../assets/images/logoEmpresa.png";
 
 import { toast, Toaster } from "sonner";
+import { useStore } from "@/Context/ContextSucursal";
 
 export default function Login() {
+  const setAuthSession = useStore((state) => state.setAuthSession);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({
@@ -60,9 +63,14 @@ export default function Login() {
         contrasena: password,
       });
 
-      if (response.status === 201) {
-        localStorage.setItem("authToken", response.data.authToken);
+      if (response.data.authToken && response.data.usuario) {
+        setAuthSession({
+          authToken: response.data.authToken,
+          usuario: response.data.usuario,
+        });
+
         toast.success("Usuario logueado");
+
         window.location.href = "/marcas-gt/dashboard";
       }
     } catch (error) {

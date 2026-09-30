@@ -97,7 +97,7 @@ type Departamento = {
 };
 
 function Sales() {
-  const sucursalId = useStore((state) => state.sucursalId) ?? 0;
+  const sucursalId = useStore((state) => state.empresaId) ?? 0;
   const [sales, setSales] = useState<SalesType | null>(null);
 
   const getSales = async () => {
@@ -139,7 +139,7 @@ function Sales() {
     const getDepartamentos = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/customer-location/get-departamentos`
+          `${API_URL}/customer-location/get-departamentos`,
         );
         if (response.status === 200) {
           setDepartamentos(response.data);
@@ -186,7 +186,7 @@ function Sales() {
     const ventasTotales = sales?.length;
 
     const [selectedVenta, setSelectedVenta] = useState<SaleTypeOne | null>(
-      null
+      null,
     ); // Estado para manejar la venta seleccionada
     const [isProductsOpen, setIsProductsOpen] = useState(true);
     console.log("Las ventas son: ", sales);
@@ -217,7 +217,7 @@ function Sales() {
     async function deleteVentaById(
       ventaId: number,
       adminPassword: string,
-      userId: number
+      userId: number,
     ): Promise<void> {
       try {
         const response = await axios.delete(
@@ -228,7 +228,7 @@ function Sales() {
               adminPassword,
               sucursalId,
             },
-          }
+          },
         );
 
         if (response.status === 200) {
@@ -239,12 +239,12 @@ function Sales() {
           toast.error("Error al eliminar");
 
           throw new Error(
-            response.data.message || "Error desconocido al eliminar la venta"
+            response.data.message || "Error desconocido al eliminar la venta",
           );
         }
       } catch (error: any) {
         throw new Error(
-          error.response?.data?.message || "Error al conectar con el servidor"
+          error.response?.data?.message || "Error al conectar con el servidor",
         );
       }
     }
@@ -278,7 +278,7 @@ function Sales() {
       try {
         await deleteVentaById(selectedVentaId, adminPassword, userId);
         setVentasList((prevVentas) =>
-          prevVentas.filter((venta) => venta.id !== selectedVentaId)
+          prevVentas.filter((venta) => venta.id !== selectedVentaId),
         );
         closeDeleteDialog();
       } catch (error: any) {
@@ -411,7 +411,7 @@ function Sales() {
                         <TableCell className="text-center">
                           {venta.productos.reduce(
                             (total, producto) => total + producto.cantidad,
-                            0
+                            0,
                           )}
                         </TableCell>
                         <TableCell>{venta.vendedor.nombre}</TableCell>
@@ -420,8 +420,8 @@ function Sales() {
                             venta.metodoPago == MetodoPago.CREDITO
                               ? "text-red-500"
                               : venta.metodoPago == MetodoPago.CONTADO
-                              ? "text-green-500"
-                              : "text-black"
+                                ? "text-green-500"
+                                : "text-black"
                           }`}
                         >
                           {venta.metodoPago}
@@ -545,6 +545,15 @@ function Sales() {
                                             </>
                                           )}
                                         </div>
+
+                                        <div>
+                                          {venta.referenciaPago ? (
+                                            <div>
+                                              {" "}
+                                              REF: {venta.referenciaPago}
+                                            </div>
+                                          ) : null}
+                                        </div>
                                       </div>
                                     </CardContent>
                                   </Card>
@@ -588,7 +597,7 @@ function Sales() {
                                                         {producto.cantidad}{" "}
                                                         unidades a Q
                                                         {producto.precio.toFixed(
-                                                          2
+                                                          2,
                                                         )}
                                                       </div>
                                                       <span className="text-muted-foreground">
@@ -606,7 +615,7 @@ function Sales() {
                                                       <Separator className="my-2" />
                                                     )}
                                                   </li>
-                                                )
+                                                ),
                                               )}
                                             </ul>
                                           </ScrollArea>
