@@ -6,11 +6,229 @@ export const marcasEndpoints = {
   notifications: {
     forAdmin: (userId: number) =>
       `/notifications/notifications/for-admin/${userId}`,
-
     markAsRead: (notificationId: number) =>
       `/notifications/update-notify/${notificationId}`,
-
     clearAllAdmin: (userId: number) =>
       `/notifications/delete-all-notifications-admin/${userId}`,
+  },
+
+  bodegas: {
+    root: "/bodegas",
+    selectables: "/bodegas/seleccionables",
+    principal: "/bodegas/principal",
+    summary: "/bodegas/resumen",
+    detail: (id: number) => `/bodegas/${id}`,
+    events: (id: number) => `/bodegas/${id}/eventos`,
+    responsible: (id: number) => `/bodegas/${id}/responsable`,
+    activate: (id: number) => `/bodegas/${id}/activar`,
+    deactivate: (id: number) => `/bodegas/${id}/desactivar`,
+    setPrincipal: (id: number) => `/bodegas/${id}/principal`,
+  },
+
+  inventario: {
+    root: "/inventario",
+    summary: "/inventario/resumen",
+    productAvailability: (productId: number) =>
+      `/inventario/productos/${productId}/disponibilidad`,
+    movements: "/inventario/movimientos",
+    kardex: (productId: number) => `/inventario/kardex/${productId}`,
+    reservations: "/inventario/reservas",
+    reservation: (id: number) => `/inventario/reservas/${id}`,
+    stock: (id: number) => `/inventario/stocks/${id}`,
+    entries: "/inventario/entradas",
+    adjustments: "/inventario/ajustes",
+    returns: "/inventario/devoluciones",
+    applyReservation: (id: number) => `/inventario/reservas/${id}/aplicar`,
+    releaseReservation: (id: number) => `/inventario/reservas/${id}/liberar`,
+    cancelReservation: (id: number) => `/inventario/reservas/${id}/cancelar`,
+  },
+
+  requisiciones: {
+    root: "/requisiciones",
+    summary: "/requisiciones/resumen",
+    receipts: "/requisiciones/recepciones",
+    detail: (id: number) => `/requisiciones/${id}`,
+    events: (id: number) => `/requisiciones/${id}/eventos`,
+    requisitionReceipts: (id: number) => `/requisiciones/${id}/recepciones`,
+    request: (id: number) => `/requisiciones/${id}/solicitar`,
+    approve: (id: number) => `/requisiciones/${id}/aprobar`,
+    reject: (id: number) => `/requisiciones/${id}/rechazar`,
+    cancel: (id: number) => `/requisiciones/${id}/cancelar`,
+  },
+
+  transferencias: {
+    root: "/transferencias",
+    summary: "/transferencias/resumen",
+    operations: "/transferencias/operaciones",
+    detail: (id: number) => `/transferencias/${id}`,
+    events: (id: number) => `/transferencias/${id}/eventos`,
+    transferOperations: (id: number) => `/transferencias/${id}/operaciones`,
+    prepare: (id: number) => `/transferencias/${id}/preparar`,
+    cancel: (id: number) => `/transferencias/${id}/cancelar`,
+    outputs: (id: number) => `/transferencias/${id}/salidas`,
+    receipts: (id: number) => `/transferencias/${id}/recepciones`,
+  },
+
+  pedidos: {
+    root: "/pedidos",
+    summary: "/pedidos/resumen",
+    detail: (id: number) => `/pedidos/${id}`,
+    events: (id: number) => `/pedidos/${id}/eventos`,
+    requestValidation: (id: number) => `/pedidos/${id}/solicitar-validacion`,
+    confirm: (id: number) => `/pedidos/${id}/confirmar`,
+    cancel: (id: number) => `/pedidos/${id}/cancelar`,
+  },
+
+  creditos: {
+    portfolio: "/creditos/cartera",
+
+    policies: {
+      root: "/creditos/politicas",
+      detail: (id: number) => `/creditos/politicas/${id}`,
+      status: (id: number) => `/creditos/politicas/${id}/estado`,
+    },
+
+    applications: {
+      root: "/creditos/solicitudes",
+      summary: "/creditos/solicitudes/resumen",
+      detail: (id: number) => `/creditos/solicitudes/${id}`,
+      events: (id: number) => `/creditos/solicitudes/${id}/eventos`,
+      submit: (id: number) => `/creditos/solicitudes/${id}/enviar-revision`,
+      cancel: (id: number) => `/creditos/solicitudes/${id}/cancelar`,
+      references: (id: number) => `/creditos/solicitudes/${id}/referencias`,
+      reference: (id: number, referenceId: number) =>
+        `/creditos/solicitudes/${id}/referencias/${referenceId}`,
+      reviewReference: (id: number, referenceId: number) =>
+        `/creditos/solicitudes/${id}/referencias/${referenceId}/revisar`,
+      documents: (id: number) => `/creditos/solicitudes/${id}/documentos`,
+      reviewDocument: (id: number, documentId: number) =>
+        `/creditos/solicitudes/${id}/documentos/${documentId}/revisar`,
+      reviewRequirement: (id: number, requirementId: number) =>
+        `/creditos/solicitudes/${id}/requisitos/${requirementId}/revisar`,
+      approve: (id: number) => `/creditos/solicitudes/${id}/aprobar`,
+      reject: (id: number) => `/creditos/solicitudes/${id}/rechazar`,
+      retryIntegration: (id: number) =>
+        `/creditos/solicitudes/${id}/reintentar-integracion`,
+    },
+  },
+
+  despachos: {
+    root: "/despachos",
+    candidates: "/despachos/candidatos",
+    summary: "/despachos/resumen",
+    operationalReport: "/despachos/reportes/operacion",
+    operations: "/despachos/operaciones",
+    retryOperation: (operationId: number) =>
+      `/despachos/operaciones/${operationId}/reintentar`,
+    detail: (id: number) => `/despachos/${id}`,
+    events: (id: number) => `/despachos/${id}/eventos`,
+    dispatchOperations: (id: number) => `/despachos/${id}/operaciones`,
+    startPreparation: (id: number) => `/despachos/${id}/iniciar-preparacion`,
+    preparation: (id: number) => `/despachos/${id}/preparacion`,
+    finishPreparation: (id: number) => `/despachos/${id}/finalizar-preparacion`,
+    outputs: (id: number) => `/despachos/${id}/salidas`,
+    cancel: (id: number) => `/despachos/${id}/cancelar`,
+    observations: (id: number) => `/despachos/${id}/observaciones`,
+  },
+
+  transporte: {
+    carriers: {
+      root: "/transportistas",
+      deactivate: (id: number) => `/transportistas/${id}/desactivar`,
+    },
+    vehicles: {
+      root: "/vehiculos",
+      deactivate: (id: number) => `/vehiculos/${id}/desactivar`,
+    },
+    drivers: {
+      root: "/conductores",
+      deactivate: (id: number) => `/conductores/${id}/desactivar`,
+    },
+    shipments: {
+      root: "/envios",
+      candidates: "/envios/candidatos",
+      summary: "/envios/resumen",
+      operationalReport: "/envios/reportes/operacion",
+      detail: (id: number) => `/envios/${id}`,
+      assign: (id: number) => `/envios/${id}/asignar`,
+      confirmLoad: (id: number) => `/envios/${id}/confirmar-carga`,
+      startRoute: (id: number) => `/envios/${id}/iniciar-ruta`,
+      cancel: (id: number) => `/envios/${id}/cancelar`,
+      observations: (id: number) => `/envios/${id}/observaciones`,
+      incidents: (id: number) => `/envios/${id}/incidencias`,
+      resolveIncident: (id: number, incidentId: number) =>
+        `/envios/${id}/incidencias/${incidentId}/resolver`,
+    },
+  },
+
+  entregas: {
+    root: "/entregas",
+    candidates: "/entregas/candidatos",
+    summary: "/entregas/resumen",
+    operationalReport: "/entregas/reportes/operacion",
+    detail: (id: number) => `/entregas/${id}`,
+    events: (id: number) => `/entregas/${id}/eventos`,
+    evidences: (id: number) => `/entregas/${id}/evidencias`,
+    evidence: (id: number, evidenceId: number) =>
+      `/entregas/${id}/evidencias/${evidenceId}`,
+    start: (id: number) => `/entregas/${id}/iniciar`,
+    result: (id: number) => `/entregas/${id}/resultado`,
+    finish: (id: number) => `/entregas/${id}/finalizar`,
+    observations: (id: number) => `/entregas/${id}/observaciones`,
+  },
+
+  facturacion: {
+    invoices: {
+      root: "/facturas",
+      candidates: "/facturas/candidatos",
+      summary: "/facturas/resumen",
+      operationalReport: "/facturas/reportes/operacion",
+      detail: (id: number) => `/facturas/${id}`,
+      events: (id: number) => `/facturas/${id}/eventos`,
+      felOperations: (id: number) => `/facturas/${id}/operaciones-fel`,
+      prepare: (id: number) => `/facturas/${id}/preparar`,
+      discard: (id: number) => `/facturas/${id}/descartar`,
+    },
+    fiscalConfig: {
+      company: "/configuracion-fiscal/empresa",
+      establishments: "/configuracion-fiscal/establecimientos",
+      customer: (customerId: number) =>
+        `/configuracion-fiscal/clientes/${customerId}`,
+      product: (productId: number) =>
+        `/configuracion-fiscal/productos/${productId}`,
+    },
+    receivables: {
+      root: "/cuentas-por-cobrar",
+      summary: "/cuentas-por-cobrar/resumen",
+    },
+  },
+
+  pagos: {
+    root: "/pagos",
+    summary: "/pagos/resumen",
+    detail: (id: number) => `/pagos/${id}`,
+    events: (id: number) => `/pagos/${id}/eventos`,
+    applications: (id: number) => `/pagos/${id}/aplicaciones`,
+    candidateReceivables: (id: number) => `/pagos/${id}/cuentas-candidatas`,
+    proofs: (id: number) => `/pagos/${id}/comprobantes`,
+    verify: (id: number) => `/pagos/${id}/verificar`,
+    reject: (id: number) => `/pagos/${id}/rechazar`,
+    revertApplication: (paymentId: number, applicationId: number) =>
+      `/pagos/${paymentId}/aplicaciones/${applicationId}/revertir`,
+    cancel: (id: number) => `/pagos/${id}/anular`,
+  },
+
+  tracking: {
+    start: "/real-time-location/tracking/start",
+    me: "/real-time-location/tracking/me",
+    location: "/real-time-location/tracking/location",
+    finish: (trackingSessionId: number) =>
+      `/real-time-location/tracking/${trackingSessionId}/finish`,
+    realtime: "/real-time-location/tracking/realtime",
+    history: "/real-time-location/tracking/history",
+    attendance: (attendanceId: number) =>
+      `/real-time-location/tracking/attendance/${attendanceId}`,
+    attendanceLocations: (attendanceId: number) =>
+      `/real-time-location/tracking/attendance/${attendanceId}/locations`,
   },
 } as const;

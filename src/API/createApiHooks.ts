@@ -1,57 +1,190 @@
 import {
   useMutation,
   useQuery,
+  useQueryClient,
   type QueryKey,
   type UseMutationOptions,
   type UseQueryOptions,
 } from "@tanstack/react-query";
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
-function normalizeEndpoint(endpoint: string) {
-  return endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+import {
+  ApiError,
+  type ApiClient,
+  type ApiQueryParams,
+  type ApiRequestConfig,
+  type HttpMethod,
+} from "./createApiClient";
+
+type MutationMethod = HttpMethod | Lowercase<HttpMethod>;
+
+type EndpointResolver<TVariables> =
+  | string
+  | ((variables: TVariables) => string);
+
+type ParamsResolver<TVariables> =
+  | ApiQueryParams
+  | ((variables: TVariables) => ApiQueryParams | undefined);
+
+type BodyResolver<TVariables> = (variables: TVariables) => unknown;
+
+type InvalidationResolver<TData, TVariables> =
+  | QueryKey[]
+  | ((data: TData, variables: TVariables) => QueryKey[] | Promise<QueryKey[]>);
+
+export type ApiQueryDefinition<
+  TQueryFnData,
+  TError = ApiError,
+  TData = TQueryFnData,
+> = {
+  queryKey: QueryKey;
+  endpoint: string;
+  params?: ApiQueryParams;
+  request?: Omit<ApiRequestConfig, "params" | "signal">;
+  options?: Omit<
+    UseQueryOptions<TQueryFnData, TError, TData, QueryKey>,
+    "queryKey" | "queryFn"
+  >;
+};
+
+export type ApiMutationDefinition<
+  TData,
+  TVariables = void,
+  TError = ApiError,
+  TOnMutateResult = unknown,
+> = {
+  method: MutationMethod;
+  endpoint: EndpointResolver<TVariables>;
+  params?: ParamsResolver<TVariables>;
+  body?: BodyResolver<TVariables>;
+  request?: Omit<ApiRequestConfig, "params" | "signal">;
+  invalidateKeys?: InvalidationResolver<TData, TVariables>;
+  invalidateExact?: boolean;
+  options?: Omit<
+    UseMutationOptions<TData, TError, TVariables, TOnMutateResult>,
+    "mutationFn"
+  >;
+};
+
+function normalizeMethod(method: MutationMethod): HttpMethod {
+  return method.toUpperCase() as HttpMethod;
 }
 
-export function createApiHooks(client: AxiosInstance) {
-  return {
-    useQueryApi<TData, TError = Error>(
-      key: QueryKey,
-      endpoint: string,
-      config?: AxiosRequestConfig,
-      options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">,
-    ) {
-      return useQuery<TData, TError>({
-        queryKey: key,
-        queryFn: async () => {
-          const { data } = await client.get<TData>(
-            normalizeEndpoint(endpoint),
-            config,
+function resolveEndpoint<TVariables>(
+  endpoint: EndpointResolver<TVariables>,
+  variables: TVariables,
+) {
+  return typeof endpoint === "function" ? endpoint(variables) : endpoint;
+}
+
+function resolveParams<TVariables>(
+  params: ParamsResolver<TVariables> | undefined,
+  variables: TVariables,
+) {
+  if (!params) {
+    return undefined;
+  }
+
+  return typeof params === "function" ? params(variables) : params;
+}
+
+export function createApiHooks(client: ApiClient) {
+  function useQueryApi<
+    TQueryFnData,
+    TError = ApiError,
+    TData = TQueryFnData,
+  >({
+    queryKey,
+    endpoint,
+    params,
+    request,
+    options,
+  }: ApiQueryDefinition<TQueryFnData, TError, TData>) {
+    return useQuery<TQueryFnData, TError, TData, QueryKey>({
+      queryKey,
+      queryFn: ({ signal }) =>
+        client.get<TQueryFnData>(endpoint, {
+          ...request,
+          params,
+          signal,
+        }),
+      ...options,
+    });
+  }
+
+  function useMutationApi<
+    TData,
+    TVariables = void,
+    TError = ApiError,
+    TOnMutateResult = unknown,
+  >({
+    method,
+    endpoint,
+    params,
+    body,
+    request,
+    invalidateKeys,
+    invalidateExact = false,
+    options,
+  }: ApiMutationDefinition<TData, TVariables, TError, TOnMutateResult>) {
+    const queryClient = useQueryClient();
+    const onSuccess = options?.onSuccess;
+
+    return useMutation<TData, TError, TVariables, TOnMutateResult>({
+      ...(options ?? {}),
+      mutationFn: (variables) =>
+        client.request<TData>(
+          normalizeMethod(method),
+          resolveEndpoint(endpoint, variables),
+          body ? body(variables) : variables,
+          {
+            ...request,
+            params: resolveParams(params, variables),
+          },
+        ),
+      onSuccess: async (data, variables, onMutateResult, context) => {
+        const keys =
+          typeof invalidateKeys === "function"
+            ? await invalidateKeys(data, variables)
+            : (invalidateKeys ?? []);
+
+        if (keys.length > 0) {
+          await Promise.all(
+            keys.map((queryKey) =>
+              queryClient.invalidateQueries({
+                queryKey,
+                exact: invalidateExact,
+              }),
+            ),
           );
+        }
 
-          return data;
-        },
-        ...options,
-      });
-    },
+        await onSuccess?.(data, variables, onMutateResult, context);
+      },
+    });
+  }
 
-    useMutationApi<TData, TVariables = unknown, TError = Error>(
-      method: "post" | "put" | "patch" | "delete",
-      endpoint: string,
-      config?: AxiosRequestConfig,
-      options?: UseMutationOptions<TData, TError, TVariables>,
-    ) {
-      return useMutation<TData, TError, TVariables>({
-        mutationFn: async (variables) => {
-          const { data } = await client.request<TData>({
-            url: normalizeEndpoint(endpoint),
-            method,
-            data: variables,
-            ...config,
-          });
+  function useInvalidateQueries() {
+    const queryClient = useQueryClient();
 
-          return data;
-        },
-        ...options,
-      });
-    },
+    return (
+      queryKeys: QueryKey[],
+      options: { exact?: boolean } = {},
+    ) =>
+      Promise.all(
+        queryKeys.map((queryKey) =>
+          queryClient.invalidateQueries({
+            queryKey,
+            exact: options.exact ?? false,
+          }),
+        ),
+      );
+  }
+
+  return {
+    useQuery: useQueryApi,
+    useMutation: useMutationApi,
+    useInvalidateQueries,
+    useQueryApi,
+    useMutationApi,
   };
 }

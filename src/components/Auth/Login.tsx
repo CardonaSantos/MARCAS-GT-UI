@@ -79,7 +79,6 @@ export default function Login() {
     }
   };
 
-  console.log(localStorage.getItem("authToken"));
 
   return (
     <div className="flex items-center justify-center min-h-screen w-full">

@@ -23,12 +23,12 @@ import { toast } from "sonner";
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useStore } from "@/Context/ContextSucursal";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function CreateUser() {
-  console.log("MI URL DEL SEVER CONECTADO ES:", API_URL);
-
   const navigate = useNavigate();
+  const setAuthSession = useStore((state) => state.setAuthSession);
 
   const [comprobarContraseña, setComprobarContraseña] = useState<string>("");
   const [formData, setFormData] = useState({
@@ -74,10 +74,17 @@ export default function CreateUser() {
     try {
       const response = await axios.post(`${API_URL}/users`, formData);
 
-      if (response.status === 201) {
+      if (
+        response.status === 201 &&
+        response.data.authToken &&
+        response.data.usuario
+      ) {
+        setAuthSession({
+          authToken: response.data.authToken,
+          usuario: response.data.usuario,
+        });
+
         toast.success("Usuario creado");
-        const { authToken } = response.data; // Asegúrate de que el backend retorna authToken
-        localStorage.setItem("authToken", authToken);
         navigate("/marcas-gt/dashboard");
       }
     } catch (error) {

@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { QueryKey } from "@tanstack/react-query";
 
-import { marcasApi } from "../api";
+import { API } from "../api";
 import { marcasEndpoints } from "../routes/endpoints";
 
 export interface MarcasNotification {
@@ -18,73 +18,50 @@ export const notificationKeys = {
     [...notificationKeys.all, "user", userId] as const,
 };
 
+function notificationInvalidationKeys(userId?: number | null): QueryKey[] {
+  return userId ? [notificationKeys.byUser(userId)] : [];
+}
+
 export function useNotifications(userId?: number | null) {
-  return useQuery<MarcasNotification[], Error>({
+  return API.useQuery<MarcasNotification[]>({
     queryKey: userId
       ? notificationKeys.byUser(userId)
       : [...notificationKeys.all, "anonymous"],
-    enabled: Boolean(userId),
-    queryFn: async () => {
-      if (!userId) {
-        return [];
-      }
-
-      const { data } = await marcasApi.get<MarcasNotification[]>(
-        marcasEndpoints.notifications.forAdmin(userId),
-      );
-
-      return data;
+    endpoint: marcasEndpoints.notifications.forAdmin(userId ?? 0),
+    options: {
+      enabled: Boolean(userId),
     },
   });
 }
 
 export function useMarkNotificationAsRead(userId?: number | null) {
-  const queryClient = useQueryClient();
-
-  return useMutation<void, Error, { notificationId: number }>({
-    mutationFn: async ({ notificationId }) => {
+  return API.useMutation<void, { notificationId: number }>({
+    method: "PATCH",
+    endpoint: ({ notificationId }) => {
       if (!userId) {
         throw new Error("No hay un usuario autenticado");
       }
 
-      await marcasApi.patch(
-        marcasEndpoints.notifications.markAsRead(notificationId),
-        {
-          usuarioId: userId,
-        },
-      );
+      return marcasEndpoints.notifications.markAsRead(notificationId);
     },
-
-    onSuccess: async () => {
-      if (!userId) return;
-
-      await queryClient.invalidateQueries({
-        queryKey: notificationKeys.byUser(userId),
-      });
-    },
+    body: () => ({ usuarioId: userId }),
+    invalidateKeys: notificationInvalidationKeys(userId),
   });
 }
 
 export function useClearNotifications(userId?: number | null) {
-  const queryClient = useQueryClient();
-
-  return useMutation<void, Error, void>({
-    mutationFn: async () => {
+  return API.useMutation<void, void>({
+    // El endpoint legacy actualmente limpia notificaciones mediante GET.
+    // Se conserva su contrato hasta que el backend legacy sea retirado.
+    method: "GET",
+    endpoint: () => {
       if (!userId) {
         throw new Error("No hay un usuario autenticado");
       }
 
-      await marcasApi.get(
-        marcasEndpoints.notifications.clearAllAdmin(userId),
-      );
+      return marcasEndpoints.notifications.clearAllAdmin(userId);
     },
-
-    onSuccess: async () => {
-      if (!userId) return;
-
-      await queryClient.invalidateQueries({
-        queryKey: notificationKeys.byUser(userId),
-      });
-    },
+    body: () => undefined,
+    invalidateKeys: notificationInvalidationKeys(userId),
   });
 }
