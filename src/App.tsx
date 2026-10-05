@@ -30,7 +30,10 @@ import ProspectoUbicacion from "./Pages/MapProspect/ProspectoUbicacion";
 import PdfPage from "./components/PDF/PdfPage";
 // import DeliveryPdfPage from "./components/PDF/DeliveryPdfPage";
 import EditCustomer from "./Pages/Tools/EditCustomer";
-import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
+import {
+  ProtectedRoute,
+  ProtectedRouteRoles,
+} from "./components/Auth/ProtectedRoute";
 import DashboardEmp from "./Pages/DashboardEmployee/DashboardEmp";
 import { ProtectedRouteAdmin } from "./components/Auth/ProtectedRouteAdmin";
 import MySales from "./Pages/EmployePages/MySales";
@@ -53,6 +56,20 @@ import BodegaDetailsPage from "./Pages/Bodegas/BodegaDetailsPage";
 import EditBodegaPage from "./Pages/Bodegas/EditBodegaPage";
 import BodegaResponsiblePage from "./Pages/Bodegas/BodegaResponsiblePage";
 import DeactivateBodegaPage from "./Pages/Bodegas/DeactivateBodegaPage";
+import InventoryPage from "./Pages/Inventario/InventoryPage";
+import InventoryAvailabilityPage from "./Pages/Inventario/InventoryAvailabilityPage";
+import InventoryMovementsPage from "./Pages/Inventario/InventoryMovementsPage";
+import InventoryStockDetailPage from "./Pages/Inventario/InventoryStockDetailPage";
+import InventoryProductPage from "./Pages/Inventario/InventoryProductPage";
+import InventoryReservationsPage from "./Pages/Inventario/InventoryReservationsPage";
+import InventoryReservationDetailPage from "./Pages/Inventario/InventoryReservationDetailPage";
+import CreateInventoryReservationPage from "./Pages/Inventario/CreateInventoryReservationPage";
+import RegisterInventoryEntryPage from "./Pages/Inventario/RegisterInventoryEntryPage";
+import AdjustInventoryPage from "./Pages/Inventario/AdjustInventoryPage";
+import RegisterInventoryReturnPage from "./Pages/Inventario/RegisterInventoryReturnPage";
+import ApplyInventoryReservationPage from "./Pages/Inventario/ApplyInventoryReservationPage";
+import ReleaseInventoryReservationPage from "./Pages/Inventario/ReleaseInventoryReservationPage";
+import CancelInventoryReservationPage from "./Pages/Inventario/CancelInventoryReservationPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -140,6 +157,123 @@ function App() {
                 <ProtectedRouteAdmin>
                   <DeactivateBodegaPage />
                 </ProtectedRouteAdmin>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/inventario"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <InventoryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/disponibilidad"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR"]}
+                >
+                  <InventoryAvailabilityPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/movimientos"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <InventoryMovementsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/stocks/:id"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <InventoryStockDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/productos/:productoId"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR"]}
+                >
+                  <InventoryProductPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/reservas"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <InventoryReservationsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/reservas/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateInventoryReservationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/reservas/:id"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <InventoryReservationDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/reservas/:id/aplicar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <ApplyInventoryReservationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/reservas/:id/liberar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <ReleaseInventoryReservationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/reservas/:id/cancelar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CancelInventoryReservationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/entradas/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <RegisterInventoryEntryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/ajustes/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <AdjustInventoryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/devoluciones/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <RegisterInventoryReturnPage />
+                </ProtectedRouteRoles>
               }
             />
 

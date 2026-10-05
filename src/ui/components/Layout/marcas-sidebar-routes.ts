@@ -16,9 +16,11 @@ import {
   MapPin,
   MapPinned,
   PackagePlus,
+  PencilLine,
   PieChart,
   ShoppingBag,
   ShoppingCart,
+  RotateCcw,
   Star,
   Tags,
   Truck,
@@ -156,6 +158,31 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/bodegas",
       },
       {
+        icon: BarChart3,
+        label: "Existencias",
+        href: "/marcas-gt/inventario",
+      },
+      {
+        icon: Boxes,
+        label: "Consultar disponibilidad",
+        href: "/marcas-gt/inventario/disponibilidad",
+      },
+      {
+        icon: FileClock,
+        label: "Movimientos",
+        href: "/marcas-gt/inventario/movimientos",
+      },
+      {
+        icon: ClipboardList,
+        label: "Reservas",
+        href: "/marcas-gt/inventario/reservas",
+      },
+      {
+        icon: PackagePlus,
+        label: "Registrar entrada",
+        href: "/marcas-gt/inventario/entradas/nueva",
+      },
+      {
         icon: Boxes,
         label: "Catálogo de productos",
         href: "/marcas-gt/ver-productos",
@@ -169,11 +196,6 @@ const adminRoutes: MarcasRoute[] = [
         icon: Tags,
         label: "Categorías de productos",
         href: "/marcas-gt/crear-categoria",
-      },
-      {
-        icon: BarChart3,
-        label: "Control de inventario",
-        href: "/marcas-gt/asignar-stock",
       },
       {
         icon: Truck,
@@ -217,6 +239,11 @@ const sellerRoutes: MarcasRoute[] = [
     href: "/marcas-gt/clientes",
   },
   {
+    icon: Boxes,
+    label: "Disponibilidad de productos",
+    href: "/marcas-gt/inventario/disponibilidad",
+  },
+  {
     icon: CheckSquare,
     label: "Registro de entrada/salida",
     href: "/marcas-gt/registrar-entrada-salida",
@@ -253,6 +280,41 @@ const warehouseRoutes: MarcasRoute[] = [
         label: "Bodegas",
         href: "/marcas-gt/bodegas",
       },
+      {
+        icon: BarChart3,
+        label: "Existencias",
+        href: "/marcas-gt/inventario",
+      },
+      {
+        icon: Boxes,
+        label: "Consultar disponibilidad",
+        href: "/marcas-gt/inventario/disponibilidad",
+      },
+      {
+        icon: FileClock,
+        label: "Movimientos",
+        href: "/marcas-gt/inventario/movimientos",
+      },
+      {
+        icon: ClipboardList,
+        label: "Reservas",
+        href: "/marcas-gt/inventario/reservas",
+      },
+      {
+        icon: PackagePlus,
+        label: "Registrar entrada",
+        href: "/marcas-gt/inventario/entradas/nueva",
+      },
+      {
+        icon: PencilLine,
+        label: "Ajustar inventario",
+        href: "/marcas-gt/inventario/ajustes/nuevo",
+      },
+      {
+        icon: RotateCcw,
+        label: "Registrar devolución",
+        href: "/marcas-gt/inventario/devoluciones/nueva",
+      },
     ],
   },
 ];
@@ -264,9 +326,30 @@ const accountingRoutes: MarcasRoute[] = [
     href: "/marcas-gt/dashboard-empleado",
   },
   {
-    icon: Building2,
-    label: "Bodegas",
-    href: "/marcas-gt/bodegas",
+    icon: Boxes,
+    label: "Inventario",
+    submenu: [
+      {
+        icon: Building2,
+        label: "Bodegas",
+        href: "/marcas-gt/bodegas",
+      },
+      {
+        icon: BarChart3,
+        label: "Existencias",
+        href: "/marcas-gt/inventario",
+      },
+      {
+        icon: Boxes,
+        label: "Consultar disponibilidad",
+        href: "/marcas-gt/inventario/disponibilidad",
+      },
+      {
+        icon: FileClock,
+        label: "Movimientos",
+        href: "/marcas-gt/inventario/movimientos",
+      },
+    ],
   },
 ];
 

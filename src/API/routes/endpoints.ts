@@ -7,6 +7,18 @@ export const marcasEndpoints = {
     root: "/users",
   },
 
+  products: {
+    root: "/product",
+    search: "/product/search",
+    inventoryCatalog: "/product/get-product-to-inventary",
+    detail: (id: number) => `/product/${id}`,
+  },
+
+  providers: {
+    root: "/provider",
+    detail: (id: number) => `/provider/${id}`,
+  },
+
   notifications: {
     forAdmin: (userId: number) =>
       `/notifications/notifications/for-admin/${userId}`,
