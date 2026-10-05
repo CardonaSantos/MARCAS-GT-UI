@@ -3,6 +3,10 @@ export const marcasEndpoints = {
     login: "/auth/login",
   },
 
+  users: {
+    root: "/users",
+  },
+
   notifications: {
     forAdmin: (userId: number) =>
       `/notifications/notifications/for-admin/${userId}`,

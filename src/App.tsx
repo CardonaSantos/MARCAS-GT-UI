@@ -47,6 +47,12 @@ import Saldos from "./Pages/Saldos/Saldos";
 import PaymentCreditPage from "./components/PDF/PDF CREDITOS/PaymentCreditPage";
 import Creditos from "./Pages/Creditos/Creditos";
 import Cancelados from "./Pages/Cancelados/Cancelados";
+import BodegasPage from "./Pages/Bodegas/BodegasPage";
+import CreateBodegaPage from "./Pages/Bodegas/CreateBodegaPage";
+import BodegaDetailsPage from "./Pages/Bodegas/BodegaDetailsPage";
+import EditBodegaPage from "./Pages/Bodegas/EditBodegaPage";
+import BodegaResponsiblePage from "./Pages/Bodegas/BodegaResponsiblePage";
+import DeactivateBodegaPage from "./Pages/Bodegas/DeactivateBodegaPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -85,6 +91,55 @@ function App() {
                 <ProtectedRoute>
                   <DashboardEmp />
                 </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/bodegas"
+              element={
+                <ProtectedRoute>
+                  <BodegasPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/bodegas/nueva"
+              element={
+                <ProtectedRouteAdmin>
+                  <CreateBodegaPage />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/bodegas/:id"
+              element={
+                <ProtectedRoute>
+                  <BodegaDetailsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/bodegas/:id/editar"
+              element={
+                <ProtectedRouteAdmin>
+                  <EditBodegaPage />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/bodegas/:id/responsable"
+              element={
+                <ProtectedRouteAdmin>
+                  <BodegaResponsiblePage />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/bodegas/:id/desactivar"
+              element={
+                <ProtectedRouteAdmin>
+                  <DeactivateBodegaPage />
+                </ProtectedRouteAdmin>
               }
             />
 

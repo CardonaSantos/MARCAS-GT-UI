@@ -151,6 +151,11 @@ const adminRoutes: MarcasRoute[] = [
     label: "Inventario",
     submenu: [
       {
+        icon: Building2,
+        label: "Bodegas",
+        href: "/marcas-gt/bodegas",
+      },
+      {
         icon: Boxes,
         label: "Catálogo de productos",
         href: "/marcas-gt/ver-productos",
@@ -233,6 +238,42 @@ const sellerRoutes: MarcasRoute[] = [
   },
 ];
 
+const warehouseRoutes: MarcasRoute[] = [
+  {
+    icon: Home,
+    label: "Inicio",
+    href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: Boxes,
+    label: "Operación de bodega",
+    submenu: [
+      {
+        icon: Building2,
+        label: "Bodegas",
+        href: "/marcas-gt/bodegas",
+      },
+    ],
+  },
+];
+
+const accountingRoutes: MarcasRoute[] = [
+  {
+    icon: Home,
+    label: "Inicio",
+    href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: Building2,
+    label: "Bodegas",
+    href: "/marcas-gt/bodegas",
+  },
+];
+
 export function getMarcasRoutesByRole(role?: string | null) {
-  return role === "ADMIN" ? adminRoutes : sellerRoutes;
+  if (role === "ADMIN") return adminRoutes;
+  if (role === "BODEGA") return warehouseRoutes;
+  if (role === "CONTABILIDAD") return accountingRoutes;
+
+  return sellerRoutes;
 }
