@@ -80,7 +80,7 @@ export default function CreateBodegaPage() {
               description="Datos generales, ubicación y contacto."
               size="sm"
             >
-              <BodegaBasicFormFields<CreateBodegaFormValues />
+              <BodegaBasicFormFields<CreateBodegaFormValues> />
             </AppCard>
 
             <AppCard

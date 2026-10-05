@@ -100,7 +100,7 @@ export default function EditBodegaPage() {
                 description="El estado, responsable y condición principal se administran mediante operaciones separadas."
                 size="sm"
               >
-                <BodegaBasicFormFields<UpdateBodegaFormValues />
+                <BodegaBasicFormFields<UpdateBodegaFormValues> />
               </AppCard>
 
               <div className="flex justify-end gap-2">

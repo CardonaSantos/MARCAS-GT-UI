@@ -18,7 +18,7 @@ export function useBodegas(filters: BodegaListFilters) {
   return API.useQuery<BodegaListResponse>({
     queryKey: marcasQueryKeys.bodegas.list(filters),
     endpoint: marcasEndpoints.bodegas.root,
-    params: filters,
+    params: { ...filters },
   });
 }
 
@@ -56,7 +56,7 @@ export function useBodegaEvents(id: number, filters: BodegaEventFilters) {
       filters,
     ),
     endpoint: marcasEndpoints.bodegas.events(id),
-    params: filters,
+    params: { ...filters },
     options: {
       enabled: Number.isInteger(id) && id > 0,
     },
@@ -67,7 +67,7 @@ export function useBodegaSelectables(filters: BodegaSelectFilters = {}) {
   return API.useQuery<BodegaSelectable[]>({
     queryKey: marcasQueryKeys.bodegas.custom("selectables", filters),
     endpoint: marcasEndpoints.bodegas.selectables,
-    params: filters,
+    params: { ...filters },
   });
 }
 

@@ -5,6 +5,7 @@ import {
   type QueryKey,
   type UseMutationOptions,
   type UseQueryOptions,
+  type UseQueryResult,
 } from "@tanstack/react-query";
 
 import {
@@ -31,6 +32,15 @@ type InvalidationResolver<TData, TVariables> =
   | QueryKey[]
   | ((data: TData, variables: TVariables) => QueryKey[] | Promise<QueryKey[]>);
 
+type ApiUseQueryOptions<
+  TQueryFnData,
+  TError,
+  TData,
+> = Omit<
+  UseQueryOptions<TQueryFnData, TError, TData, QueryKey>,
+  "queryKey" | "queryFn" | "initialData"
+>;
+
 export type ApiQueryDefinition<
   TQueryFnData,
   TError = ApiError,
@@ -40,10 +50,7 @@ export type ApiQueryDefinition<
   endpoint: string;
   params?: ApiQueryParams;
   request?: Omit<ApiRequestConfig, "params" | "signal">;
-  options?: Omit<
-    UseQueryOptions<TQueryFnData, TError, TData, QueryKey>,
-    "queryKey" | "queryFn"
-  >;
+  options?: ApiUseQueryOptions<TQueryFnData, TError, TData>;
 };
 
 export type ApiMutationDefinition<
@@ -98,7 +105,11 @@ export function createApiHooks(client: ApiClient) {
     params,
     request,
     options,
-  }: ApiQueryDefinition<TQueryFnData, TError, TData>) {
+  }: ApiQueryDefinition<
+    TQueryFnData,
+    TError,
+    TData
+  >): UseQueryResult<TData, TError> {
     return useQuery<TQueryFnData, TError, TData, QueryKey>({
       queryKey,
       queryFn: ({ signal }) =>
