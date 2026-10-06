@@ -2,7 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import {
@@ -37,6 +42,7 @@ import { AppStack } from "@/ui/components/app/primitives/app-stack";
 export default function CreateInventoryReservationPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const backTo = getReturnRoute(
     location.state,
     "/marcas-gt/inventario/reservas",
@@ -44,9 +50,14 @@ export default function CreateInventoryReservationPage() {
   const listFrom = getListReturnRoute(location.state, backTo);
   const key = useIdempotencyKey("inventory-reservation");
 
+  const initialOrderId = Number(searchParams.get("pedidoId"));
   const [orderSearchInput, setOrderSearchInput] = useState("");
   const [orderSearch, setOrderSearch] = useState("");
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(
+    Number.isInteger(initialOrderId) && initialOrderId > 0
+      ? initialOrderId
+      : null,
+  );
 
   const ordersQuery = useInventoryOrderOptions(orderSearch);
   const orderQuery = useInventoryOrderDetail(selectedOrderId);
@@ -72,7 +83,16 @@ export default function CreateInventoryReservationPage() {
     form.setValue("cantidad", "");
   }, [form, selectedOrderId]);
 
-  const orderOptions = (ordersQuery.data?.data ?? []).map((order) => ({
+  const orderRows = [...(ordersQuery.data?.data ?? [])];
+
+  if (
+    orderQuery.data &&
+    !orderRows.some((order) => order.id === orderQuery.data?.id)
+  ) {
+    orderRows.unshift(orderQuery.data);
+  }
+
+  const orderOptions = orderRows.map((order) => ({
     value: order.id,
     label: `${order.numero} · ${order.cliente.nombreCompleto}`,
   }));
@@ -133,14 +153,14 @@ export default function CreateInventoryReservationPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Nueva reserva"
-          description="Reserva existencias para una línea de pedido con unidades pendientes."
+          description="Reserva existencias para una línea de pedido confirmada con unidades pendientes."
           backTo={backTo}
           backLabel="Volver a reservas"
         />
 
         <AppCard
           title="Pedido"
-          description="Busca un pedido abierto y selecciona la línea que deseas reservar."
+          description="Se muestran pedidos confirmados o en operación que todavía tienen unidades pendientes de reserva."
           size="sm"
         >
           <AppStack gap="md">
@@ -157,7 +177,7 @@ export default function CreateInventoryReservationPage() {
               isLoading={ordersQuery.isLoading}
               placeholder="Seleccionar pedido"
               onChange={setSelectedOrderId}
-              noOptionsText="No hay pedidos abiertos"
+              noOptionsText="No hay pedidos elegibles para reserva"
             />
           </AppStack>
         </AppCard>

@@ -70,6 +70,11 @@ import RegisterInventoryReturnPage from "./Pages/Inventario/RegisterInventoryRet
 import ApplyInventoryReservationPage from "./Pages/Inventario/ApplyInventoryReservationPage";
 import ReleaseInventoryReservationPage from "./Pages/Inventario/ReleaseInventoryReservationPage";
 import CancelInventoryReservationPage from "./Pages/Inventario/CancelInventoryReservationPage";
+import OrdersPage from "./Pages/Pedidos/OrdersPage";
+import CreateOrderPage from "./Pages/Pedidos/CreateOrderPage";
+import OrderDetailPage from "./Pages/Pedidos/OrderDetailPage";
+import EditOrderPage from "./Pages/Pedidos/EditOrderPage";
+import CancelOrderPage from "./Pages/Pedidos/CancelOrderPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -273,6 +278,51 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
                   <RegisterInventoryReturnPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/pedidos"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
+                >
+                  <OrdersPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <CreateOrderPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
+                >
+                  <OrderDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/:id/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <EditOrderPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/:id/cancelar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <CancelOrderPage />
                 </ProtectedRouteRoles>
               }
             />

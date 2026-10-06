@@ -19,6 +19,17 @@ export const marcasEndpoints = {
     detail: (id: number) => `/provider/${id}`,
   },
 
+  customers: {
+    root: "/customers",
+    simple: "/customers/customer-simple",
+    detail: (id: number) => `/customers/${id}`,
+  },
+
+  visits: {
+    records: "/date/get-visits-regists",
+    detail: (id: number) => `/date/${id}`,
+  },
+
   notifications: {
     forAdmin: (userId: number) =>
       `/notifications/notifications/for-admin/${userId}`,

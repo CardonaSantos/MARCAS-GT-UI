@@ -114,7 +114,11 @@ export function useInventoryReservation(id: number, enabled = true) {
 export function useInventoryOrderOptions(search: string) {
   const normalized = search.trim();
 
-  return API.useQuery<InventoryOrderPageResponse>({
+  return API.useQuery<
+    InventoryOrderPageResponse,
+    Error,
+    InventoryOrderPageResponse
+  >({
     queryKey: marcasQueryKeys.pedidos.custom(
       "inventory-reservation-options",
       normalized,
@@ -122,11 +126,35 @@ export function useInventoryOrderOptions(search: string) {
     endpoint: marcasEndpoints.pedidos.root,
     params: {
       page: 1,
-      limit: 30,
+      limit: 100,
       search: normalized || undefined,
       soloAbiertos: true,
       sortBy: "creadoEn",
       sortDir: "desc",
+    },
+    options: {
+      select: (page) => {
+        const eligibleStates = new Set([
+          "CONFIRMADO",
+          "EN_PREPARACION",
+          "PARCIALMENTE_DESPACHADO",
+        ]);
+        const data = page.data.filter(
+          (order) =>
+            eligibleStates.has(order.estado) &&
+            order.progreso.unidadesPendientesReserva > 0,
+        );
+
+        return {
+          data,
+          meta: {
+            ...page.meta,
+            total: data.length,
+            totalPages: data.length ? 1 : 0,
+            page: 1,
+          },
+        };
+      },
     },
   });
 }

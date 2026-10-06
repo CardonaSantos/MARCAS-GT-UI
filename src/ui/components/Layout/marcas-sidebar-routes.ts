@@ -75,6 +75,11 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/hacer-ventas",
       },
       {
+        icon: ShoppingCart,
+        label: "Pedidos",
+        href: "/marcas-gt/pedidos",
+      },
+      {
         icon: ClipboardList,
         label: "Historial de ventas",
         href: "/marcas-gt/ventas",
@@ -234,6 +239,11 @@ const sellerRoutes: MarcasRoute[] = [
     href: "/marcas-gt/hacer-ventas",
   },
   {
+    icon: ShoppingCart,
+    label: "Pedidos",
+    href: "/marcas-gt/pedidos",
+  },
+  {
     icon: Users,
     label: "Gestión de clientes",
     href: "/marcas-gt/clientes",
@@ -270,6 +280,11 @@ const warehouseRoutes: MarcasRoute[] = [
     icon: Home,
     label: "Inicio",
     href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: ShoppingCart,
+    label: "Pedidos",
+    href: "/marcas-gt/pedidos",
   },
   {
     icon: Boxes,
@@ -324,6 +339,11 @@ const accountingRoutes: MarcasRoute[] = [
     icon: Home,
     label: "Inicio",
     href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: ShoppingCart,
+    label: "Pedidos",
+    href: "/marcas-gt/pedidos",
   },
   {
     icon: Boxes,
