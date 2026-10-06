@@ -11,14 +11,7 @@ const moneyText = z
   );
 
 const orderLineSchema = z.object({
-  productoId: z
-    .number()
-    .int()
-    .positive()
-    .nullable()
-    .refine((value) => value !== null, {
-      message: "Selecciona un producto.",
-    }),
+  productoId: z.number().int().positive().nullable(),
   cantidadSolicitada: z
     .string()
     .trim()
@@ -32,22 +25,8 @@ const orderLineSchema = z.object({
 
 export const orderFormSchema = z
   .object({
-    clienteId: z
-      .number()
-      .int()
-      .positive()
-      .nullable()
-      .refine((value) => value !== null, {
-        message: "Selecciona un cliente.",
-      }),
-    vendedorId: z
-      .number()
-      .int()
-      .positive()
-      .nullable()
-      .refine((value) => value !== null, {
-        message: "Selecciona un vendedor.",
-      }),
+    clienteId: z.number().int().positive().nullable(),
+    vendedorId: z.number().int().positive().nullable(),
     visitaId: z.number().int().positive().nullable(),
     condicionPago: z.enum(ORDER_PAYMENT_CONDITIONS),
     observaciones: z
@@ -57,10 +36,33 @@ export const orderFormSchema = z
     detalles: z.array(orderLineSchema).max(200, "Máximo 200 productos."),
   })
   .superRefine((values, ctx) => {
+    if (values.clienteId === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["clienteId"],
+        message: "Selecciona un cliente.",
+      });
+    }
+
+    if (values.vendedorId === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["vendedorId"],
+        message: "Selecciona un vendedor.",
+      });
+    }
+
     const seen = new Set<number>();
 
     values.detalles.forEach((line, index) => {
-      if (line.productoId === null) return;
+      if (line.productoId === null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["detalles", index, "productoId"],
+          message: "Selecciona un producto.",
+        });
+        return;
+      }
 
       if (seen.has(line.productoId)) {
         ctx.addIssue({
