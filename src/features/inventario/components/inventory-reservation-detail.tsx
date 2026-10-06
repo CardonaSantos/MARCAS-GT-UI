@@ -39,7 +39,7 @@ export function InventoryReservationDetail({
   return (
     <div className="space-y-4">
       <AppGrid cols={{ base: 1, md: 2, xl: 4 }} gap="sm">
-        <AppCard title="Cantidad original" size="sm">
+        <AppCard title="Reservado acumulado" size="sm">
           <p className="text-2xl font-semibold tabular-nums">
             {formatInteger(reservation.cantidadOriginal)}
           </p>

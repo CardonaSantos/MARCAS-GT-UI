@@ -1,4 +1,4 @@
-import { Eye, PackageCheck, PackageMinus, XCircle } from "lucide-react";
+import { Eye, PackageMinus, XCircle } from "lucide-react";
 import type { ReturnRouteState } from "@/features/common/navigation/route-state";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { ColumnDef, PaginationState } from "@tanstack/react-table";
@@ -92,7 +92,7 @@ export function InventoryReservationTable({
     },
     {
       accessorKey: "cantidadOriginal",
-      header: "Original",
+      header: "Acumulado",
       size: 95,
       meta: { align: "right" },
       cell: ({ row }) => formatInteger(row.original.cantidadOriginal),
@@ -148,18 +148,6 @@ export function InventoryReservationTable({
             icon: <Eye />,
             onClick: () =>
               go("/marcas-gt/inventario/reservas/" + reservation.id),
-          },
-          {
-            label: "Aplicar reserva",
-            icon: <PackageCheck />,
-            hidden: !canMutate,
-            separatorBefore: true,
-            onClick: () =>
-              go(
-                "/marcas-gt/inventario/reservas/" +
-                  reservation.id +
-                  "/aplicar",
-              ),
           },
           {
             label: "Liberar reserva",

@@ -1,4 +1,4 @@
-import { PackageCheck, PackageMinus, XCircle } from "lucide-react";
+import { PackageMinus, XCircle } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
@@ -52,16 +52,6 @@ export default function InventoryReservationDetailPage() {
                   >
                     <PackageMinus className="h-4 w-4" />
                     Liberar
-                  </Link>
-                </AppButton>
-
-                <AppButton asChild variant="primary" size="sm">
-                  <Link
-                    to={"/marcas-gt/inventario/reservas/" + id + "/aplicar"}
-                    state={actionState}
-                  >
-                    <PackageCheck className="h-4 w-4" />
-                    Aplicar
                   </Link>
                 </AppButton>
 

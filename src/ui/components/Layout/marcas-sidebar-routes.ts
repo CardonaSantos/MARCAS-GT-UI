@@ -188,6 +188,16 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/inventario/entradas/nueva",
       },
       {
+        icon: PencilLine,
+        label: "Ajustar inventario",
+        href: "/marcas-gt/inventario/ajustes/nuevo",
+      },
+      {
+        icon: RotateCcw,
+        label: "Registrar devolución",
+        href: "/marcas-gt/inventario/devoluciones/nueva",
+      },
+      {
         icon: Boxes,
         label: "Catálogo de productos",
         href: "/marcas-gt/ver-productos",

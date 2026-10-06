@@ -1,6 +1,6 @@
 import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { RotateCcw } from "lucide-react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 import { useUserSelectables } from "@/features/common/catalogs/catalog.queries";
 import { formatDateTime } from "@/features/common/formatters/value.formatters";
@@ -117,14 +117,40 @@ export function OrderActivity({ orderId }: { orderId: number }) {
       id: "referenciaTipo",
       header: "Tipo referencia",
       size: 155,
-      cell: ({ row }) => row.original.referencia?.tipo ?? "—",
+      cell: ({ row }) => {
+        const reference = row.original.referencia;
+        if (!reference) return "—";
+
+        if (reference.tipo === "RESERVA_INVENTARIO") {
+          return "Reserva de inventario";
+        }
+
+        return reference.tipo;
+      },
     },
     {
       id: "referenciaId",
       header: "ID referencia",
       size: 105,
       meta: { align: "right" },
-      cell: ({ row }) => row.original.referencia?.id ?? "—",
+      cell: ({ row }) => {
+        const reference = row.original.referencia;
+        if (!reference) return "—";
+
+        if (reference.tipo === "RESERVA_INVENTARIO") {
+          return (
+            <Link
+              to={"/marcas-gt/inventario/reservas/" + reference.id}
+              state={{ from: location.pathname + location.search }}
+              className="font-medium text-[hsl(var(--app-primary))] hover:underline"
+            >
+              #{reference.id}
+            </Link>
+          );
+        }
+
+        return "#" + reference.id;
+      },
     },
   ];
 

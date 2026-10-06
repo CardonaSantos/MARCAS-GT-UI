@@ -32,12 +32,12 @@ export function InventorySummaryCards({
       icon: <Layers3 />,
     },
     {
-      title: "Productos con existencia",
+      title: "Registros con existencia",
       value: formatInteger(summary?.productosConExistencia),
       icon: <Boxes />,
     },
     {
-      title: "Productos agotados",
+      title: "Registros sin disponibilidad",
       value: formatInteger(summary?.productosAgotados),
       icon: <CircleOff />,
     },
