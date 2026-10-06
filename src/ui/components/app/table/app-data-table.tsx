@@ -637,21 +637,22 @@ export function AppDataTable<TData>({
     );
   };
 
+  const toolbarContent =
+    toolbar || rightToolbar || enableColumnVisibility ? (
+      <div className={cn(appDataTableToolbarVariants(), toolbarClassName)}>
+        <div className="min-w-0">{toolbar}</div>
+
+        <div className="flex min-w-0 items-center justify-end gap-2">
+          {rightToolbar}
+          {enableColumnVisibility ? (
+            <AppTableColumnVisibility table={table} />
+          ) : null}
+        </div>
+      </div>
+    ) : null;
+
   const tableContent = (
     <>
-      {(toolbar || rightToolbar || enableColumnVisibility) && (
-        <div className={cn(appDataTableToolbarVariants(), toolbarClassName)}>
-          <div className="min-w-0">{toolbar}</div>
-
-          <div className="flex min-w-0 items-center justify-end gap-2">
-            {rightToolbar}
-            {enableColumnVisibility ? (
-              <AppTableColumnVisibility table={table} />
-            ) : null}
-          </div>
-        </div>
-      )}
-
       {selectedCount > 0 && bulkActions ? (
         <div className={bulkClassName}>{bulkActions}</div>
       ) : null}
@@ -728,6 +729,8 @@ export function AppDataTable<TData>({
         className,
       )}
     >
+      {toolbarContent}
+
       <AppDataState
         isLoading={isLoading}
         isFetching={isFetching}
