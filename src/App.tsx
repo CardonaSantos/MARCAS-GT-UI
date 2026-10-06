@@ -48,7 +48,6 @@ import Reportes from "./Pages/Reportes/Reportes";
 import RestablecerContrasena from "./Pages/Recovery/RestablecerContrasena";
 import Saldos from "./Pages/Saldos/Saldos";
 import PaymentCreditPage from "./components/PDF/PDF CREDITOS/PaymentCreditPage";
-import Creditos from "./Pages/Creditos/Creditos";
 import Cancelados from "./Pages/Cancelados/Cancelados";
 import BodegasPage from "./Pages/Bodegas/BodegasPage";
 import CreateBodegaPage from "./Pages/Bodegas/CreateBodegaPage";
@@ -74,6 +73,25 @@ import CreateOrderPage from "./Pages/Pedidos/CreateOrderPage";
 import OrderDetailPage from "./Pages/Pedidos/OrderDetailPage";
 import EditOrderPage from "./Pages/Pedidos/EditOrderPage";
 import CancelOrderPage from "./Pages/Pedidos/CancelOrderPage";
+import CreditApplicationsPage from "./Pages/Creditos/CreditApplicationsPage";
+import CreateCreditApplicationPage from "./Pages/Creditos/CreateCreditApplicationPage";
+import EditCreditApplicationPage from "./Pages/Creditos/EditCreditApplicationPage";
+import CreditApplicationDetailPage from "./Pages/Creditos/CreditApplicationDetailPage";
+import CancelCreditApplicationPage from "./Pages/Creditos/CancelCreditApplicationPage";
+import ApproveCreditApplicationPage from "./Pages/Creditos/ApproveCreditApplicationPage";
+import RejectCreditApplicationPage from "./Pages/Creditos/RejectCreditApplicationPage";
+import AddCreditReferencePage from "./Pages/Creditos/AddCreditReferencePage";
+import EditCreditReferencePage from "./Pages/Creditos/EditCreditReferencePage";
+import ReviewCreditReferencePage from "./Pages/Creditos/ReviewCreditReferencePage";
+import AddCreditDocumentPage from "./Pages/Creditos/AddCreditDocumentPage";
+import ReviewCreditDocumentPage from "./Pages/Creditos/ReviewCreditDocumentPage";
+import ReviewCreditRequirementPage from "./Pages/Creditos/ReviewCreditRequirementPage";
+import CreditPoliciesPage from "./Pages/Creditos/CreditPoliciesPage";
+import CreateCreditPolicyPage from "./Pages/Creditos/CreateCreditPolicyPage";
+import EditCreditPolicyPage from "./Pages/Creditos/EditCreditPolicyPage";
+import CreditPolicyDetailPage from "./Pages/Creditos/CreditPolicyDetailPage";
+import DeactivateCreditPolicyPage from "./Pages/Creditos/DeactivateCreditPolicyPage";
+import CreditPortfolioPage from "./Pages/Creditos/CreditPortfolioPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -314,6 +332,169 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
                   <CancelOrderPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/creditos"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                >
+                  <CreditApplicationsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <CreateCreditApplicationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                >
+                  <CreditApplicationDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <EditCreditApplicationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/cancelar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <CancelCreditApplicationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/aprobar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <ApproveCreditApplicationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/rechazar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <RejectCreditApplicationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/referencias/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <AddCreditReferencePage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/referencias/:referenceId/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <EditCreditReferencePage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/referencias/:referenceId/revisar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <ReviewCreditReferencePage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/documentos/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <AddCreditDocumentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/documentos/:documentId/revisar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <ReviewCreditDocumentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/solicitudes/:id/requisitos/:requirementId/revisar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <ReviewCreditRequirementPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/politicas"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                >
+                  <CreditPoliciesPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/politicas/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN"]}>
+                  <CreateCreditPolicyPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/politicas/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                >
+                  <CreditPolicyDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/politicas/:id/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN"]}>
+                  <EditCreditPolicyPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/politicas/:id/desactivar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN"]}>
+                  <DeactivateCreditPolicyPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/cartera"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                >
+                  <CreditPortfolioPage />
                 </ProtectedRouteRoles>
               }
             />
@@ -594,15 +775,6 @@ function App() {
                 <ProtectedRoute>
                   <PaymentCreditPage />
                 </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/marcas-gt/creditos"
-              element={
-                <ProtectedRouteAdmin>
-                  <Creditos />
-                </ProtectedRouteAdmin>
               }
             />
 

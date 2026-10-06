@@ -30,7 +30,6 @@ export const ORDER_PAYMENT_CONDITIONS: readonly OrderPaymentCondition[] = [
   "PREPAGO",
   "CONTRAENTREGA",
   "CREDITO",
-  "MIXTO",
 ];
 
 export const ORDER_SORT_FIELDS: readonly OrderSortField[] = [

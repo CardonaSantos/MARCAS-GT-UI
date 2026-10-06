@@ -3,6 +3,7 @@ import {
   PackageCheck,
   Pencil,
   Send,
+  WalletCards,
   XCircle,
 } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -59,6 +60,22 @@ export default function OrderDetailPage() {
 
   const order = query.data;
   const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canReadCredit = ["ADMIN", "VENDEDOR", "CONTABILIDAD"].includes(
+    role ?? "",
+  );
+  const linkedCredit =
+    order?.solicitudesCredito.find(
+      (application) =>
+        !["RECHAZADA", "CANCELADA"].includes(application.estado),
+    ) ??
+    order?.solicitudesCredito[0] ??
+    null;
+  const canStartCredit =
+    canWrite &&
+    order?.condicionPago === "CREDITO" &&
+    order.estado === "PENDIENTE_VALIDACION" &&
+    !linkedCredit;
+
   const canReserve =
     (role === "ADMIN" || role === "BODEGA") &&
     Boolean(
@@ -190,6 +207,44 @@ export default function OrderDetailPage() {
                       await confirmOrder.mutateAsync({ id });
                     }}
                   />
+                ) : null}
+
+                {canReadCredit &&
+                order.condicionPago === "CREDITO" &&
+                linkedCredit ? (
+                  <AppButton asChild variant="secondary" size="sm">
+                    <Link
+                      to={
+                        "/marcas-gt/creditos/solicitudes/" +
+                        linkedCredit.id
+                      }
+                      state={{
+                        from: currentUrl,
+                        listFrom: backTo,
+                      }}
+                    >
+                      <WalletCards className="h-4 w-4" />
+                      Ver crédito
+                    </Link>
+                  </AppButton>
+                ) : null}
+
+                {canStartCredit ? (
+                  <AppButton asChild variant="primary" size="sm">
+                    <Link
+                      to={
+                        "/marcas-gt/creditos/solicitudes/nueva?pedidoId=" +
+                        id
+                      }
+                      state={{
+                        from: currentUrl,
+                        listFrom: backTo,
+                      }}
+                    >
+                      <WalletCards className="h-4 w-4" />
+                      Tramitar crédito
+                    </Link>
+                  </AppButton>
                 ) : null}
 
                 {canReserve ? (

@@ -13,6 +13,7 @@ import {
   FileClock,
   FileSpreadsheet,
   Home,
+  Landmark,
   MapPin,
   MapPinned,
   PackagePlus,
@@ -21,6 +22,7 @@ import {
   ShoppingBag,
   ShoppingCart,
   RotateCcw,
+  Settings2,
   Star,
   Tags,
   Truck,
@@ -96,8 +98,18 @@ const adminRoutes: MarcasRoute[] = [
       },
       {
         icon: CreditCard,
-        label: "Gestión de créditos",
+        label: "Solicitudes de crédito",
         href: "/marcas-gt/creditos",
+      },
+      {
+        icon: Landmark,
+        label: "Cartera de crédito",
+        href: "/marcas-gt/creditos/cartera",
+      },
+      {
+        icon: Settings2,
+        label: "Políticas de crédito",
+        href: "/marcas-gt/creditos/politicas",
       },
     ],
   },
@@ -254,6 +266,21 @@ const sellerRoutes: MarcasRoute[] = [
     href: "/marcas-gt/pedidos",
   },
   {
+    icon: CreditCard,
+    label: "Solicitudes de crédito",
+    href: "/marcas-gt/creditos",
+  },
+  {
+    icon: Landmark,
+    label: "Cartera de crédito",
+    href: "/marcas-gt/creditos/cartera",
+  },
+  {
+    icon: Settings2,
+    label: "Políticas de crédito",
+    href: "/marcas-gt/creditos/politicas",
+  },
+  {
     icon: Users,
     label: "Gestión de clientes",
     href: "/marcas-gt/clientes",
@@ -354,6 +381,27 @@ const accountingRoutes: MarcasRoute[] = [
     icon: ShoppingCart,
     label: "Pedidos",
     href: "/marcas-gt/pedidos",
+  },
+  {
+    icon: CreditCard,
+    label: "Créditos",
+    submenu: [
+      {
+        icon: ClipboardList,
+        label: "Solicitudes de crédito",
+        href: "/marcas-gt/creditos",
+      },
+      {
+        icon: Landmark,
+        label: "Cartera de crédito",
+        href: "/marcas-gt/creditos/cartera",
+      },
+      {
+        icon: Settings2,
+        label: "Políticas de crédito",
+        href: "/marcas-gt/creditos/politicas",
+      },
+    ],
   },
   {
     icon: Boxes,
