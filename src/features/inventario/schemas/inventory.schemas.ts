@@ -1,12 +1,21 @@
 import { z } from "zod";
 
-const requiredSelectId = (message: string) =>
-  z
-    .number()
-    .int()
-    .positive()
-    .nullable()
-    .refine((value) => value !== null, { message });
+const nullableSelectId = z.number().int().positive().nullable();
+
+function validateRequiredSelect(
+  value: number | null,
+  path: string,
+  message: string,
+  ctx: z.RefinementCtx,
+) {
+  if (value !== null) return;
+
+  ctx.addIssue({
+    code: "custom",
+    path: [path],
+    message,
+  });
+}
 
 const positiveIntegerText = z
   .string()
@@ -73,45 +82,103 @@ function validateReferencePair(
 
 export const registerInventoryEntrySchema = z
   .object({
-    bodegaId: requiredSelectId("Selecciona una bodega."),
-    productoId: requiredSelectId("Selecciona un producto."),
+    bodegaId: nullableSelectId,
+    productoId: nullableSelectId,
     cantidad: positiveIntegerText,
     costoUnitario: costText,
     proveedorId: z.number().int().positive().nullable(),
     observaciones: optionalText(500),
     ...referenceFields,
   })
-  .superRefine(validateReferencePair);
+  .superRefine((values, ctx) => {
+    validateRequiredSelect(
+      values.bodegaId,
+      "bodegaId",
+      "Selecciona una bodega.",
+      ctx,
+    );
+    validateRequiredSelect(
+      values.productoId,
+      "productoId",
+      "Selecciona un producto.",
+      ctx,
+    );
+    validateReferencePair(values, ctx);
+  });
 
-export const adjustInventorySchema = z.object({
-  bodegaId: requiredSelectId("Selecciona una bodega."),
-  productoId: requiredSelectId("Selecciona un producto."),
-  tipo: z.enum(["ENTRADA", "SALIDA"]),
-  cantidad: positiveIntegerText,
-  costoUnitario: optionalCostText,
-  motivo: z
-    .string()
-    .trim()
-    .min(3, "El motivo debe tener al menos 3 caracteres.")
-    .max(500, "El motivo no puede exceder 500 caracteres."),
-});
+export const adjustInventorySchema = z
+  .object({
+    bodegaId: nullableSelectId,
+    productoId: nullableSelectId,
+    tipo: z.enum(["ENTRADA", "SALIDA"]),
+    cantidad: positiveIntegerText,
+    costoUnitario: optionalCostText,
+    motivo: z
+      .string()
+      .trim()
+      .min(3, "El motivo debe tener al menos 3 caracteres.")
+      .max(500, "El motivo no puede exceder 500 caracteres."),
+  })
+  .superRefine((values, ctx) => {
+    validateRequiredSelect(
+      values.bodegaId,
+      "bodegaId",
+      "Selecciona una bodega.",
+      ctx,
+    );
+    validateRequiredSelect(
+      values.productoId,
+      "productoId",
+      "Selecciona un producto.",
+      ctx,
+    );
+  });
 
 export const registerInventoryReturnSchema = z
   .object({
-    bodegaId: requiredSelectId("Selecciona una bodega."),
-    productoId: requiredSelectId("Selecciona un producto."),
+    bodegaId: nullableSelectId,
+    productoId: nullableSelectId,
     cantidad: positiveIntegerText,
     costoUnitario: optionalCostText,
     observaciones: optionalText(500),
     ...referenceFields,
   })
-  .superRefine(validateReferencePair);
+  .superRefine((values, ctx) => {
+    validateRequiredSelect(
+      values.bodegaId,
+      "bodegaId",
+      "Selecciona una bodega.",
+      ctx,
+    );
+    validateRequiredSelect(
+      values.productoId,
+      "productoId",
+      "Selecciona un producto.",
+      ctx,
+    );
+    validateReferencePair(values, ctx);
+  });
 
-export const reserveInventorySchema = z.object({
-  pedidoDetalleId: requiredSelectId("Selecciona un detalle de pedido."),
-  bodegaId: requiredSelectId("Selecciona una bodega."),
-  cantidad: positiveIntegerText,
-});
+export const reserveInventorySchema = z
+  .object({
+    pedidoDetalleId: nullableSelectId,
+    bodegaId: nullableSelectId,
+    cantidad: positiveIntegerText,
+  })
+  .superRefine((values, ctx) => {
+    validateRequiredSelect(
+      values.pedidoDetalleId,
+      "pedidoDetalleId",
+      "Selecciona un detalle de pedido.",
+      ctx,
+    );
+    validateRequiredSelect(
+      values.bodegaId,
+      "bodegaId",
+      "Selecciona una bodega.",
+      ctx,
+    );
+  });
 
 export const reservationMutationSchema = z
   .object({
