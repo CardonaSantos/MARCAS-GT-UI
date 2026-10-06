@@ -1,8 +1,8 @@
 import {
   CheckCircle2,
-  PackageCheck,
   Pencil,
   Send,
+  Truck,
   WalletCards,
   XCircle,
 } from "lucide-react";
@@ -35,7 +35,7 @@ import { AppDataState } from "@/ui/components/app/primitives/app-data-state";
 import { AppStack } from "@/ui/components/app/primitives/app-stack";
 import { AppTabs } from "@/ui/components/app/primitives/app-tabs";
 
-const RESERVABLE_STATES = [
+const DISPATCHABLE_STATES = [
   "CONFIRMADO",
   "EN_PREPARACION",
   "PARCIALMENTE_DESPACHADO",
@@ -76,14 +76,14 @@ export default function OrderDetailPage() {
     order.estado === "PENDIENTE_VALIDACION" &&
     !linkedCredit;
 
-  const canReserve =
+  const canPlanDispatch =
     (role === "ADMIN" || role === "BODEGA") &&
     Boolean(
       order &&
-        RESERVABLE_STATES.includes(
-          order.estado as (typeof RESERVABLE_STATES)[number],
+        DISPATCHABLE_STATES.includes(
+          order.estado as (typeof DISPATCHABLE_STATES)[number],
         ) &&
-        order.progreso.unidadesPendientesReserva > 0,
+        order.progreso.unidadesPendientesDespacho > 0,
     );
 
   const tabs = order
@@ -247,19 +247,17 @@ export default function OrderDetailPage() {
                   </AppButton>
                 ) : null}
 
-                {canReserve ? (
+                {canPlanDispatch ? (
                   <AppButton asChild variant="primary" size="sm">
                     <Link
-                      to={
-                        "/marcas-gt/inventario/reservas/nueva?pedidoId=" + id
-                      }
+                      to={"/marcas-gt/despachos/nuevo?pedidoId=" + id}
                       state={{
                         from: currentUrl,
                         listFrom: backTo,
                       }}
                     >
-                      <PackageCheck className="h-4 w-4" />
-                      Reservar inventario
+                      <Truck className="h-4 w-4" />
+                      Planificar despacho
                     </Link>
                   </AppButton>
                 ) : null}

@@ -195,6 +195,11 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/inventario/reservas",
       },
       {
+        icon: Truck,
+        label: "Despachos",
+        href: "/marcas-gt/despachos",
+      },
+      {
         icon: PackagePlus,
         label: "Registrar entrada",
         href: "/marcas-gt/inventario/entradas/nueva",
@@ -264,6 +269,11 @@ const sellerRoutes: MarcasRoute[] = [
     icon: ShoppingCart,
     label: "Pedidos",
     href: "/marcas-gt/pedidos",
+  },
+  {
+    icon: Truck,
+    label: "Despachos",
+    href: "/marcas-gt/despachos",
   },
   {
     icon: CreditCard,
@@ -353,6 +363,11 @@ const warehouseRoutes: MarcasRoute[] = [
         href: "/marcas-gt/inventario/reservas",
       },
       {
+        icon: Truck,
+        label: "Despachos",
+        href: "/marcas-gt/despachos",
+      },
+      {
         icon: PackagePlus,
         label: "Registrar entrada",
         href: "/marcas-gt/inventario/entradas/nueva",
@@ -426,6 +441,11 @@ const accountingRoutes: MarcasRoute[] = [
         icon: FileClock,
         label: "Movimientos",
         href: "/marcas-gt/inventario/movimientos",
+      },
+      {
+        icon: Truck,
+        label: "Despachos",
+        href: "/marcas-gt/despachos",
       },
     ],
   },

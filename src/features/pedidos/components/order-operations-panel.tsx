@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import { Link, useLocation } from "react-router-dom";
 import {
   Banknote,
   FileText,
@@ -42,6 +43,8 @@ function StatusValue({
 }
 
 export function OrderOperationsPanel({ order }: { order: OrderDetail }) {
+  const location = useLocation();
+  const currentUrl = location.pathname + location.search;
   const creditColumns: ColumnDef<CreditRow, unknown>[] = [
     {
       accessorKey: "id",
@@ -99,7 +102,15 @@ export function OrderOperationsPanel({ order }: { order: OrderDetail }) {
       accessorKey: "id",
       header: "Despacho",
       size: 90,
-      cell: ({ row }) => "#" + row.original.id,
+      cell: ({ row }) => (
+        <Link
+          to={"/marcas-gt/despachos/" + row.original.id}
+          state={{ from: currentUrl }}
+          className="font-medium text-[hsl(var(--app-primary))] hover:underline"
+        >
+          #{row.original.id}
+        </Link>
+      ),
     },
     {
       accessorKey: "estado",

@@ -92,6 +92,16 @@ import EditCreditPolicyPage from "./Pages/Creditos/EditCreditPolicyPage";
 import CreditPolicyDetailPage from "./Pages/Creditos/CreditPolicyDetailPage";
 import DeactivateCreditPolicyPage from "./Pages/Creditos/DeactivateCreditPolicyPage";
 import CreditPortfolioPage from "./Pages/Creditos/CreditPortfolioPage";
+import DispatchesPage from "./Pages/Despachos/DispatchesPage";
+import CreateDispatchPage from "./Pages/Despachos/CreateDispatchPage";
+import DispatchDetailPage from "./Pages/Despachos/DispatchDetailPage";
+import EditDispatchPage from "./Pages/Despachos/EditDispatchPage";
+import StartDispatchPreparationPage from "./Pages/Despachos/StartDispatchPreparationPage";
+import UpdateDispatchPreparationPage from "./Pages/Despachos/UpdateDispatchPreparationPage";
+import RegisterDispatchOutputPage from "./Pages/Despachos/RegisterDispatchOutputPage";
+import CancelDispatchPage from "./Pages/Despachos/CancelDispatchPage";
+import DispatchOperationsPage from "./Pages/Despachos/DispatchOperationsPage";
+import DispatchOperationalReportPage from "./Pages/Despachos/DispatchOperationalReportPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -495,6 +505,95 @@ function App() {
                   roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
                 >
                   <CreditPortfolioPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/despachos"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <DispatchesPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateDispatchPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/operaciones"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <DispatchOperationsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/reportes/operacion"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <DispatchOperationalReportPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <DispatchDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/:id/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <EditDispatchPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/:id/iniciar-preparacion"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <StartDispatchPreparationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/:id/preparacion"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <UpdateDispatchPreparationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/:id/salida"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <RegisterDispatchOutputPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/despachos/:id/cancelar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CancelDispatchPage />
                 </ProtectedRouteRoles>
               }
             />
