@@ -18,6 +18,7 @@ import CreateProduct from "./Pages/CreateProduct";
 import StockPage from "./Pages/StockPage";
 import ViewProducts from "./Pages/ViewProducts";
 import MakeSale from "./Pages/MakeSale";
+import HistorialVentas from "./Pages/SaleCard";
 import CheckInCheckOut from "./Pages/CheckInCheckOut";
 import CrearCategoria from "./Pages/CrearCategoria";
 import CrearProveedor from "./Pages/CrearProveedor";
@@ -231,6 +232,389 @@ function App() {
                 </ProtectedRouteRoles>
               }
             />
+            <Route
+              path="/marcas-gt/inventario/reservas/:id/liberar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <ReleaseInventoryReservationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/reservas/:id/cancelar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CancelInventoryReservationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/entradas/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <RegisterInventoryEntryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/ajustes/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <AdjustInventoryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/inventario/devoluciones/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <RegisterInventoryReturnPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/pedidos"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
+                >
+                  <OrdersPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <CreateOrderPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
+                >
+                  <OrderDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/:id/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <EditOrderPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/:id/cancelar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                  <CancelOrderPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/clientes"
+              element={
+                <ProtectedRoute>
+                  <Customers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/usuarios"
+              element={
+                <ProtectedRouteAdmin>
+                  <Users />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/ventas"
+              element={
+                <ProtectedRouteAdmin>
+                  <Sales />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/comprobante-venta"
+              element={
+                <ProtectedRoute>
+                  <PdfPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/empleados"
+              element={
+                <ProtectedRouteAdmin>
+                  <Employees />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/historial-prospectos"
+              element={
+                <ProtectedRouteAdmin>
+                  <ProspectoHistorial />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/historial-empleados-check"
+              element={
+                <ProtectedRouteAdmin>
+                  <SellerHistory />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/crear-productos"
+              element={
+                <ProtectedRouteAdmin>
+                  <CreateProduct />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/asignar-stock"
+              element={
+                <ProtectedRouteAdmin>
+                  <StockPage />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/ver-productos"
+              element={
+                <ProtectedRouteAdmin>
+                  <ViewProducts />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/hacer-ventas"
+              element={
+                <ProtectedRoute>
+                  <MakeSale />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/historial-ventas"
+              element={
+                <ProtectedRoute>
+                  <HistorialVentas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/registrar-entrada-salida"
+              element={
+                <ProtectedRoute>
+                  <CheckInCheckOut />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/crear-categoria"
+              element={
+                <ProtectedRouteAdmin>
+                  <CrearCategoria />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/proveedor"
+              element={
+                <ProtectedRouteAdmin>
+                  <CrearProveedor />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/crear-cliente"
+              element={
+                <ProtectedRoute>
+                  <CreateClient />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/registro-entregas"
+              element={
+                <ProtectedRouteAdmin>
+                  <StockDeliveryRecords />
+                </ProtectedRouteAdmin>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/prospecto"
+              element={
+                <ProtectedRoute>
+                  <ProspectoFormulario />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marcas-gt/prospecto-ubicacion"
+              element={
+                <ProtectedRoute>
+                  <ProspectoUbicacion />
+                </ProtectedRoute>
+              }
+            />
+            {/* <Route
+              path="/conseguir-comprobante-entrega"
+              element={
+                <ProtectedRoute>
+                  <DeliveryPdfPage />
+                </ProtectedRoute>
+              }
+            /> */}
+            <Route
+              path="/marcas-gt/editar-cliente/:id"
+              element={
+                <ProtectedRoute>
+                  <EditCustomer />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/mis-ventas"
+              element={
+                <ProtectedRoute>
+                  <MySales />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/visita"
+              element={
+                <ProtectedRoute>
+                  <RegistroVisita />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/historial-visitas"
+              element={
+                <ProtectedRouteAdmin>
+                  <VisitasTable />
+                </ProtectedRouteAdmin>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/historial-cliente-ventas/:id"
+              element={
+                <ProtectedRoute>
+                  <CustomerSales />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/comprobante-venta/:id"
+              element={
+                <ProtectedRoute>
+                  <VentaPdfPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/empresa-info"
+              element={
+                <ProtectedRouteAdmin>
+                  <EmpresaForm />
+                </ProtectedRouteAdmin>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/analisis"
+              element={
+                <ProtectedRouteAdmin>
+                  <ChatsAnalytics />
+                </ProtectedRouteAdmin>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/reportes"
+              element={
+                <ProtectedRouteAdmin>
+                  <Reportes />
+                </ProtectedRouteAdmin>
+              }
+            />
+
+            {/* <Route
+              path="/recovery"
+              element={
+                // <ProtectedRoute>
+                <SolicitarRecuperacion />
+                // </ProtectedRoute>
+              }
+            /> */}
+
+            <Route
+              path="/marcas-gt/restablecer-contraseña"
+              element={
+                <ProtectedRoute>
+                  <RestablecerContrasena />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/saldos"
+              element={
+                <ProtectedRouteAdmin>
+                  <Saldos />
+                </ProtectedRouteAdmin>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/comprobante-pago/:id"
+              element={
+                <ProtectedRoute>
+                  <PaymentCreditPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/creditos"
+              element={
+                <ProtectedRouteAdmin>
+                  <Creditos />
+                </ProtectedRouteAdmin>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/seguimiento-de-cancelaciones"
+              element={
+                <ProtectedRoute>
+                  <Cancelados />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Routes>
       </Router>
     </>
