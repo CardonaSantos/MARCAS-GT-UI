@@ -5,7 +5,6 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { useStore } from "@/Context/ContextSucursal";
 import {
   formatDateTime,
-  formatDecimal,
   formatInteger,
   formatMoney,
 } from "@/features/common/formatters/value.formatters";
@@ -14,7 +13,6 @@ import { getReturnRoute } from "@/features/common/navigation/route-state";
 import { useSetCreditPolicyStatus } from "@/features/creditos/api/credit.mutations";
 import { useCreditPolicy } from "@/features/creditos/api/credit.queries";
 import type { CreditPolicyRequirement } from "@/features/creditos/api/credit.types";
-import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppBadge } from "@/ui/components/app/primitives/app-badge";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppCard } from "@/ui/components/app/primitives/app-card";
@@ -177,13 +175,6 @@ export default function CreditPolicyDetailPage() {
         >
           {policy ? (
             <AppStack gap="md">
-              {Number(policy.porcentajeAnticipo ?? 0) > 0 ? (
-                <AppAlert
-                  tone="warning"
-                  title="Política no compatible con nuevas solicitudes CREDITO"
-                  description="Esta política legacy exige anticipo. El flujo nuevo de Crédito puro sólo ofrece políticas con anticipo mínimo de 0%."
-                />
-              ) : null}
 
               <AppGrid cols={{ base: 1, md: 2, xl: 4 }} gap="sm">
                 <AppCard title="Monto máximo" size="sm">
@@ -196,11 +187,6 @@ export default function CreditPolicyDetailPage() {
                     {policy.plazoMaximoDias == null
                       ? "Sin límite"
                       : formatInteger(policy.plazoMaximoDias) + " días"}
-                  </p>
-                </AppCard>
-                <AppCard title="Anticipo mínimo" size="sm">
-                  <p className="text-xl font-semibold">
-                    {formatDecimal(policy.porcentajeAnticipo ?? 0)}%
                   </p>
                 </AppCard>
                 <AppCard title="Requisitos activos" size="sm">

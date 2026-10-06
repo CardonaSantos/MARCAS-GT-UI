@@ -14,7 +14,6 @@ import {
   formatInteger,
   formatMoney,
 } from "@/features/common/formatters/value.formatters";
-import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppBadge } from "@/ui/components/app/primitives/app-badge";
 import { AppCard } from "@/ui/components/app/primitives/app-card";
 import { AppGrid } from "@/ui/components/app/primitives/app-grid";
@@ -48,13 +47,6 @@ function DetailValue({
 export function CreditDetailSummary({ credit }: { credit: CreditDetail }) {
   return (
     <div className="space-y-4">
-      {credit.origen.pedido.condicionPago !== "CREDITO" ? (
-        <AppAlert
-          tone="warning"
-          title="Condición fuera del alcance de esta interfaz"
-          description="La UI nueva de Crédito gestiona únicamente pedidos CREDITO."
-        />
-      ) : null}
 
       <AppGrid cols={{ base: 1, md: 2, xl: 4 }} gap="sm">
         <AppCard title="Solicitado" icon={<BadgeDollarSign />} size="sm">

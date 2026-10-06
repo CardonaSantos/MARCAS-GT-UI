@@ -4,7 +4,6 @@ import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 
 import {
   formatDateTime,
-  formatDecimal,
   formatInteger,
   formatMoney,
 } from "@/features/common/formatters/value.formatters";
@@ -88,14 +87,6 @@ export function CreditPolicyTable({
         row.original.plazoMaximoDias == null
           ? "Sin límite"
           : formatInteger(row.original.plazoMaximoDias) + " días",
-    },
-    {
-      accessorKey: "porcentajeAnticipo",
-      header: "Anticipo mín.",
-      size: 110,
-      meta: { align: "right" },
-      cell: ({ row }) =>
-        formatDecimal(row.original.porcentajeAnticipo ?? 0) + "%",
     },
     {
       id: "requisitos",
