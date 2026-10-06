@@ -52,7 +52,7 @@ export function DispatchDetailSummary({
                 ? "warning"
                 : "info"
           }
-          title={warning.codigo.replaceAll("_", " ")}
+          title={warning.codigo.replace("_", " ")}
           description={warning.mensaje}
         />
       ))}
@@ -135,7 +135,9 @@ export function DispatchDetailSummary({
 
         <AppCard title="Tiempos" icon={<Clock3 />} size="sm">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Value label="Creado">{formatDateTime(dispatch.tiempos.creadoEn)}</Value>
+            <Value label="Creado">
+              {formatDateTime(dispatch.tiempos.creadoEn)}
+            </Value>
             <Value label="Programado">
               {formatDateTime(dispatch.tiempos.programadoEn)}
             </Value>

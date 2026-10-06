@@ -23,7 +23,8 @@ export const queryClient = new QueryClient({
     queries: {
       retry: shouldRetryQuery,
       staleTime: 30_000,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
     },
     mutations: {
       retry: false,
