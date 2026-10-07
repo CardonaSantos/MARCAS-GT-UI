@@ -1,9 +1,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link, useLocation } from "react-router-dom";
 
-import {
-  formatInteger,
-} from "@/features/common/formatters/value.formatters";
+import { useStore } from "@/Context/ContextSucursal";
+import { formatInteger } from "@/features/common/formatters/value.formatters";
 import { AppBadge } from "@/ui/components/app/primitives/app-badge";
 import { AppDataTable } from "@/ui/components/app/table/app-data-table";
 
@@ -11,7 +10,10 @@ import type { ShipmentStop } from "../api/transport.types";
 
 export function ShipmentStopsTable({ data }: { data: ShipmentStop[] }) {
   const location = useLocation();
+  const role = useStore((state) => state.userRol);
   const from = location.pathname + location.search;
+  const canOperateDelivery =
+    role === "ADMIN" || role === "BODEGA" || role === "REPARTIDOR";
 
   const columns: ColumnDef<ShipmentStop, unknown>[] = [
     {
@@ -110,8 +112,44 @@ export function ShipmentStopsTable({ data }: { data: ShipmentStop[] }) {
     {
       id: "entrega",
       header: "Entrega",
-      size: 120,
-      cell: ({ row }) => row.original.entrega?.estado ?? "—",
+      size: 140,
+      cell: ({ row }) => {
+        if (row.original.entrega) {
+          return (
+            <Link
+              to={"/marcas-gt/entregas/" + row.original.entrega.id}
+              state={{ from }}
+              className="font-medium text-[hsl(var(--app-primary))] hover:underline"
+            >
+              #{row.original.entrega.id} · {row.original.entrega.estado.replace(/_+/g, " ")}
+            </Link>
+          );
+        }
+
+        const hasLoad = row.original.cargas.some(
+          (line) => line.cantidadCargada > 0,
+        );
+        if (
+          canOperateDelivery &&
+          row.original.estado === "EN_RUTA" &&
+          hasLoad
+        ) {
+          return (
+            <Link
+              to={
+                "/marcas-gt/entregas/nueva?envioDespachoId=" +
+                row.original.id
+              }
+              state={{ from }}
+              className="font-medium text-[hsl(var(--app-primary))] hover:underline"
+            >
+              Crear entrega
+            </Link>
+          );
+        }
+
+        return "—";
+      },
     },
   ];
 

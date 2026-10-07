@@ -16,6 +16,7 @@ import {
   Landmark,
   MapPin,
   MapPinned,
+  PackageCheck,
   PackagePlus,
   PencilLine,
   PieChart,
@@ -251,6 +252,11 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/transporte/envios",
       },
       {
+        icon: PackageCheck,
+        label: "Entregas",
+        href: "/marcas-gt/entregas",
+      },
+      {
         icon: Users,
         label: "Transportistas",
         href: "/marcas-gt/transporte/transportistas",
@@ -305,6 +311,11 @@ const sellerRoutes: MarcasRoute[] = [
     icon: Truck,
     label: "Envíos",
     href: "/marcas-gt/transporte/envios",
+  },
+  {
+    icon: PackageCheck,
+    label: "Entregas",
+    href: "/marcas-gt/entregas",
   },
   {
     icon: CreditCard,
@@ -425,6 +436,11 @@ const warehouseRoutes: MarcasRoute[] = [
         href: "/marcas-gt/transporte/envios",
       },
       {
+        icon: PackageCheck,
+        label: "Entregas",
+        href: "/marcas-gt/entregas",
+      },
+      {
         icon: Users,
         label: "Transportistas",
         href: "/marcas-gt/transporte/transportistas",
@@ -516,6 +532,11 @@ const accountingRoutes: MarcasRoute[] = [
         href: "/marcas-gt/transporte/envios",
       },
       {
+        icon: PackageCheck,
+        label: "Entregas",
+        href: "/marcas-gt/entregas",
+      },
+      {
         icon: Users,
         label: "Transportistas",
         href: "/marcas-gt/transporte/transportistas",
@@ -544,6 +565,11 @@ const deliveryRoutes: MarcasRoute[] = [
     icon: Truck,
     label: "Mis envíos",
     href: "/marcas-gt/transporte/envios",
+  },
+  {
+    icon: PackageCheck,
+    label: "Mis entregas",
+    href: "/marcas-gt/entregas",
   },
   {
     icon: CheckSquare,

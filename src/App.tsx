@@ -119,6 +119,13 @@ import CreateCarrierPage from "./Pages/Transporte/CreateCarrierPage";
 import CreateVehiclePage from "./Pages/Transporte/CreateVehiclePage";
 import CreateDriverPage from "./Pages/Transporte/CreateDriverPage";
 import DeactivateTransportResourcePage from "./Pages/Transporte/DeactivateTransportResourcePage";
+import DeliveriesPage from "./Pages/Entregas/DeliveriesPage";
+import CreateDeliveryPage from "./Pages/Entregas/CreateDeliveryPage";
+import DeliveryDetailPage from "./Pages/Entregas/DeliveryDetailPage";
+import StartDeliveryPage from "./Pages/Entregas/StartDeliveryPage";
+import UpdateDeliveryResultPage from "./Pages/Entregas/UpdateDeliveryResultPage";
+import FinalizeDeliveryPage from "./Pages/Entregas/FinalizeDeliveryPage";
+import DeliveryOperationalReportPage from "./Pages/Entregas/DeliveryOperationalReportPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -779,6 +786,68 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
                   <DeactivateTransportResourcePage kind="conductor" />
+                </ProtectedRouteRoles>
+              }
+            />
+
+
+            <Route
+              path="/marcas-gt/entregas"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <DeliveriesPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/entregas/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <CreateDeliveryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/entregas/reportes/operacion"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <DeliveryOperationalReportPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/entregas/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <DeliveryDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/entregas/:id/iniciar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <StartDeliveryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/entregas/:id/resultado"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <UpdateDeliveryResultPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/entregas/:id/finalizar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <FinalizeDeliveryPage />
                 </ProtectedRouteRoles>
               }
             />
