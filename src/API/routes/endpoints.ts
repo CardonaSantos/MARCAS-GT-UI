@@ -177,6 +177,7 @@ export const marcasEndpoints = {
       summary: "/envios/resumen",
       operationalReport: "/envios/reportes/operacion",
       detail: (id: number) => `/envios/${id}`,
+      events: (id: number) => `/envios/${id}/eventos`,
       assign: (id: number) => `/envios/${id}/asignar`,
       confirmLoad: (id: number) => `/envios/${id}/confirmar-carga`,
       startRoute: (id: number) => `/envios/${id}/iniciar-ruta`,

@@ -242,6 +242,32 @@ const adminRoutes: MarcasRoute[] = [
     ],
   },
   {
+    icon: Truck,
+    label: "Logística",
+    submenu: [
+      {
+        icon: Truck,
+        label: "Envíos",
+        href: "/marcas-gt/transporte/envios",
+      },
+      {
+        icon: Users,
+        label: "Transportistas",
+        href: "/marcas-gt/transporte/transportistas",
+      },
+      {
+        icon: Truck,
+        label: "Vehículos",
+        href: "/marcas-gt/transporte/vehiculos",
+      },
+      {
+        icon: UserCog,
+        label: "Conductores",
+        href: "/marcas-gt/transporte/conductores",
+      },
+    ],
+  },
+  {
     icon: Building2,
     label: "Empresa",
     submenu: [
@@ -274,6 +300,11 @@ const sellerRoutes: MarcasRoute[] = [
     icon: Truck,
     label: "Despachos",
     href: "/marcas-gt/despachos",
+  },
+  {
+    icon: Truck,
+    label: "Envíos",
+    href: "/marcas-gt/transporte/envios",
   },
   {
     icon: CreditCard,
@@ -384,6 +415,32 @@ const warehouseRoutes: MarcasRoute[] = [
       },
     ],
   },
+  {
+    icon: Truck,
+    label: "Logística",
+    submenu: [
+      {
+        icon: Truck,
+        label: "Envíos",
+        href: "/marcas-gt/transporte/envios",
+      },
+      {
+        icon: Users,
+        label: "Transportistas",
+        href: "/marcas-gt/transporte/transportistas",
+      },
+      {
+        icon: Truck,
+        label: "Vehículos",
+        href: "/marcas-gt/transporte/vehiculos",
+      },
+      {
+        icon: UserCog,
+        label: "Conductores",
+        href: "/marcas-gt/transporte/conductores",
+      },
+    ],
+  },
 ];
 
 const accountingRoutes: MarcasRoute[] = [
@@ -449,12 +506,57 @@ const accountingRoutes: MarcasRoute[] = [
       },
     ],
   },
+  {
+    icon: Truck,
+    label: "Logística",
+    submenu: [
+      {
+        icon: Truck,
+        label: "Envíos",
+        href: "/marcas-gt/transporte/envios",
+      },
+      {
+        icon: Users,
+        label: "Transportistas",
+        href: "/marcas-gt/transporte/transportistas",
+      },
+      {
+        icon: Truck,
+        label: "Vehículos",
+        href: "/marcas-gt/transporte/vehiculos",
+      },
+      {
+        icon: UserCog,
+        label: "Conductores",
+        href: "/marcas-gt/transporte/conductores",
+      },
+    ],
+  },
+];
+
+const deliveryRoutes: MarcasRoute[] = [
+  {
+    icon: Home,
+    label: "Inicio",
+    href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: Truck,
+    label: "Mis envíos",
+    href: "/marcas-gt/transporte/envios",
+  },
+  {
+    icon: CheckSquare,
+    label: "Registro de entrada/salida",
+    href: "/marcas-gt/registrar-entrada-salida",
+  },
 ];
 
 export function getMarcasRoutesByRole(role?: string | null) {
   if (role === "ADMIN") return adminRoutes;
   if (role === "BODEGA") return warehouseRoutes;
   if (role === "CONTABILIDAD") return accountingRoutes;
+  if (role === "REPARTIDOR") return deliveryRoutes;
 
   return sellerRoutes;
 }

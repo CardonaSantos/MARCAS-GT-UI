@@ -102,6 +102,23 @@ import RegisterDispatchOutputPage from "./Pages/Despachos/RegisterDispatchOutput
 import CancelDispatchPage from "./Pages/Despachos/CancelDispatchPage";
 import DispatchOperationsPage from "./Pages/Despachos/DispatchOperationsPage";
 import DispatchOperationalReportPage from "./Pages/Despachos/DispatchOperationalReportPage";
+import ShipmentsPage from "./Pages/Transporte/ShipmentsPage";
+import CreateShipmentPage from "./Pages/Transporte/CreateShipmentPage";
+import ShipmentDetailPage from "./Pages/Transporte/ShipmentDetailPage";
+import AssignShipmentPage from "./Pages/Transporte/AssignShipmentPage";
+import ConfirmShipmentLoadPage from "./Pages/Transporte/ConfirmShipmentLoadPage";
+import StartShipmentRoutePage from "./Pages/Transporte/StartShipmentRoutePage";
+import CancelShipmentPage from "./Pages/Transporte/CancelShipmentPage";
+import ReportShipmentIncidentPage from "./Pages/Transporte/ReportShipmentIncidentPage";
+import ResolveShipmentIncidentPage from "./Pages/Transporte/ResolveShipmentIncidentPage";
+import TransportOperationalReportPage from "./Pages/Transporte/TransportOperationalReportPage";
+import CarriersPage from "./Pages/Transporte/CarriersPage";
+import VehiclesPage from "./Pages/Transporte/VehiclesPage";
+import DriversPage from "./Pages/Transporte/DriversPage";
+import CreateCarrierPage from "./Pages/Transporte/CreateCarrierPage";
+import CreateVehiclePage from "./Pages/Transporte/CreateVehiclePage";
+import CreateDriverPage from "./Pages/Transporte/CreateDriverPage";
+import DeactivateTransportResourcePage from "./Pages/Transporte/DeactivateTransportResourcePage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -594,6 +611,174 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
                   <CancelDispatchPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+
+            <Route
+              path="/marcas-gt/transporte"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <Navigate to="/marcas-gt/transporte/envios" replace />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <ShipmentsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateShipmentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/reportes/operacion"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <TransportOperationalReportPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                >
+                  <ShipmentDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/:id/asignar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <AssignShipmentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/:id/carga"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <ConfirmShipmentLoadPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/:id/iniciar-ruta"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <StartShipmentRoutePage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/:id/cancelar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CancelShipmentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/:id/incidencias/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <ReportShipmentIncidentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/envios/:id/incidencias/:incidentId/resolver"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <ResolveShipmentIncidentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/transportistas"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <CarriersPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/transportistas/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateCarrierPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/transportistas/:id/desactivar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <DeactivateTransportResourcePage kind="transportista" />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/vehiculos"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <VehiclesPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/vehiculos/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateVehiclePage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/vehiculos/:id/desactivar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <DeactivateTransportResourcePage kind="vehiculo" />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/conductores"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <DriversPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/conductores/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateDriverPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transporte/conductores/:id/desactivar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <DeactivateTransportResourcePage kind="conductor" />
                 </ProtectedRouteRoles>
               }
             />
