@@ -68,6 +68,12 @@ import AdjustInventoryPage from "./Pages/Inventario/AdjustInventoryPage";
 import RegisterInventoryReturnPage from "./Pages/Inventario/RegisterInventoryReturnPage";
 import ReleaseInventoryReservationPage from "./Pages/Inventario/ReleaseInventoryReservationPage";
 import CancelInventoryReservationPage from "./Pages/Inventario/CancelInventoryReservationPage";
+import RequisitionsPage from "./Pages/Requisiciones/RequisitionsPage";
+import CreateRequisitionPage from "./Pages/Requisiciones/CreateRequisitionPage";
+import EditRequisitionPage from "./Pages/Requisiciones/EditRequisitionPage";
+import RequisitionDetailPage from "./Pages/Requisiciones/RequisitionDetailPage";
+import ReceiveRequisitionPage from "./Pages/Requisiciones/ReceiveRequisitionPage";
+import RequisitionReceiptsPage from "./Pages/Requisiciones/RequisitionReceiptsPage";
 import OrdersPage from "./Pages/Pedidos/OrdersPage";
 import CreateOrderPage from "./Pages/Pedidos/CreateOrderPage";
 import OrderDetailPage from "./Pages/Pedidos/OrderDetailPage";
@@ -335,6 +341,55 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
                   <RegisterInventoryReturnPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/requisiciones"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <RequisitionsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/requisiciones/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateRequisitionPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/requisiciones/recepciones"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <RequisitionReceiptsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/requisiciones/:id"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <RequisitionDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/requisiciones/:id/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <EditRequisitionPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/requisiciones/:id/recibir"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <ReceiveRequisitionPage />
                 </ProtectedRouteRoles>
               }
             />

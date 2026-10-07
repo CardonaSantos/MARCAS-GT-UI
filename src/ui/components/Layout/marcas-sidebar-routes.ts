@@ -188,6 +188,12 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/inventario",
       },
       {
+        icon: ClipboardList,
+        label: "Requisiciones",
+        href: "/marcas-gt/requisiciones",
+        activePaths: ["/marcas-gt/requisiciones"],
+      },
+      {
         icon: Boxes,
         label: "Consultar disponibilidad",
         href: "/marcas-gt/inventario/disponibilidad",
@@ -453,6 +459,12 @@ const warehouseRoutes: MarcasRoute[] = [
         href: "/marcas-gt/inventario",
       },
       {
+        icon: ClipboardList,
+        label: "Requisiciones",
+        href: "/marcas-gt/requisiciones",
+        activePaths: ["/marcas-gt/requisiciones"],
+      },
+      {
         icon: Boxes,
         label: "Consultar disponibilidad",
         href: "/marcas-gt/inventario/disponibilidad",
@@ -571,6 +583,12 @@ const accountingRoutes: MarcasRoute[] = [
         icon: BarChart3,
         label: "Existencias",
         href: "/marcas-gt/inventario",
+      },
+      {
+        icon: ClipboardList,
+        label: "Requisiciones",
+        href: "/marcas-gt/requisiciones",
+        activePaths: ["/marcas-gt/requisiciones"],
       },
       {
         icon: Boxes,
