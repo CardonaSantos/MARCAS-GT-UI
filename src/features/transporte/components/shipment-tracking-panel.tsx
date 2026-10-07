@@ -12,12 +12,20 @@ export function ShipmentTrackingPanel({
 }: {
   tracking: ShipmentTrackingSnapshot | null;
 }) {
-  if (!tracking) {
+  const hasTrackingData =
+    tracking != null &&
+    (tracking.sesionId != null ||
+      tracking.ultimoHeartbeatEn != null ||
+      tracking.capturadoEn != null ||
+      tracking.latitud != null ||
+      tracking.longitud != null);
+
+  if (!tracking || !hasTrackingData) {
     return (
       <AppAlert
         tone="info"
         title="Sin ubicación disponible"
-        description="El responsable asignado todavía no tiene un snapshot de tracking disponible."
+        description="El responsable asignado todavía no tiene una sesión o punto de tracking disponible."
       />
     );
   }
