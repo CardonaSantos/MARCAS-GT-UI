@@ -1,4 +1,5 @@
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
+import { useEffect } from "react";
 
 import type { BodegaSelectable } from "@/features/bodegas/api/bodega.types";
 import type { ProductSelectable } from "@/features/common/catalogs/catalog.types";
@@ -20,19 +21,29 @@ function emptyLine(): TransferDraftLine {
   };
 }
 
+export type TransferAvailabilityStatus = { productoId: number; bodegaOrigenId: number; disponible: number | null };
+
 function TransferLineAvailability({
   productoId,
   bodegaOrigenId,
   requested,
+  onAvailabilityChange,
 }: {
   productoId: number | null;
   bodegaOrigenId: number | null;
   requested: string;
+  onAvailabilityChange?: (status: TransferAvailabilityStatus) => void;
 }) {
   const query = useProductAvailability(
     productoId ?? 0,
     Boolean(productoId && bodegaOrigenId),
   );
+
+  const warehouse = query.data?.bodegas.find((item) => item.bodegaId === bodegaOrigenId);
+  const disponible = query.isSuccess ? (warehouse?.disponible ?? 0) : null;
+  useEffect(() => {
+    if (productoId && bodegaOrigenId) onAvailabilityChange?.({ productoId, bodegaOrigenId, disponible });
+  }, [productoId, bodegaOrigenId, disponible, onAvailabilityChange]);
 
   if (!productoId || !bodegaOrigenId) {
     return (
@@ -42,18 +53,15 @@ function TransferLineAvailability({
     );
   }
 
-  if (query.isLoading) {
+  if (query.isLoading || query.isError) {
     return (
       <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-        Consultando disponibilidad...
+        {query.isError ? "No se pudo consultar disponibilidad." : "Consultando disponibilidad..."}
       </p>
     );
   }
 
-  const warehouse = query.data?.bodegas.find(
-    (item) => item.bodegaId === bodegaOrigenId,
-  );
-  const available = warehouse?.disponible ?? 0;
+  const available = disponible ?? 0;
   const quantity = Number(requested);
   const remaining =
     Number.isFinite(quantity) && quantity > 0 ? available - quantity : available;
@@ -86,12 +94,14 @@ export function TransferForm({
   productos,
   onChange,
   disabled = false,
+  onAvailabilityChange,
 }: {
   value: TransferDraft;
   bodegas: BodegaSelectable[];
   productos: ProductSelectable[];
   onChange: (next: TransferDraft) => void;
   disabled?: boolean;
+  onAvailabilityChange?: (status: TransferAvailabilityStatus) => void;
 }) {
   const selectedIds = new Set(
     value.detalles
@@ -245,6 +255,7 @@ export function TransferForm({
                     productoId={line.productoId}
                     bodegaOrigenId={value.bodegaOrigenId}
                     requested={line.cantidadSolicitada}
+                    onAvailabilityChange={onAvailabilityChange}
                   />
                 </div>
 
