@@ -12,6 +12,7 @@ import type {
   CreditPolicy,
   CreditPolicyFilters,
   CreditPolicyPageResponse,
+  CreditPortfolioDetail,
   CreditPortfolioFilters,
   CreditPortfolioPageResponse,
   CreditSummary,
@@ -87,6 +88,16 @@ export function useCreditPortfolio(filters: CreditPortfolioFilters) {
     queryKey: marcasQueryKeys.creditos.custom("portfolio", filters),
     endpoint: marcasEndpoints.creditos.portfolio,
     params: { ...filters },
+  });
+}
+
+export function useCreditPortfolioDetail(id: number) {
+  return API.useQuery<CreditPortfolioDetail>({
+    queryKey: marcasQueryKeys.creditos.custom("portfolio", "detail", id),
+    endpoint: marcasEndpoints.creditos.portfolioDetail(id),
+    options: {
+      enabled: Number.isInteger(id) && id > 0,
+    },
   });
 }
 

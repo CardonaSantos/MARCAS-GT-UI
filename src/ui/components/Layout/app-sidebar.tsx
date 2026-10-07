@@ -35,21 +35,39 @@ function normalizeHref(href?: string) {
   return href.startsWith("/") ? href : `/${href}`;
 }
 
-function isRouteActive(pathname: string, href?: string) {
-  if (!href) return false;
-
-  const routePath = normalizeHref(href).split(/[?#]/)[0];
-
+function pathMatches(pathname: string, routePath: string) {
   return pathname === routePath || pathname.startsWith(`${routePath}/`);
 }
 
+function isRouteActive(pathname: string, item: MarcasRoute) {
+  if (
+    item.exactPaths?.some(
+      (path) => pathname === normalizeHref(path).split(/[?#]/)[0],
+    )
+  ) {
+    return true;
+  }
+
+  if (item.activePaths?.length) {
+    return item.activePaths.some((path) =>
+      pathMatches(pathname, normalizeHref(path).split(/[?#]/)[0]),
+    );
+  }
+
+  if (item.exactPaths?.length) return false;
+  if (!item.href) return false;
+
+  const routePath = normalizeHref(item.href).split(/[?#]/)[0];
+  return pathMatches(pathname, routePath);
+}
+
 function hasActiveChild(pathname: string, item: MarcasRoute) {
-  if (item.href && isRouteActive(pathname, item.href)) {
+  if (item.href && isRouteActive(pathname, item)) {
     return true;
   }
 
   return (
-    item.submenu?.some((subItem) => isRouteActive(pathname, subItem.href)) ??
+    item.submenu?.some((subItem) => isRouteActive(pathname, subItem)) ??
     false
   );
 }
@@ -206,7 +224,7 @@ function SidebarGroupItem({
               <SidebarItem
                 key={subItem.href ?? subItem.label}
                 item={subItem}
-                active={isRouteActive(pathname, subItem.href)}
+                active={isRouteActive(pathname, subItem)}
                 collapsed
                 level="sub"
                 onNavigate={onNavigate}
@@ -255,7 +273,7 @@ function SidebarGroupItem({
               <SidebarItem
                 key={subItem.href ?? subItem.label}
                 item={subItem}
-                active={isRouteActive(pathname, subItem.href)}
+                active={isRouteActive(pathname, subItem)}
                 collapsed={false}
                 level="sub"
                 onNavigate={onNavigate}

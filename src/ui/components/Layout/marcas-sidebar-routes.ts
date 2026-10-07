@@ -39,6 +39,8 @@ export type MarcasRoute = {
   icon: LucideIcon;
   label: string;
   href?: string;
+  activePaths?: string[];
+  exactPaths?: string[];
   submenu?: MarcasRoute[];
 };
 
@@ -102,16 +104,20 @@ const adminRoutes: MarcasRoute[] = [
         icon: CreditCard,
         label: "Solicitudes de crédito",
         href: "/marcas-gt/creditos",
+        exactPaths: ["/marcas-gt/creditos"],
+        activePaths: ["/marcas-gt/creditos/solicitudes"],
       },
       {
         icon: Landmark,
         label: "Cartera de crédito",
         href: "/marcas-gt/creditos/cartera",
+        activePaths: ["/marcas-gt/creditos/cartera"],
       },
       {
         icon: Settings2,
         label: "Políticas de crédito",
         href: "/marcas-gt/creditos/politicas",
+        activePaths: ["/marcas-gt/creditos/politicas"],
       },
     ],
   },
@@ -369,16 +375,20 @@ const sellerRoutes: MarcasRoute[] = [
     icon: CreditCard,
     label: "Solicitudes de crédito",
     href: "/marcas-gt/creditos",
+    exactPaths: ["/marcas-gt/creditos"],
+        activePaths: ["/marcas-gt/creditos/solicitudes"],
   },
   {
     icon: Landmark,
     label: "Cartera de crédito",
     href: "/marcas-gt/creditos/cartera",
+    activePaths: ["/marcas-gt/creditos/cartera"],
   },
   {
     icon: Settings2,
     label: "Políticas de crédito",
     href: "/marcas-gt/creditos/politicas",
+    activePaths: ["/marcas-gt/creditos/politicas"],
   },
   {
     icon: Users,
@@ -526,16 +536,20 @@ const accountingRoutes: MarcasRoute[] = [
         icon: ClipboardList,
         label: "Solicitudes de crédito",
         href: "/marcas-gt/creditos",
+        exactPaths: ["/marcas-gt/creditos"],
+        activePaths: ["/marcas-gt/creditos/solicitudes"],
       },
       {
         icon: Landmark,
         label: "Cartera de crédito",
         href: "/marcas-gt/creditos/cartera",
+        activePaths: ["/marcas-gt/creditos/cartera"],
       },
       {
         icon: Settings2,
         label: "Políticas de crédito",
         href: "/marcas-gt/creditos/politicas",
+        activePaths: ["/marcas-gt/creditos/politicas"],
       },
     ],
   },

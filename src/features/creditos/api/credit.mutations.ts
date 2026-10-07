@@ -8,10 +8,13 @@ import { getApiErrorMessage } from "@/lib/api-error";
 import type {
   AddCreditDocumentPayload,
   AddCreditReferencePayload,
+  ActivateCreditPaymentPlanPayload,
   ApproveCreditPayload,
   CreateCreditApplicationPayload,
+  CreateCreditPaymentPlanPayload,
   CreateCreditPolicyPayload,
   CreditDetail,
+  CreditPaymentPlanResponse,
   CreditPolicy,
   CreditPolicyStatusPayload,
   CreditReasonPayload,
@@ -19,6 +22,7 @@ import type {
   ReviewCreditReferencePayload,
   ReviewCreditRequirementPayload,
   UpdateCreditApplicationPayload,
+  UpdateCreditPaymentPlanPayload,
   UpdateCreditPolicyPayload,
   UpdateCreditReferencePayload,
 } from "./credit.types";
@@ -297,6 +301,62 @@ export function useSetCreditPolicyStatus() {
             ? "Política activada."
             : "Política desactivada.",
         ),
+      onError: mutationError,
+    },
+  });
+}
+
+
+const creditPlanInvalidations = [
+  marcasQueryKeys.creditos.all,
+  marcasQueryKeys.pagos.all,
+  marcasQueryKeys.facturacion.all,
+];
+
+export function useCreateCreditPaymentPlan() {
+  return API.useMutation<
+    CreditPaymentPlanResponse,
+    { id: number; payload: CreateCreditPaymentPlanPayload }
+  >({
+    method: "POST",
+    endpoint: ({ id }) => marcasEndpoints.creditos.paymentPlan(id),
+    body: ({ payload }) => payload,
+    invalidateKeys: creditPlanInvalidations,
+    options: {
+      onSuccess: () => toast.success("Plan de pagos guardado en borrador."),
+      onError: mutationError,
+    },
+  });
+}
+
+export function useUpdateCreditPaymentPlan() {
+  return API.useMutation<
+    CreditPaymentPlanResponse,
+    { id: number; payload: UpdateCreditPaymentPlanPayload }
+  >({
+    method: "PATCH",
+    endpoint: ({ id }) => marcasEndpoints.creditos.paymentPlan(id),
+    body: ({ payload }) => payload,
+    invalidateKeys: creditPlanInvalidations,
+    options: {
+      onSuccess: () => toast.success("Plan de pagos actualizado."),
+      onError: mutationError,
+    },
+  });
+}
+
+export function useActivateCreditPaymentPlan() {
+  return API.useMutation<
+    CreditPaymentPlanResponse,
+    { id: number; payload: ActivateCreditPaymentPlanPayload }
+  >({
+    method: "POST",
+    endpoint: ({ id }) => marcasEndpoints.creditos.activatePaymentPlan(id),
+    body: ({ payload }) => payload,
+    invalidateKeys: creditPlanInvalidations,
+    options: {
+      onSuccess: () =>
+        toast.success("Plan activado y cuentas por cobrar generadas."),
       onError: mutationError,
     },
   });

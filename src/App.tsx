@@ -92,6 +92,7 @@ import EditCreditPolicyPage from "./Pages/Creditos/EditCreditPolicyPage";
 import CreditPolicyDetailPage from "./Pages/Creditos/CreditPolicyDetailPage";
 import DeactivateCreditPolicyPage from "./Pages/Creditos/DeactivateCreditPolicyPage";
 import CreditPortfolioPage from "./Pages/Creditos/CreditPortfolioPage";
+import CreditPortfolioDetailPage from "./Pages/Creditos/CreditPortfolioDetailPage";
 import DispatchesPage from "./Pages/Despachos/DispatchesPage";
 import CreateDispatchPage from "./Pages/Despachos/CreateDispatchPage";
 import DispatchDetailPage from "./Pages/Despachos/DispatchDetailPage";
@@ -541,6 +542,16 @@ function App() {
                   roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
                 >
                   <CreditPortfolioPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/creditos/cartera/:id"
+              element={
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                >
+                  <CreditPortfolioDetailPage />
                 </ProtectedRouteRoles>
               }
             />

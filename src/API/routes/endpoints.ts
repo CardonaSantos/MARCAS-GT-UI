@@ -108,6 +108,10 @@ export const marcasEndpoints = {
 
   creditos: {
     portfolio: "/creditos/cartera",
+    portfolioDetail: (id: number) => `/creditos/cartera/${id}`,
+    paymentPlan: (id: number) => `/creditos/cartera/${id}/plan-pagos`,
+    activatePaymentPlan: (id: number) =>
+      `/creditos/cartera/${id}/plan-pagos/activar`,
 
     policies: {
       root: "/creditos/politicas",

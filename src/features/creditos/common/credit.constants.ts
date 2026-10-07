@@ -266,3 +266,30 @@ export const CREDIT_READ_ROLES = [
 
 export const CREDIT_WRITE_ROLES = ["ADMIN", "VENDEDOR"] as const;
 export const CREDIT_REVIEW_ROLES = ["ADMIN", "CONTABILIDAD"] as const;
+
+
+export const CREDIT_PAYMENT_PLAN_FREQUENCIES = [
+  "SEMANAL",
+  "QUINCENAL",
+  "MENSUAL",
+  "PERSONALIZADA",
+] as const;
+
+export const CREDIT_PAYMENT_PLAN_FREQUENCY_LABELS = {
+  SEMANAL: "Semanal",
+  QUINCENAL: "Quincenal",
+  MENSUAL: "Mensual",
+  PERSONALIZADA: "Personalizada",
+} as const;
+
+export const CREDIT_PORTFOLIO_DETAIL_TABS = [
+  "resumen",
+  "plan",
+  "pagos",
+  "cuentas",
+  "facturacion",
+  "actividad",
+] as const;
+
+export type CreditPortfolioDetailTab =
+  (typeof CREDIT_PORTFOLIO_DETAIL_TABS)[number];

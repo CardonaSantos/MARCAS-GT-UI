@@ -414,7 +414,7 @@ export interface CreditPortfolioItem {
     anticipoRequerido: string;
     financiado: string;
     cuentaOriginal: string;
-    saldoPendiente: string;
+    saldoPendiente: string | null;
     pagadoAplicado: string;
   };
   plazoAutorizadoDias: number;
@@ -581,3 +581,150 @@ export type CreditPageResponse = PageResult<CreditApplicationListItem>;
 export type CreditEventPageResponse = PageResult<CreditEvent>;
 export type CreditPolicyPageResponse = PageResult<CreditPolicy>;
 export type CreditPortfolioPageResponse = PageResult<CreditPortfolioItem>;
+
+
+export type CreditPaymentPlanState = "BORRADOR" | "ACTIVO" | "CANCELADO";
+export type CreditPaymentPlanFrequency =
+  | "SEMANAL"
+  | "QUINCENAL"
+  | "MENSUAL"
+  | "PERSONALIZADA";
+
+export interface CreditPortfolioDetail {
+  id: number;
+  numero: string;
+  estado: "ACTIVO" | "CERRADO";
+  cliente: CreditCustomer;
+  vendedor: CreditUser;
+  aprobadoPor: CreditUser | null;
+  solicitud: {
+    id: number;
+    numero: string;
+    estado: CreditApplicationState;
+  };
+  pedido: {
+    id: number;
+    numero: string;
+    estado: string;
+    condicionPago: string;
+    estadoPago: string;
+    moneda: string;
+    total: string;
+  };
+  montos: {
+    autorizado: string;
+    anticipoRequerido: string;
+    financiado: string;
+    pagadoVerificado: string;
+    pagadoAplicado: string;
+    saldoPendiente: string | null;
+  };
+  plazoAutorizadoDias: number;
+  aprobadoEn: string | null;
+  cerradoEn: string | null;
+  creadoEn: string;
+  actualizadoEn: string;
+  planPago: null | {
+    id: number;
+    estado: CreditPaymentPlanState;
+    frecuencia: CreditPaymentPlanFrequency;
+    montoProgramado: string;
+    numeroCuotas: number;
+    primeraFechaVencimiento: string;
+    activadoEn: string | null;
+    version: number;
+    cuotas: Array<{
+      id: number;
+      numero: number;
+      montoProgramado: string;
+      fechaVencimiento: string;
+      estado: string;
+      cuentaPorCobrarId: number | null;
+      montoPagado: string;
+      saldoPendiente: string;
+    }>;
+    eventos: Array<{
+      id: number;
+      tipo: string;
+      estado: CreditPaymentPlanState;
+      detalle: string | null;
+      actor: CreditUser | null;
+      creadoEn: string;
+    }>;
+  };
+  cuentasPorCobrar: Array<{
+    id: number;
+    numeroDocumento: string | null;
+    estado: string;
+    montoOriginal: string;
+    saldoPendiente: string;
+    fechaEmision: string;
+    fechaVencimiento: string;
+    cuotaNumero: number | null;
+  }>;
+  pagos: Array<{
+    id: number;
+    metodo: string;
+    estado: string;
+    monto: string;
+    montoAplicado: string;
+    montoDisponible: string;
+    referencia: string | null;
+    fechaPago: string;
+    verificadoEn: string | null;
+  }>;
+  facturas: Array<{
+    id: number;
+    estado: string;
+    serie: string | null;
+    numero: string | null;
+    total: string;
+    emitidaEn: string | null;
+    fechaVencimiento: string | null;
+  }>;
+  acciones: {
+    puedeGestionarPlan: boolean;
+    puedeActivarPlan: boolean;
+  };
+}
+
+export interface CreditPlanInstallmentPayload {
+  fechaVencimiento: string;
+  montoProgramado: string;
+}
+
+export interface CreateCreditPaymentPlanPayload {
+  frecuencia: CreditPaymentPlanFrequency;
+  cuotas: CreditPlanInstallmentPayload[];
+  claveIdempotencia: string;
+}
+
+export interface UpdateCreditPaymentPlanPayload
+  extends CreateCreditPaymentPlanPayload {
+  expectedVersion: number;
+}
+
+export interface ActivateCreditPaymentPlanPayload {
+  expectedVersion: number;
+  claveIdempotencia: string;
+}
+
+export interface CreditPaymentPlanResponse {
+  id: number;
+  empresaId: number;
+  creditoId: number;
+  estado: CreditPaymentPlanState;
+  frecuencia: CreditPaymentPlanFrequency;
+  montoProgramado: string;
+  numeroCuotas: number;
+  primeraFechaVencimiento: string;
+  version: number;
+  activadoEn: string | null;
+  cuotas: Array<{
+    id: number;
+    numero: number;
+    montoProgramado: string;
+    fechaVencimiento: string;
+    cuentaPorCobrarId: number | null;
+  }>;
+}

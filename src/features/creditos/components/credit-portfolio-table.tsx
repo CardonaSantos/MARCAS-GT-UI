@@ -45,6 +45,15 @@ export function CreditPortfolioTable({
       accessorKey: "numero",
       header: "Crédito",
       size: 125,
+      cell: ({ row }) => (
+        <Link
+          to={"/marcas-gt/creditos/cartera/" + row.original.id}
+          state={{ from: returnTo }}
+          className="font-medium text-[hsl(var(--app-primary))] hover:underline"
+        >
+          {row.original.numero}
+        </Link>
+      ),
     },
     {
       id: "solicitud",
@@ -108,7 +117,10 @@ export function CreditPortfolioTable({
       header: "Saldo",
       size: 120,
       meta: { align: "right" },
-      cell: ({ row }) => formatMoney(row.original.montos.saldoPendiente),
+      cell: ({ row }) =>
+        row.original.montos.saldoPendiente == null
+          ? "—"
+          : formatMoney(row.original.montos.saldoPendiente),
     },
     {
       id: "vencidas",
@@ -133,14 +145,12 @@ export function CreditPortfolioTable({
     createAppRowActionsColumn<CreditPortfolioItem>({
       actions: (row) => [
         {
-          label: "Ver solicitud",
+          label: "Ver crédito",
           icon: <Eye />,
           onClick: () =>
-            navigate(
-              "/marcas-gt/creditos/solicitudes/" +
-                row.original.solicitud.id,
-              { state: { from: returnTo } },
-            ),
+            navigate("/marcas-gt/creditos/cartera/" + row.original.id, {
+              state: { from: returnTo },
+            }),
         },
       ],
     }),

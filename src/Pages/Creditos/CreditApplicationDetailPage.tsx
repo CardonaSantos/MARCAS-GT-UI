@@ -1,6 +1,7 @@
 import {
   CheckCircle2,
   FilePlus2,
+  Landmark,
   Pencil,
   Plus,
   RefreshCw,
@@ -203,6 +204,18 @@ export default function CreditApplicationDetailPage() {
           actions={
             credit ? (
               <>
+                {credit.credito ? (
+                  <AppButton asChild variant="secondary" size="sm">
+                    <Link
+                      to={"/marcas-gt/creditos/cartera/" + credit.credito.id}
+                      state={{ from: currentUrl }}
+                    >
+                      <Landmark className="h-4 w-4" />
+                      Ver crédito
+                    </Link>
+                  </AppButton>
+                ) : null}
+
                 {credit.acciones.puedeEditar ? (
                   <AppButton asChild variant="secondary" size="sm">
                     <Link
