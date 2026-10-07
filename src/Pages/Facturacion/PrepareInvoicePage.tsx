@@ -114,7 +114,7 @@ export default function PrepareInvoicePage() {
                       label="Entorno"
                       options={[{ value: "PRUEBAS", label: "Pruebas" }]}
                       required
-                      disabled
+                      isDisabled
                     />
                     <AppFormInput<PrepareInvoiceFormValues>
                       name="establecimientoId"

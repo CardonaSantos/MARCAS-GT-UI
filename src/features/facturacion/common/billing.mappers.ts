@@ -28,7 +28,7 @@ export function toPrepareInvoicePayload(
   return {
     tipoDte: values.tipoDte.trim().toUpperCase(),
     entorno: values.entorno,
-    ...(establishmentId ? { establecimientoId } : {}),
+    ...(establishmentId ? { establecimientoId: establishmentId } : {}),
     ...(text(values.serieInterna)
       ? { serieInterna: text(values.serieInterna) }
       : {}),
