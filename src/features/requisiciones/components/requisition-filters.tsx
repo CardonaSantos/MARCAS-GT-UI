@@ -65,7 +65,7 @@ export function RequisitionFilters({
     <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
       <AppSearchInput
         value={search}
-        onChange={onSearchChange}
+        onValueChange={(value) => onSearchChange(value)}
         onDebouncedChange={onSearchDebouncedChange}
         placeholder="Buscar bodega, proveedor, producto..."
         aria-label="Buscar requisiciones"
