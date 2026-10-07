@@ -1,5 +1,5 @@
 import { Save } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useBodegaSelectables } from "@/features/bodegas/api/bodega.queries";
@@ -16,6 +16,7 @@ import {
   newTransferDraft,
   TransferForm,
 } from "@/features/transferencias/components/transfer-form";
+import type { TransferAvailabilityStatus } from "@/features/transferencias/components/transfer-form";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppConfirmDialog } from "@/ui/components/app/primitives/app-confirm-dialog";
@@ -29,13 +30,27 @@ export default function CreateTransferPage() {
 
   const [draft, setDraft] = useState<TransferDraft>(() => newTransferDraft());
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [availability, setAvailability] = useState<Record<string, number | null>>({});
+  const onAvailabilityChange = useCallback((status: TransferAvailabilityStatus) => {
+    const lookup = `${status.bodegaOrigenId}:${status.productoId}`;
+    setAvailability((previous) =>
+      Object.prototype.hasOwnProperty.call(previous, lookup) && previous[lookup] === status.disponible
+        ? previous
+        : { ...previous, [lookup]: status.disponible },
+    );
+  }, []);
 
   const bodegasQuery = useBodegaSelectables({ limit: 100 });
   const productsQuery = useProductSelectables();
   const mutation = useCreateTransfer();
 
   const errors = useMemo(() => validateTransferDraft(draft), [draft]);
-  const canReview = errors.length === 0;
+  const availabilityError = draft.detalles.some((line) => {
+    if (!draft.bodegaOrigenId || !line.productoId) return false;
+    const available = availability[`${draft.bodegaOrigenId}:${line.productoId}`];
+    return available == null || Number(line.cantidadSolicitada) > available;
+  });
+  const canReview = errors.length === 0 && !availabilityError;
 
   const origin = bodegasQuery.data?.find(
     (item) => item.id === draft.bodegaOrigenId,
@@ -84,6 +99,7 @@ export default function CreateTransferPage() {
 
         <TransferForm
           value={draft}
+          onAvailabilityChange={onAvailabilityChange}
           bodegas={bodegasQuery.data ?? []}
           productos={productsQuery.data ?? []}
           onChange={setDraft}
