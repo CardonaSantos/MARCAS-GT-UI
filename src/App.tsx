@@ -74,6 +74,13 @@ import EditRequisitionPage from "./Pages/Requisiciones/EditRequisitionPage";
 import RequisitionDetailPage from "./Pages/Requisiciones/RequisitionDetailPage";
 import ReceiveRequisitionPage from "./Pages/Requisiciones/ReceiveRequisitionPage";
 import RequisitionReceiptsPage from "./Pages/Requisiciones/RequisitionReceiptsPage";
+import TransfersPage from "./Pages/Transferencias/TransfersPage";
+import CreateTransferPage from "./Pages/Transferencias/CreateTransferPage";
+import EditTransferPage from "./Pages/Transferencias/EditTransferPage";
+import TransferDetailPage from "./Pages/Transferencias/TransferDetailPage";
+import SendTransferPage from "./Pages/Transferencias/SendTransferPage";
+import ReceiveTransferPage from "./Pages/Transferencias/ReceiveTransferPage";
+import TransferOperationsPage from "./Pages/Transferencias/TransferOperationsPage";
 import OrdersPage from "./Pages/Pedidos/OrdersPage";
 import CreateOrderPage from "./Pages/Pedidos/CreateOrderPage";
 import OrderDetailPage from "./Pages/Pedidos/OrderDetailPage";
@@ -390,6 +397,63 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
                   <ReceiveRequisitionPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+            <Route
+              path="/marcas-gt/transferencias"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <TransfersPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transferencias/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <CreateTransferPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transferencias/operaciones"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <TransferOperationsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transferencias/:id"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                  <TransferDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transferencias/:id/editar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <EditTransferPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transferencias/:id/salida"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <SendTransferPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/transferencias/:id/recibir"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <ReceiveTransferPage />
                 </ProtectedRouteRoles>
               }
             />

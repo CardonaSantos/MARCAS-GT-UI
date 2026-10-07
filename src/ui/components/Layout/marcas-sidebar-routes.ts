@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowRightLeft,
   BarChart3,
   Box,
   Boxes,
@@ -192,6 +193,12 @@ const adminRoutes: MarcasRoute[] = [
         label: "Requisiciones",
         href: "/marcas-gt/requisiciones",
         activePaths: ["/marcas-gt/requisiciones"],
+      },
+      {
+        icon: ArrowRightLeft,
+        label: "Transferencias",
+        href: "/marcas-gt/transferencias",
+        activePaths: ["/marcas-gt/transferencias"],
       },
       {
         icon: Boxes,
@@ -465,6 +472,12 @@ const warehouseRoutes: MarcasRoute[] = [
         activePaths: ["/marcas-gt/requisiciones"],
       },
       {
+        icon: ArrowRightLeft,
+        label: "Transferencias",
+        href: "/marcas-gt/transferencias",
+        activePaths: ["/marcas-gt/transferencias"],
+      },
+      {
         icon: Boxes,
         label: "Consultar disponibilidad",
         href: "/marcas-gt/inventario/disponibilidad",
@@ -589,6 +602,12 @@ const accountingRoutes: MarcasRoute[] = [
         label: "Requisiciones",
         href: "/marcas-gt/requisiciones",
         activePaths: ["/marcas-gt/requisiciones"],
+      },
+      {
+        icon: ArrowRightLeft,
+        label: "Transferencias",
+        href: "/marcas-gt/transferencias",
+        activePaths: ["/marcas-gt/transferencias"],
       },
       {
         icon: Boxes,
