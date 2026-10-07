@@ -1,4 +1,5 @@
 import {
+  Banknote,
   CalendarClock,
   CheckCircle2,
   Plus,
@@ -6,6 +7,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
 import {
@@ -133,8 +135,13 @@ export function CreditPaymentPlanPanel({
 }: {
   credit: CreditPortfolioDetail;
 }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const role = useStore((state) => state.userRol);
   const canApply = role === "ADMIN" || role === "CONTABILIDAD";
+  const canRegister = ["ADMIN", "CONTABILIDAD", "VENDEDOR"].includes(
+    role ?? "",
+  );
 
   const createMutation = useCreateCreditPaymentPlan();
   const updateMutation = useUpdateCreditPaymentPlan();
@@ -308,6 +315,22 @@ export function CreditPaymentPlanPanel({
     });
   };
 
+  const goRegisterPayment = (
+    installment: NonNullable<CreditPortfolioDetail["planPago"]>["cuotas"][number],
+  ) => {
+    const next = new URLSearchParams(location.search);
+    next.set("tab", "pagos");
+    next.set("monto", Number(installment.saldoPendiente).toFixed(2));
+    next.set("cuota", String(installment.numero));
+    navigate(
+      {
+        pathname: location.pathname,
+        search: "?" + next.toString(),
+      },
+      { state: location.state },
+    );
+  };
+
   const confirmApply = async () => {
     if (!applyReview) return;
 
@@ -377,6 +400,32 @@ export function CreditPaymentPlanPanel({
               />
             </div>
           </AppCard>
+        ) : canRegister &&
+          existingPlan.cuotas.some(
+            (installment) => Number(installment.saldoPendiente) > 0,
+          ) ? (
+          <AppCard
+            title="No hay dinero verificado disponible"
+            description="Las cuotas siguen abiertas. Registra el siguiente cobro y, cuando esté verificado, podrás aplicarlo a la cuota."
+            icon={<Banknote />}
+            size="sm"
+          >
+            <div className="flex justify-end">
+              <AppButton
+                variant="primary"
+                size="sm"
+                leftIcon={<Banknote />}
+                onClick={() => {
+                  const nextInstallment = existingPlan.cuotas.find(
+                    (installment) => Number(installment.saldoPendiente) > 0,
+                  );
+                  if (nextInstallment) goRegisterPayment(nextInstallment);
+                }}
+              >
+                Registrar siguiente pago
+              </AppButton>
+            </div>
+          </AppCard>
         ) : null}
 
         <div className="space-y-2">
@@ -444,6 +493,17 @@ export function CreditPaymentPlanPanel({
                       onClick={() => requestApply(installment)}
                     >
                       Aplicar pago
+                    </AppButton>
+                  ) : canRegister &&
+                    Number(installment.saldoPendiente) > 0 &&
+                    availablePayments.length === 0 ? (
+                    <AppButton
+                      variant="secondary"
+                      size="sm"
+                      leftIcon={<Banknote />}
+                      onClick={() => goRegisterPayment(installment)}
+                    >
+                      Registrar pago
                     </AppButton>
                   ) : null}
                 </div>

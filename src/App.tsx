@@ -136,6 +136,7 @@ import ReceivablesPage from "./Pages/Facturacion/ReceivablesPage";
 import BillingOperationalReportPage from "./Pages/Facturacion/BillingOperationalReportPage";
 import FiscalConfigurationPage from "./Pages/Facturacion/FiscalConfigurationPage";
 import PaymentsPage from "./Pages/Pagos/PaymentsPage";
+import PaymentBanksPage from "./Pages/Pagos/PaymentBanksPage";
 import CreatePaymentPage from "./Pages/Pagos/CreatePaymentPage";
 import PaymentDetailPage from "./Pages/Pagos/PaymentDetailPage";
 import ApplyPaymentPage from "./Pages/Pagos/ApplyPaymentPage";
@@ -955,6 +956,14 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
                   <PaymentsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pagos/bancos"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <PaymentBanksPage />
                 </ProtectedRouteRoles>
               }
             />

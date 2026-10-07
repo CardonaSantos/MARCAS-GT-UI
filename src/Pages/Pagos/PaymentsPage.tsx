@@ -1,6 +1,7 @@
-import { Plus } from "lucide-react";
+import { Building2, Plus } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
+import { useStore } from "@/Context/ContextSucursal";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import {
   usePayments,
@@ -15,6 +16,7 @@ import { AppContainer } from "@/ui/components/app/primitives/app-container";
 import { AppStack } from "@/ui/components/app/primitives/app-stack";
 
 export default function PaymentsPage() {
+  const role = useStore((state) => state.userRol);
   const location = useLocation();
   const state = usePaymentListState();
   const query = usePayments(state.queryFilters);
@@ -32,15 +34,28 @@ export default function PaymentsPage() {
           title="Pagos"
           description="Registro, verificación y aplicación de cobros a pedidos y cuentas por cobrar."
           actions={
-            <AppButton asChild variant="primary" size="sm">
-              <Link
-                to="/marcas-gt/pagos/nuevo"
-                state={{ from: currentUrl }}
-              >
-                <Plus className="h-4 w-4" />
-                Registrar pago
-              </Link>
-            </AppButton>
+            <>
+              {["ADMIN", "CONTABILIDAD"].includes(role ?? "") ? (
+                <AppButton asChild variant="secondary" size="sm">
+                  <Link
+                    to="/marcas-gt/pagos/bancos"
+                    state={{ from: currentUrl }}
+                  >
+                    <Building2 className="h-4 w-4" />
+                    Bancos
+                  </Link>
+                </AppButton>
+              ) : null}
+              <AppButton asChild variant="primary" size="sm">
+                <Link
+                  to="/marcas-gt/pagos/nuevo"
+                  state={{ from: currentUrl }}
+                >
+                  <Plus className="h-4 w-4" />
+                  Registrar pago
+                </Link>
+              </AppButton>
+            </>
           }
         />
 

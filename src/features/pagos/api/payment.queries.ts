@@ -4,6 +4,7 @@ import { marcasEndpoints } from "@/API/routes/endpoints";
 
 import type {
   PaymentApplicationPageResponse,
+  PaymentBankAdmin,
   PaymentBankOption,
   PaymentDetail,
   PaymentEventPageResponse,
@@ -36,6 +37,13 @@ export function usePaymentBanks() {
   return API.useQuery<PaymentBankOption[]>({
     queryKey: marcasQueryKeys.pagos.custom("banks"),
     endpoint: marcasEndpoints.pagos.banks,
+  });
+}
+
+export function usePaymentBanksAdmin() {
+  return API.useQuery<PaymentBankAdmin[]>({
+    queryKey: marcasQueryKeys.pagos.custom("banks", "admin"),
+    endpoint: marcasEndpoints.pagos.banksAdmin,
   });
 }
 

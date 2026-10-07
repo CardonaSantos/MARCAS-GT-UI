@@ -300,6 +300,11 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/pagos",
       },
       {
+        icon: Building2,
+        label: "Bancos",
+        href: "/marcas-gt/pagos/bancos",
+      },
+      {
         icon: Settings2,
         label: "Configuración fiscal",
         href: "/marcas-gt/facturacion/configuracion-fiscal",
@@ -633,6 +638,11 @@ const accountingRoutes: MarcasRoute[] = [
         icon: Wallet,
         label: "Pagos",
         href: "/marcas-gt/pagos",
+      },
+      {
+        icon: Building2,
+        label: "Bancos",
+        href: "/marcas-gt/pagos/bancos",
       },
       {
         icon: Settings2,

@@ -226,6 +226,30 @@ export interface PaymentBankOption {
   codigo: string | null;
 }
 
+export interface PaymentBankAdmin {
+  id: number;
+  nombre: string;
+  codigo: string | null;
+  cuenta: string | null;
+  activo: boolean;
+  creadoEn: string;
+  actualizadoEn: string;
+}
+
+export interface CreatePaymentBankPayload {
+  nombre: string;
+  codigo?: string;
+  cuenta?: string;
+  activo?: boolean;
+}
+
+export interface UpdatePaymentBankPayload {
+  nombre?: string;
+  codigo?: string | null;
+  cuenta?: string | null;
+  activo?: boolean;
+}
+
 export interface PaymentSummary {
   total: number;
   porEstado: Partial<Record<PaymentState, number>>;

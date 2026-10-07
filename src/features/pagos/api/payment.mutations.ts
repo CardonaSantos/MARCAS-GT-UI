@@ -8,10 +8,13 @@ import { getApiErrorMessage } from "@/lib/api-error";
 import type {
   AddPaymentProofPayload,
   ApplyPaymentPayload,
+  CreatePaymentBankPayload,
   PaymentActionPayload,
+  PaymentBankAdmin,
   PaymentDetail,
   PaymentReasonActionPayload,
   RegisterPaymentPayload,
+  UpdatePaymentBankPayload,
 } from "./payment.types";
 
 const paymentInvalidations = [
@@ -133,6 +136,35 @@ export function useVoidPayment() {
     invalidateKeys: paymentInvalidations,
     options: {
       onSuccess: () => toast.success("Pago anulado."),
+      onError: mutationError,
+    },
+  });
+}
+
+
+export function useCreatePaymentBank() {
+  return API.useMutation<PaymentBankAdmin, CreatePaymentBankPayload>({
+    method: "POST",
+    endpoint: marcasEndpoints.pagos.banks,
+    invalidateKeys: [marcasQueryKeys.pagos.all],
+    options: {
+      onSuccess: () => toast.success("Banco registrado."),
+      onError: mutationError,
+    },
+  });
+}
+
+export function useUpdatePaymentBank() {
+  return API.useMutation<
+    PaymentBankAdmin,
+    { id: number; payload: UpdatePaymentBankPayload }
+  >({
+    method: "PATCH",
+    endpoint: ({ id }) => marcasEndpoints.pagos.bank(id),
+    body: ({ payload }) => payload,
+    invalidateKeys: [marcasQueryKeys.pagos.all],
+    options: {
+      onSuccess: () => toast.success("Banco actualizado."),
       onError: mutationError,
     },
   });

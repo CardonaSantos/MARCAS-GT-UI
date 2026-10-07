@@ -1,7 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Banknote, CheckCircle2, Eye, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
 import {
@@ -58,6 +58,7 @@ export function CreditPortfolioPayments({
   currentUrl: string;
 }) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const role = useStore((state) => state.userRol);
   const canVerify = role === "ADMIN" || role === "CONTABILIDAD";
   const banks = usePaymentBanks();
@@ -80,6 +81,27 @@ export function CreditPortfolioPayments({
     null,
   );
   const [verifyKey, setVerifyKey] = useState("");
+
+  const requestedAmount = searchParams.get("monto");
+  const requestedInstallment = searchParams.get("cuota");
+
+  useEffect(() => {
+    if (!requestedAmount || Number(requestedAmount) <= 0) return;
+
+    setShowRegister(true);
+    setDraft((current) => ({
+      ...current,
+      monto: requestedAmount,
+      observaciones:
+        current.observaciones ||
+        (requestedInstallment
+          ? "Cobro para cuota #" +
+            requestedInstallment +
+            " de " +
+            credit.numero
+          : "Cobro relacionado con " + credit.numero),
+    }));
+  }, [credit.numero, requestedAmount, requestedInstallment]);
 
   const bankRequired = BANK_REQUIRED_METHODS.includes(draft.metodo);
   const selectedBank = (banks.data ?? []).find(
@@ -140,6 +162,11 @@ export function CreditPortfolioPayments({
       observaciones: "",
     });
     setShowRegister(false);
+
+    const next = new URLSearchParams(searchParams);
+    next.delete("monto");
+    next.delete("cuota");
+    setSearchParams(next, { replace: true });
   };
 
   const requestVerify = (payment: CreditPaymentRow) => {
@@ -266,7 +293,11 @@ export function CreditPortfolioPayments({
 
       {showRegister ? (
         <AppCard
-          title="Registrar pago en este crédito"
+          title={
+            requestedInstallment
+              ? "Registrar pago para cuota #" + requestedInstallment
+              : "Registrar pago en este crédito"
+          }
           description="Cliente y pedido ya están fijados por el crédito. Revisa únicamente el dinero recibido."
           size="sm"
         >
@@ -367,6 +398,33 @@ export function CreditPortfolioPayments({
             </div>
           </div>
 
+          {bankRequired &&
+          !banks.isLoading &&
+          (banks.data ?? []).length === 0 ? (
+            <div className="mt-3 space-y-2">
+              <AppAlert
+                tone="warning"
+                title="No hay bancos activos"
+                description="Para registrar una transferencia, depósito o cheque primero debe existir al menos un banco activo."
+              />
+              {canVerify ? (
+                <div className="flex justify-end">
+                  <AppButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      navigate("/marcas-gt/pagos/bancos", {
+                        state: { from: currentUrl },
+                      })
+                    }
+                  >
+                    Administrar bancos
+                  </AppButton>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="mt-3 flex justify-end">
             <AppButton
               variant="primary"
@@ -381,10 +439,38 @@ export function CreditPortfolioPayments({
       ) : null}
 
       <AppAlert
-        tone="info"
-        title="Verificado no significa aplicado"
-        description="Un pago verificado reconoce dinero recibido. Para reducir el saldo del crédito debes aplicarlo a una cuota en la pestaña Plan de pagos."
+        tone={verifiedAvailable > 0 ? "warning" : "info"}
+        title={
+          verifiedAvailable > 0
+            ? "Tienes dinero listo para aplicar"
+            : "Verificado no significa aplicado"
+        }
+        description={
+          verifiedAvailable > 0
+            ? "Hay " +
+              formatMoney(verifiedAvailable) +
+              " verificados y todavía sin aplicar. Continúa en Plan de pagos para reducir el saldo de las cuotas."
+            : "Un pago verificado reconoce dinero recibido. Para reducir el saldo del crédito debes aplicarlo a una cuota en la pestaña Plan de pagos."
+        }
       />
+
+      {verifiedAvailable > 0 ? (
+        <div className="flex justify-end">
+          <AppButton
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              const next = new URLSearchParams(searchParams);
+              next.set("tab", "plan");
+              next.delete("monto");
+              next.delete("cuota");
+              setSearchParams(next, { replace: true });
+            }}
+          >
+            Ir a Plan de pagos
+          </AppButton>
+        </div>
+      ) : null}
 
       <AppDataTable
         data={credit.pagos}
