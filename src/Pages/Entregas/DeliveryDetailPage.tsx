@@ -1,6 +1,7 @@
-import { Camera, CheckCircle2, MapPin, PackageCheck, Play } from "lucide-react";
+import { Camera, CheckCircle2, MapPin, PackageCheck, Play, ReceiptText } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
+import { useStore } from "@/Context/ContextSucursal";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import { getReturnRoute } from "@/features/common/navigation/route-state";
 import { useUrlTabState } from "@/features/common/navigation/use-url-tab-state";
@@ -26,11 +27,19 @@ import { AppTabs } from "@/ui/components/app/primitives/app-tabs";
 export default function DeliveryDetailPage() {
   const params = useParams();
   const location = useLocation();
+  const role = useStore((state) => state.userRol);
   const id = Number(params.id);
   const query = useDelivery(id);
   const delivery = query.data;
   const backTo = getReturnRoute(location.state, "/marcas-gt/entregas");
   const currentUrl = location.pathname + location.search;
+  const canBill =
+    (role === "ADMIN" || role === "CONTABILIDAD") &&
+    Boolean(
+      delivery?.advertencias.some(
+        (warning) => warning.codigo === "ENTREGA_SIN_FACTURAR",
+      ),
+    );
 
   const tabState = useUrlTabState<DeliveryDetailTab>({
     defaultValue: "resumen",
@@ -164,6 +173,20 @@ export default function DeliveryDetailPage() {
                     >
                       <CheckCircle2 className="h-4 w-4" />
                       Finalizar
+                    </Link>
+                  </AppButton>
+                ) : null}
+                {canBill ? (
+                  <AppButton asChild variant="secondary" size="sm">
+                    <Link
+                      to={
+                        "/marcas-gt/facturacion/facturas/nueva?entregaId=" +
+                        id
+                      }
+                      state={{ from: currentUrl }}
+                    >
+                      <ReceiptText className="h-4 w-4" />
+                      Facturar
                     </Link>
                   </AppButton>
                 ) : null}

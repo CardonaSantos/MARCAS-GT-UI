@@ -126,6 +126,14 @@ import StartDeliveryPage from "./Pages/Entregas/StartDeliveryPage";
 import UpdateDeliveryResultPage from "./Pages/Entregas/UpdateDeliveryResultPage";
 import FinalizeDeliveryPage from "./Pages/Entregas/FinalizeDeliveryPage";
 import DeliveryOperationalReportPage from "./Pages/Entregas/DeliveryOperationalReportPage";
+import InvoicesPage from "./Pages/Facturacion/InvoicesPage";
+import CreateInvoicePage from "./Pages/Facturacion/CreateInvoicePage";
+import InvoiceDetailPage from "./Pages/Facturacion/InvoiceDetailPage";
+import PrepareInvoicePage from "./Pages/Facturacion/PrepareInvoicePage";
+import DiscardInvoicePage from "./Pages/Facturacion/DiscardInvoicePage";
+import ReceivablesPage from "./Pages/Facturacion/ReceivablesPage";
+import BillingOperationalReportPage from "./Pages/Facturacion/BillingOperationalReportPage";
+import FiscalConfigurationPage from "./Pages/Facturacion/FiscalConfigurationPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -848,6 +856,80 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
                   <FinalizeDeliveryPage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+
+            <Route
+              path="/marcas-gt/facturacion"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                  <Navigate to="/marcas-gt/facturacion/facturas" replace />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/facturas"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                  <InvoicesPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/facturas/nueva"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <CreateInvoicePage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/reportes/operacion"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <BillingOperationalReportPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/cuentas-por-cobrar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                  <ReceivablesPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/configuracion-fiscal"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <FiscalConfigurationPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/facturas/:id"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                  <InvoiceDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/facturas/:id/preparar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <PrepareInvoicePage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/facturacion/facturas/:id/descartar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <DiscardInvoicePage />
                 </ProtectedRouteRoles>
               }
             />

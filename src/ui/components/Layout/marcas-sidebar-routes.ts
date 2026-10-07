@@ -23,6 +23,7 @@ import {
   ShoppingBag,
   ShoppingCart,
   RotateCcw,
+  ReceiptText,
   Settings2,
   Star,
   Tags,
@@ -274,6 +275,27 @@ const adminRoutes: MarcasRoute[] = [
     ],
   },
   {
+    icon: ReceiptText,
+    label: "Finanzas",
+    submenu: [
+      {
+        icon: ReceiptText,
+        label: "Facturación",
+        href: "/marcas-gt/facturacion/facturas",
+      },
+      {
+        icon: Landmark,
+        label: "Cuentas por cobrar",
+        href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+      {
+        icon: Settings2,
+        label: "Configuración fiscal",
+        href: "/marcas-gt/facturacion/configuracion-fiscal",
+      },
+    ],
+  },
+  {
     icon: Building2,
     label: "Empresa",
     submenu: [
@@ -316,6 +338,22 @@ const sellerRoutes: MarcasRoute[] = [
     icon: PackageCheck,
     label: "Entregas",
     href: "/marcas-gt/entregas",
+  },
+  {
+    icon: ReceiptText,
+    label: "Finanzas",
+    submenu: [
+      {
+        icon: ReceiptText,
+        label: "Facturas",
+        href: "/marcas-gt/facturacion/facturas",
+      },
+      {
+        icon: Landmark,
+        label: "Cuentas por cobrar",
+        href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+    ],
   },
   {
     icon: CreditCard,
@@ -550,6 +588,27 @@ const accountingRoutes: MarcasRoute[] = [
         icon: UserCog,
         label: "Conductores",
         href: "/marcas-gt/transporte/conductores",
+      },
+    ],
+  },
+  {
+    icon: ReceiptText,
+    label: "Finanzas",
+    submenu: [
+      {
+        icon: ReceiptText,
+        label: "Facturación",
+        href: "/marcas-gt/facturacion/facturas",
+      },
+      {
+        icon: Landmark,
+        label: "Cuentas por cobrar",
+        href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+      {
+        icon: Settings2,
+        label: "Configuración fiscal",
+        href: "/marcas-gt/facturacion/configuracion-fiscal",
       },
     ],
   },
