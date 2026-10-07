@@ -107,11 +107,15 @@ export default function ReceiveTransferPage() {
     0,
   );
 
-  const patchLine = (detailId: number, quantity: string) => {
+  const patchLine = (detailId: number, quantity: string, maximum: number) => {
+    const numeric = Number(quantity);
+    const safeQuantity = quantity === "" ? "" : Number.isFinite(numeric)
+      ? String(Math.min(Math.max(Math.trunc(numeric), 0), maximum))
+      : quantity;
     setLines((current) =>
       current.map((line) =>
         line.transferenciaDetalleId === detailId
-          ? { ...line, cantidad: quantity }
+          ? { ...line, cantidad: safeQuantity }
           : line,
       ),
     );
@@ -324,7 +328,7 @@ export default function ReceiveTransferPage() {
                             step={1}
                             value={line.cantidad}
                             onChange={(event) =>
-                              patchLine(source.id, event.target.value)
+                              patchLine(source.id, event.target.value, source.cantidadEnTransito)
                             }
                           />
                         </div>
