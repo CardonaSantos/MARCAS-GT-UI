@@ -1,4 +1,5 @@
 import {
+  Banknote,
   CheckCircle2,
   Pencil,
   Send,
@@ -60,6 +61,9 @@ export default function OrderDetailPage() {
 
   const order = query.data;
   const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canRegisterPayment = ["ADMIN", "CONTABILIDAD", "VENDEDOR"].includes(
+    role ?? "",
+  );
   const canReadCredit = ["ADMIN", "VENDEDOR", "CONTABILIDAD"].includes(
     role ?? "",
   );
@@ -243,6 +247,26 @@ export default function OrderDetailPage() {
                     >
                       <WalletCards className="h-4 w-4" />
                       Tramitar crédito
+                    </Link>
+                  </AppButton>
+                ) : null}
+
+                {canRegisterPayment && order.estado !== "CANCELADO" ? (
+                  <AppButton asChild variant="secondary" size="sm">
+                    <Link
+                      to={
+                        "/marcas-gt/pagos/nuevo?clienteId=" +
+                        order.cliente.id +
+                        "&pedidoId=" +
+                        id
+                      }
+                      state={{
+                        from: currentUrl,
+                        listFrom: backTo,
+                      }}
+                    >
+                      <Banknote className="h-4 w-4" />
+                      Registrar pago
                     </Link>
                   </AppButton>
                 ) : null}

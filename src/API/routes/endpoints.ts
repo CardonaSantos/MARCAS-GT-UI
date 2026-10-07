@@ -233,6 +233,7 @@ export const marcasEndpoints = {
 
   pagos: {
     root: "/pagos",
+    banks: "/pagos/bancos",
     summary: "/pagos/resumen",
     detail: (id: number) => `/pagos/${id}`,
     events: (id: number) => `/pagos/${id}/eventos`,

@@ -289,6 +289,11 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/facturacion/cuentas-por-cobrar",
       },
       {
+        icon: Wallet,
+        label: "Pagos",
+        href: "/marcas-gt/pagos",
+      },
+      {
         icon: Settings2,
         label: "Configuración fiscal",
         href: "/marcas-gt/facturacion/configuracion-fiscal",
@@ -352,6 +357,11 @@ const sellerRoutes: MarcasRoute[] = [
         icon: Landmark,
         label: "Cuentas por cobrar",
         href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+      {
+        icon: Wallet,
+        label: "Pagos",
+        href: "/marcas-gt/pagos",
       },
     ],
   },
@@ -604,6 +614,11 @@ const accountingRoutes: MarcasRoute[] = [
         icon: Landmark,
         label: "Cuentas por cobrar",
         href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+      {
+        icon: Wallet,
+        label: "Pagos",
+        href: "/marcas-gt/pagos",
       },
       {
         icon: Settings2,

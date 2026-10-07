@@ -134,6 +134,10 @@ import DiscardInvoicePage from "./Pages/Facturacion/DiscardInvoicePage";
 import ReceivablesPage from "./Pages/Facturacion/ReceivablesPage";
 import BillingOperationalReportPage from "./Pages/Facturacion/BillingOperationalReportPage";
 import FiscalConfigurationPage from "./Pages/Facturacion/FiscalConfigurationPage";
+import PaymentsPage from "./Pages/Pagos/PaymentsPage";
+import CreatePaymentPage from "./Pages/Pagos/CreatePaymentPage";
+import PaymentDetailPage from "./Pages/Pagos/PaymentDetailPage";
+import ApplyPaymentPage from "./Pages/Pagos/ApplyPaymentPage";
 // import MakeSalePage from "./Pages/MakeSales/MakeSalePage";
 function App() {
   return (
@@ -930,6 +934,40 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
                   <DiscardInvoicePage />
+                </ProtectedRouteRoles>
+              }
+            />
+
+
+            <Route
+              path="/marcas-gt/pagos"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                  <PaymentsPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pagos/nuevo"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                  <CreatePaymentPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pagos/:id"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                  <PaymentDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pagos/:id/aplicar"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                  <ApplyPaymentPage />
                 </ProtectedRouteRoles>
               }
             />

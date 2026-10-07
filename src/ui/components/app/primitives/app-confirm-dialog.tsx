@@ -103,6 +103,7 @@ export interface AppConfirmDialogProps {
 
   isLoading?: boolean;
   disabled?: boolean;
+  confirmDisabled?: boolean;
 
   closeOnConfirm?: boolean;
   closeOnCancel?: boolean;
@@ -166,6 +167,7 @@ const AppConfirmDialog = React.forwardRef<
 
       isLoading = false,
       disabled = false,
+      confirmDisabled = false,
 
       closeOnConfirm = true,
       closeOnCancel = true,
@@ -261,7 +263,7 @@ const AppConfirmDialog = React.forwardRef<
     }, [busy, closeOnCancel, disabled, onCancel, preventClose, setOpen]);
 
     const handleConfirm = React.useCallback(async () => {
-      if (busy || disabled) return;
+      if (busy || disabled || confirmDisabled) return;
 
       try {
         const result = onConfirm?.();
@@ -283,7 +285,15 @@ const AppConfirmDialog = React.forwardRef<
       } finally {
         setInternalLoading(false);
       }
-    }, [busy, closeOnConfirm, disabled, onConfirm, onConfirmError, setOpen]);
+    }, [
+      busy,
+      closeOnConfirm,
+      confirmDisabled,
+      disabled,
+      onConfirm,
+      onConfirmError,
+      setOpen,
+    ]);
 
     return (
       <AlertDialog.Root
@@ -440,7 +450,7 @@ const AppConfirmDialog = React.forwardRef<
                     variant={confirmVariant}
                     size="sm"
                     width="full"
-                    disabled={disabled}
+                    disabled={disabled || confirmDisabled}
                     loading={busy}
                     loadingText={loadingText}
                     onClick={handleConfirm}
