@@ -159,13 +159,13 @@ const adminRoutes: MarcasRoute[] = [
       },
       {
         icon: MapPinned,
-        label: "Ubicación de empleados",
-        href: "/marcas-gt/empleados",
+        label: "Monitoreo GPS",
+        href: "/marcas-gt/tracking",
       },
       {
         icon: FileClock,
-        label: "Control de asistencia",
-        href: "/marcas-gt/historial-empleados-check",
+        label: "Auditoría de jornadas",
+        href: "/marcas-gt/tracking/historial",
       },
       {
         icon: Clock,

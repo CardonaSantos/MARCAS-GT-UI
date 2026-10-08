@@ -74,6 +74,9 @@ import EditRequisitionPage from "./Pages/Requisiciones/EditRequisitionPage";
 import RequisitionDetailPage from "./Pages/Requisiciones/RequisitionDetailPage";
 import ReceiveRequisitionPage from "./Pages/Requisiciones/ReceiveRequisitionPage";
 import RequisitionReceiptsPage from "./Pages/Requisiciones/RequisitionReceiptsPage";
+import TrackingLivePage from "./Pages/Tracking/TrackingLivePage";
+import TrackingHistoryPage from "./Pages/Tracking/TrackingHistoryPage";
+import TrackingAttendancePage from "./Pages/Tracking/TrackingAttendancePage";
 import TransfersPage from "./Pages/Transferencias/TransfersPage";
 import CreateTransferPage from "./Pages/Transferencias/CreateTransferPage";
 import EditTransferPage from "./Pages/Transferencias/EditTransferPage";
@@ -1143,6 +1146,10 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="/marcas-gt/tracking" element={<ProtectedRouteAdmin><TrackingLivePage /></ProtectedRouteAdmin>} />
+            <Route path="/marcas-gt/tracking/historial" element={<ProtectedRouteAdmin><TrackingHistoryPage /></ProtectedRouteAdmin>} />
+            <Route path="/marcas-gt/tracking/jornadas/:id" element={<ProtectedRouteAdmin><TrackingAttendancePage /></ProtectedRouteAdmin>} />
 
             <Route
               path="/marcas-gt/empleados"
