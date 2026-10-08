@@ -15,12 +15,16 @@ type MapProps = {
 };
 export function Map({children,defaultZoom,defaultCenter,className,gestureHandling="greedy",disableDefaultUI=true,mapTypeId="hybrid",onClick}: MapProps) {
   const [map, setMap] = React.useState<google.maps.Map | null>(null);
+  // CRM passes initial camera values. Keep those stable when replay updates,
+  // otherwise the map is recentered to its first point on every slider move.
+  const initialCenter = React.useRef(defaultCenter).current;
+  const initialZoom = React.useRef(defaultZoom).current;
   const options = React.useMemo<google.maps.MapOptions>(() => ({
     gestureHandling,disableDefaultUI,mapTypeId,clickableIcons:false,
     streetViewControl:false,fullscreenControl:false,
   }),[gestureHandling,disableDefaultUI,mapTypeId]);
   return <div className={"relative min-h-0 " + (className ?? "h-full w-full")}>
-    <GoogleMap mapContainerStyle={{width:"100%",height:"100%"}} center={defaultCenter} zoom={defaultZoom}
+    <GoogleMap mapContainerStyle={{width:"100%",height:"100%"}} center={initialCenter} zoom={initialZoom}
       options={options} onLoad={setMap} onUnmount={() => setMap(null)} onClick={onClick}>
       <MapContext.Provider value={map}>{children}</MapContext.Provider>
     </GoogleMap>

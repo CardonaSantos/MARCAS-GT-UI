@@ -27,7 +27,7 @@ export function toTrackingHistoryQueryParams(params: {
   search: string;
   filters: TrackingHistoryFiltersState;
 }): TrackingHistoryFilters {
-  const search = params.search.trim().slice(0, 150);
+  const search = params.search.trim().slice(0, 120);
 
   return {
     page: params.pageIndex + 1,

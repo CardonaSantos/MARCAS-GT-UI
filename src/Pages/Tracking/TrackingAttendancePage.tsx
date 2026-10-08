@@ -8,6 +8,7 @@ import {
 } from "@/features/tracking/api/tracking.types";
 import type { TrackingLocation } from "@/features/tracking/api/tracking.types";
 import { TrackingAttendanceRouteMap } from "@/features/tracking/components/tracking-attendance-route-map";
+import { TrackingAttendanceSessions } from "@/features/tracking/components/tracking-attendance-sessions";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppCard } from "@/ui/components/app/primitives/app-card";
@@ -82,21 +83,6 @@ export default function TrackingAttendancePage() {
               <AppAlert tone="warning" title="Existen sesiones expiradas"
                 description={"Se detectaron " + detail.resumen.sesionesExpiradas + " sesiones cerradas por falta de heartbeat. Su duración no se extiende hasta la hora actual."} />
             ) : null}
-            <AppCard title="Sesiones de seguimiento" description={"Total: " + detail.resumen.sesionesTotal + " · Finalizadas: " + detail.resumen.sesionesFinalizadas + " · Expiradas: " + detail.resumen.sesionesExpiradas} size="sm">
-              <div className="grid gap-2 lg:grid-cols-2">
-                {detail.sesiones.map((session) => (
-                  <button type="button" key={session.id} onClick={() => { setSessionId((current) => current === session.id ? undefined : session.id); setCursor(null); }}
-                    className={"rounded-lg border p-3 text-left transition-colors hover:bg-[hsl(var(--app-muted))] " +
-                      (sessionId === session.id ? "border-emerald-500" : "border-[hsl(var(--app-border))]")}>
-                    <div className="flex items-center justify-between gap-2">
-                      <strong className="text-sm">Sesión #{session.id}</strong><span className="text-xs">{session.estado}</span>
-                    </div>
-                    <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">{trackingDateTime(session.iniciadoEn)} → {trackingDateTime(session.finalizadoEn)}</p>
-                    <p className="mt-1 text-xs">{trackingDuration(session.duracionMinutos)} · {session.puntosRegistrados} puntos</p>
-                  </button>
-                ))}
-              </div>
-            </AppCard>
             <div className="space-y-3">
               <div className="mb-3 flex flex-wrap items-center gap-3">
                 <AppButton variant="secondary" size="sm" onClick={() => { setSessionId(undefined); setCursor(null); }} disabled={!sessionId}>Todas las sesiones</AppButton>
@@ -151,6 +137,11 @@ export default function TrackingAttendancePage() {
                 ) : null}
               </div>
             </div>
+            <TrackingAttendanceSessions
+              detail={detail}
+              locations={points}
+              totalLocations={total}
+            />
             <AppAlert tone="neutral" title="Criterio de auditoría"
               description="El trazado une muestras GPS disponibles de una misma sesión. No equivale a una ruta vial certificada; la precisión del GPS, los intervalos sin reporte y las ubicaciones ausentes pueden alterar su representación." />
           </>
