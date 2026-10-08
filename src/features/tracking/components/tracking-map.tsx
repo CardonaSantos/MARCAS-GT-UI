@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { GoogleMap, InfoWindow, Marker, OverlayView, Polyline } from "@react-google-maps/api";
+import { GoogleMap, InfoWindow, Marker, Polyline } from "@react-google-maps/api";
 import { Layers, LocateFixed, Maximize2, Minus, Plus } from "lucide-react";
 
 import { GoogleMapsProvider } from "@/features/common/maps/google-maps-provider";
@@ -15,6 +15,7 @@ export type MapEmployee = {
   descripcion?: string;
   capturadoEn?: string | null;
   precision?: number | null;
+  stale?: boolean;
 };
 
 export type MapSegment = {
@@ -25,6 +26,8 @@ export type MapSegment = {
 type Props = {
   employees?: MapEmployee[];
   segments?: MapSegment[];
+  /** Optional replay: keep full route visible while highlighting points up to the timeline cursor. */
+  playbackSegments?: MapSegment[];
   selectedId?: number | null;
   onSelect?: (id: number) => void;
   height?: number;
@@ -47,9 +50,23 @@ function toCoordinate(point: { latitud: number; longitud: number }): MapCoordina
   return { lat: point.latitud, lng: point.longitud };
 }
 
-function markerOffset(width: number, height: number) {
-  return { x: -width / 2, y: -height };
+function personMarkerIcon(person: MapEmployee, selected: boolean): google.maps.Icon {
+  // Native Google marker icons remain reliably visible at any zoom and map type.
+  const color = person.stale ? "#d97706" : person.rol === "ADMIN"
+    ? "#e11d48" : person.rol === "REPARTIDOR" ? "#d97706" : "#059669";
+  const stroke = selected ? "#38bdf8" : "#ffffff";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="74" viewBox="0 0 64 74">
+    <path d="M32 69 23 49a25 25 0 1 1 18 0Z" fill="${color}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="32" cy="28" r="19" fill="${color}" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+  </svg>`;
+  return {
+    url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+    scaledSize: new google.maps.Size(selected ? 58 : 52, selected ? 67 : 60),
+    anchor: new google.maps.Point(selected ? 29 : 26, selected ? 64 : 58),
+    labelOrigin: new google.maps.Point(selected ? 29 : 26, selected ? 26 : 23),
+  };
 }
+
 
 function MapAction({ label, onClick, children }: {
   label: string;
@@ -72,6 +89,7 @@ function MapAction({ label, onClick, children }: {
 function GoogleTrackingMap({
   employees = [],
   segments = [],
+  playbackSegments,
   selectedId = null,
   onSelect,
   height = 500,
@@ -93,6 +111,13 @@ function GoogleTrackingMap({
       })).filter((segment) => segment.points.length > 0),
     [segments],
   );
+  const validPlaybackSegments = useMemo(
+    () => playbackSegments?.map((segment) => ({
+      ...segment,
+      points: segment.points.filter((point) => trackingCoordinateValid(point)),
+    })).filter((segment) => segment.points.length > 0),
+    [playbackSegments],
+  );
   const coordinates = useMemo(
     () => [
       ...validSegments.flatMap((segment) => segment.points.map(toCoordinate)),
@@ -105,7 +130,7 @@ function GoogleTrackingMap({
   // Only joining/leaving workers or sessions triggers an automatic fit.
   const identity = useMemo(
     () =>
-      validSegments.map((segment) => segment.id).sort((a, b) => a - b).join(":") +
+      validSegments.map((segment) => segment.id + ":" + segment.points.length).sort().join(":") +
       "|" + validEmployees.map((person) => person.id).sort((a, b) => a - b).join(":"),
     [validSegments, validEmployees],
   );
@@ -199,17 +224,35 @@ function GoogleTrackingMap({
       >
         {validSegments.map((segment, index) => (
           <Polyline
-            key={segment.id}
+            key={"full-" + segment.id}
             path={segment.points.map(toCoordinate)}
             options={{
               strokeColor: ROUTE_COLORS[index % ROUTE_COLORS.length],
-              strokeWeight: 4,
-              strokeOpacity: 0.9,
+              strokeWeight: validPlaybackSegments ? 4 : 5,
+              strokeOpacity: validPlaybackSegments ? 0.42 : 1,
+              zIndex: 10,
               geodesic: false,
               clickable: false,
             }}
           />
         ))}
+        {validPlaybackSegments?.map((segment) => {
+          const colorIndex = validSegments.findIndex((item) => item.id === segment.id);
+          return (
+            <Polyline
+              key={"played-" + segment.id}
+              path={segment.points.map(toCoordinate)}
+              options={{
+                strokeColor: ROUTE_COLORS[Math.max(0, colorIndex) % ROUTE_COLORS.length],
+                strokeWeight: 6,
+                strokeOpacity: 1,
+                zIndex: 20,
+                geodesic: false,
+                clickable: false,
+              }}
+            />
+          );
+        })}
 
         {validSegments.flatMap((segment) => {
           const endpoints = segment.points.length > 1
@@ -235,52 +278,30 @@ function GoogleTrackingMap({
         })}
 
         {validEmployees.map((person) => (
-          <OverlayView
-            key={person.id}
+          <Marker
+            key={"person-" + person.id}
             position={toCoordinate(person)}
-            mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-            getPixelPositionOffset={markerOffset}
-          >
-            <button
-              type="button"
-              title={person.nombre}
-              aria-label={"Ver ubicación de " + person.nombre}
-              onClick={(event) => {
-                event.stopPropagation();
-                setOpenedId(person.id);
-                onSelect?.(person.id);
-              }}
-              className={
-                "group flex flex-col items-center outline-none transition-transform hover:scale-110 focus-visible:scale-110 " +
-                (selectedId === person.id ? "scale-110" : "")
-              }
-            >
-              <span
-                className={
-                  "flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-white text-sm font-bold text-white shadow-lg ring-2 " +
-                  (selectedId === person.id
-                    ? "bg-sky-600 ring-sky-400"
-                    : person.rol === "ADMIN"
-                      ? "bg-rose-600 ring-rose-500/60"
-                      : person.rol === "REPARTIDOR"
-                        ? "bg-amber-600 ring-amber-500/60"
-                        : "bg-emerald-600 ring-emerald-500/60")
-                }
-              >
-                {person.nombre.trim().charAt(0).toUpperCase() || "?"}
-              </span>
-              <span className="mt-0.5 max-w-[120px] truncate rounded bg-slate-900/85 px-2 py-0.5 text-[10px] font-semibold text-white shadow">
-                {person.nombre}
-              </span>
-            </button>
-          </OverlayView>
+            title={person.nombre + " · " + person.rol + " · GPS " + trackingDateTime(person.capturadoEn)}
+            zIndex={selectedId === person.id ? 200 : 100}
+            icon={personMarkerIcon(person, selectedId === person.id)}
+            label={{
+              text: (person.nombre.trim().charAt(0) || "?").toUpperCase(),
+              color: "#ffffff",
+              fontSize: selectedId === person.id ? "17px" : "16px",
+              fontWeight: "700",
+            }}
+            onClick={() => {
+              setOpenedId(person.id);
+              onSelect?.(person.id);
+            }}
+          />
         ))}
 
         {infoEmployee ? (
           <InfoWindow
             position={toCoordinate(infoEmployee)}
             onCloseClick={() => setOpenedId(null)}
-            options={{ pixelOffset: new google.maps.Size(0, -56) }}
+            options={{ pixelOffset: new google.maps.Size(0, -58) }}
           >
             <div className="max-w-[240px] space-y-1 text-sm text-slate-800">
               <p className="font-semibold">{infoEmployee.nombre}</p>
@@ -289,6 +310,7 @@ function GoogleTrackingMap({
               {infoEmployee.capturadoEn ? (
                 <p className="text-xs">Último GPS: {trackingDateTime(infoEmployee.capturadoEn)}</p>
               ) : null}
+              {infoEmployee.stale ? <p className="text-xs font-medium text-amber-700">Ubicación antigua: no se ha recibido GPS reciente.</p> : null}
               {infoEmployee.precision != null ? (
                 <p className="text-xs">Precisión ±{Math.round(infoEmployee.precision)} m</p>
               ) : null}
