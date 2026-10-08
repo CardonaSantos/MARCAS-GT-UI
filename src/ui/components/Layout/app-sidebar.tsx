@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 
@@ -182,14 +182,20 @@ function SidebarGroupItem({
   pathname,
   collapsed,
   onNavigate,
+  adminAccordion = false,
+  defaultExpanded = false,
 }: {
   item: MarcasRoute;
   pathname: string;
   collapsed: boolean;
   onNavigate: () => void;
+  /** Solo ADMIN empieza con grupos cerrados para reducir el ruido visual. */
+  adminAccordion?: boolean;
+  defaultExpanded?: boolean;
 }) {
   const active = hasActiveChild(pathname, item);
-  const [open, setOpen] = useState(true);
+  const sublistId = useId();
+  const [open, setOpen] = useState(() => !adminAccordion || active || defaultExpanded);
   useEffect(() => {
     if (active) {
       setOpen(true);
@@ -204,6 +210,7 @@ function SidebarGroupItem({
             type="button"
             onClick={() => setOpen((current) => !current)}
             aria-expanded={open}
+            aria-controls={sublistId}
             aria-label={item.label}
             title={item.label}
             className={cn(
@@ -219,7 +226,7 @@ function SidebarGroupItem({
         </SidebarTooltip>
 
         {open ? (
-          <div className="space-y-1">
+          <div id={sublistId} className="space-y-1">
             {item.submenu?.map((subItem) => (
               <SidebarItem
                 key={subItem.href ?? subItem.label}
@@ -242,6 +249,7 @@ function SidebarGroupItem({
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
+        aria-controls={sublistId}
         className={cn(
           appSidebarGroupTriggerVariants({
             active,
@@ -267,7 +275,7 @@ function SidebarGroupItem({
       </button>
 
       {open ? (
-        <div className={appSidebarSubListVariants()}>
+        <div id={sublistId} className={appSidebarSubListVariants()}>
           <div className={appSidebarSubListInnerVariants()}>
             {item.submenu?.map((subItem) => (
               <SidebarItem
@@ -297,6 +305,10 @@ export function AppSidebar() {
 
   const role = useStore((state) => state.userRol);
   const displayedRoutes = getMarcasRoutesByRole(role);
+  const isAdmin = role === "ADMIN";
+  const hasSelectedSection = displayedRoutes.some((item) =>
+    hasActiveChild(location.pathname, item),
+  );
 
   const handleNavigate = useCallback(() => {
     closeMobile();
@@ -327,18 +339,20 @@ export function AppSidebar() {
             <div className="mb-2 h-4" />
           )}
 
-          <nav className={appSidebarNavVariants()}>
+          <nav aria-label="Navegación principal" className={appSidebarNavVariants()}>
             {displayedRoutes.map((item) => {
               const active = hasActiveChild(location.pathname, item);
 
               if (item.submenu?.length) {
                 return (
                   <SidebarGroupItem
-                    key={item.href ?? item.label}
+                    key={`${role ?? "SIN_ROL"}:${item.href ?? item.label}`}
                     item={item}
                     pathname={location.pathname}
                     collapsed={collapsed}
                     onNavigate={handleNavigate}
+                    adminAccordion={isAdmin}
+                    defaultExpanded={isAdmin && !hasSelectedSection && item.label === "Inicio"}
                   />
                 );
               }
