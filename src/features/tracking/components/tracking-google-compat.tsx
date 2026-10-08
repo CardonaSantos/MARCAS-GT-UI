@@ -31,47 +31,17 @@ export function Map({children,defaultZoom,defaultCenter,className,gestureHandlin
   </div>;
 }
 type MarkerProps = {
-  children: React.ReactNode;
-  position: google.maps.LatLngLiteral;
-  title?: string;
-  zIndex?: number;
-  /**
-   * Default CRM-style markers are anchored at their bottom center.
-   * Floating information cards attach to the exact GPS point instead.
-   */
-  anchor?: "bottom-center" | "point";
-  onClick?: (event: {stop: () => void}) => void;
+  children: React.ReactNode; position: google.maps.LatLngLiteral;
+  title?: string; zIndex?: number; onClick?: (event: {stop: () => void}) => void;
 };
-
-const bottomCenterOffset = (width: number, height: number) => ({
-  x: -width / 2,
-  y: -height,
-});
-const pointOffset = () => ({ x: 0, y: 0 });
-
-export function AdvancedMarker({
-  children, position, title, zIndex = 10,
-  anchor = "bottom-center", onClick,
-}: MarkerProps) {
-  return (
-    <OverlayView
-      position={position}
-      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-      zIndex={zIndex}
-      getPixelPositionOffset={anchor === "point" ? pointOffset : bottomCenterOffset}
-    >
-      <div
-        title={title}
-        className={anchor === "point" ? "relative h-0 w-0" : "relative w-max"}
-        onClick={(event) => {
-          event.stopPropagation();
-          onClick?.({ stop: () => event.stopPropagation() });
-        }}
-      >
-        {children}
-      </div>
-    </OverlayView>
-  );
+export function AdvancedMarker({children,position,title,zIndex=10,onClick}:MarkerProps) {
+  return <OverlayView position={position} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+    <div title={title} className="absolute left-0 top-0"
+      style={{transform:"translate(-50%, -100%)",zIndex}}
+      onClick={(event) => {event.stopPropagation();onClick?.({stop:()=>event.stopPropagation()});}}>
+      {children}
+    </div>
+  </OverlayView>;
 }
 export const ControlPosition = { RIGHT_TOP:"RIGHT_TOP" } as const;
 export function MapControl({children}:{position:typeof ControlPosition.RIGHT_TOP;children:React.ReactNode}) {

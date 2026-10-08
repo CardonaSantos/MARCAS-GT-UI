@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { MarkerF } from "@react-google-maps/api";
 
 import { AdvancedMarker, Map, useMap } from "./tracking-google-compat";
 
@@ -124,6 +125,12 @@ function distanceMeters(
   return 2 * earthRadius * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
+/**
+ * Live GPS markers are rendered with the native Google Maps marker layer.
+ * The CRM's HTML AdvancedMarker adapter proved unreliable for live points
+ * in MARCAS. This component deliberately does not share its anchor or CSS
+ * layout with the historical replay map.
+ */
 function TrackingMarker({
   row,
   selected,
@@ -133,62 +140,41 @@ function TrackingMarker({
   selected: boolean;
   onSelect: () => void;
 }) {
-  if (!row.ubicacion) {
-    return null;
-  }
+  const location = row.ubicacion;
+  if (!location) return null;
 
-  const initial = row.tecnico.nombre.trim().charAt(0).toUpperCase() || "?";
+  const receivedAt = new Date(location.recibidoEn).getTime();
+  const isStale =
+    !Number.isFinite(receivedAt) ||
+    Date.now() - receivedAt >= 15 * 60_000;
+
+  // A marker always represents the last received point, even if it is old.
+  // We distinguish old GPS visually rather than hiding the employee.
+  const color = isStale ? "#d97706" : "#059669";
+  const icon: google.maps.Symbol = {
+    path: google.maps.SymbolPath.CIRCLE,
+    fillColor: color,
+    fillOpacity: 1,
+    strokeColor: "#ffffff",
+    strokeOpacity: 1,
+    strokeWeight: selected ? 4 : 3,
+    scale: selected ? 20 : 17,
+  };
 
   return (
-    <AdvancedMarker
-      position={{
-        lat: row.ubicacion.latitud,
-        lng: row.ubicacion.longitud,
+    <MarkerF
+      position={{ lat: location.latitud, lng: location.longitud }}
+      title={row.tecnico.nombre + (isStale ? " · GPS antiguo" : " · GPS reciente")}
+      icon={icon}
+      label={{
+        text: (row.tecnico.nombre.trim().charAt(0) || "?").toUpperCase(),
+        color: "#ffffff",
+        fontSize: selected ? "16px" : "14px",
+        fontWeight: "700",
       }}
-      title={row.tecnico.nombre}
-      zIndex={selected ? 1000 : 10}
-      onClick={(event) => {
-        event.stop();
-        onSelect();
-      }}
-    >
-      <button
-        type="button"
-        aria-label={`Seleccionar ${row.tecnico.nombre}`}
-        className={[
-          "relative flex cursor-pointer flex-col items-center",
-          "transition-transform duration-150",
-          selected ? "scale-110" : "hover:scale-105",
-        ].join(" ")}
-      >
-        {selected ? (
-          <span className="absolute -inset-2 animate-ping rounded-full bg-primary/30" />
-        ) : null}
-
-        <span
-          className={[
-            "relative flex size-9 items-center justify-center overflow-hidden",
-            "rounded-full border-[3px] bg-primary text-primary-foreground shadow-lg",
-            selected
-              ? "border-primary ring-2 ring-background ring-offset-2 ring-offset-primary"
-              : "border-background",
-          ].join(" ")}
-        >
-          <Avatar className="h-full w-full border-none">
-            <AvatarImage
-              src={row.tecnico.avatarUrl ?? undefined}
-              className="object-cover"
-            />
-
-            <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
-              {initial}
-            </AvatarFallback>
-          </Avatar>
-        </span>
-
-        <span className="-mt-px h-0 w-0 border-x-[5px] border-t-[7px] border-x-transparent border-t-primary" />
-      </button>
-    </AdvancedMarker>
+      zIndex={selected ? 2000 : 100}
+      onClick={onSelect}
+    />
   );
 }
 
@@ -459,7 +445,6 @@ function SelectedTechnicianCard({
         lng: location.longitud,
       }}
       zIndex={2000}
-      anchor="point"
     >
       <div
         className="pointer-events-auto absolute bottom-12 left-1/2 -translate-x-1/2"
