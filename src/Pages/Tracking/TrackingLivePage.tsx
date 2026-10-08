@@ -102,7 +102,7 @@ export default function TrackingLivePage() {
                           {!hasGps ? "Sin GPS" : old ? "GPS antiguo" : "GPS reciente"}
                         </span>
                       </div>
-                      <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">Último GPS: {trackingDateTime(position?.capturadoEn)}</p>
+                      <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">Último GPS: {trackingDateTime(position?.capturadoEn ?? position?.recibidoEn)}</p>
                     </button>
                   );
                 })}
@@ -115,7 +115,7 @@ export default function TrackingLivePage() {
               employees={mapped.map((item) => ({
                 id: item.usuario.id, nombre: item.usuario.nombre, rol: item.usuario.rol,
                 latitud: item.ubicacion!.latitud, longitud: item.ubicacion!.longitud,
-                capturadoEn: item.ubicacion!.capturadoEn, precision: item.ubicacion!.precision,
+                capturadoEn: item.ubicacion!.capturadoEn ?? item.ubicacion!.recibidoEn, precision: item.ubicacion!.precision,
                 descripcion: "Jornada #" + item.tracking.asistenciaId,
                 stale: !Number.isFinite(new Date(item.ubicacion!.capturadoEn ?? item.ubicacion!.recibidoEn).getTime()) ||
                   Date.now() - new Date(item.ubicacion!.capturadoEn ?? item.ubicacion!.recibidoEn).getTime() >= 15 * 60_000,
@@ -128,7 +128,7 @@ export default function TrackingLivePage() {
             {selected ? (
               <AppCard title={selected.usuario.nombre} description={selected.usuario.rol + " · Sesión #" + selected.tracking.sesionId} size="sm">
                 <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                  <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Último reporte</p><p>{trackingDateTime(selected.ubicacion?.capturadoEn)}</p></div>
+                  <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Último reporte</p><p>{trackingDateTime(selected.ubicacion?.capturadoEn ?? selected.ubicacion?.recibidoEn)}</p></div>
                   <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Tracking confirmado</p><p>{trackingDuration(selected.jornada.minutosTracking)}</p></div>
                   <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Batería</p><p>{selected.ubicacion?.bateria != null ? selected.ubicacion.bateria + "%" : "—"}</p></div>
                   <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Precisión GPS</p><p>{selected.ubicacion?.precision != null ? "± " + Math.round(selected.ubicacion.precision) + " m" : "—"}</p></div>

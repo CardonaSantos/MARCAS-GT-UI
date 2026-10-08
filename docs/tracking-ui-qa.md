@@ -29,7 +29,7 @@ Servidor: src/modules/tracking, base /real-time-location/tracking.
 
 ## Límites y decisiones
 
-- La UI administrativa **no crea coordenadas** ni inicia tracking ajeno: refleja sesiones que envían GPS desde un cliente.
+- La UI administrativa **no crea coordenadas** ni inicia tracking ajeno: refleja sesiones que envían GPS desde un cliente. `/tracking/realtime` retorna exclusivamente sesiones `ACTIVA`; registros de prueba finalizados o expirados solo aparecen en el historial. El servidor expira sesiones sin heartbeat cada 10 minutos si superan el umbral configurable (`TRACKING_STALE_AFTER_MINUTES`, por defecto 120 minutos).
 - Las visitas activas y los envíos activos se muestran si están presentes en el snapshot realtime. La correlación de visitas terminadas con paradas históricas no está incluida en el read-side y requerirá integración adicional.
 - **PENDIENTE DE RECONCILIACIÓN**: las pantallas legacy /attendance/check-in y /attendance/check-out todavía coexisten con Tracking V1, que administra una jornada única por usuario/día. No ampliar su uso hasta verificar compatibilidad del servicio legacy con la restricción Asistencia_usuarioId_fecha_key y el cierre de sesión.
 - El valor de «minutos de tracking» es tiempo confirmado por el servidor; los intervalos sin reporte no deben inferirse como trabajo realizado.

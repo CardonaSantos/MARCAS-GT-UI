@@ -133,6 +133,8 @@ function GoogleTrackingMap({
   const selectedPerson = validEmployees.find((person) => person.id === selectedId);
   const selectedLatitude = selectedPerson?.latitud;
   const selectedLongitude = selectedPerson?.longitud;
+  const focusLatitude = focusPoint?.latitud;
+  const focusLongitude = focusPoint?.longitud;
 
   const fitToContent = useCallback((map: google.maps.Map) => {
     const points = currentCoordinates.current;
@@ -161,13 +163,14 @@ function GoogleTrackingMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    if (focusPoint && trackingCoordinateValid(focusPoint)) {
-      map.panTo(toCoordinate(focusPoint));
+    if (focusLatitude !== undefined && focusLongitude !== undefined &&
+        trackingCoordinateValid({ latitud: focusLatitude, longitud: focusLongitude })) {
+      map.panTo({ lat: focusLatitude, lng: focusLongitude });
       if ((map.getZoom() ?? 0) < 16) map.setZoom(16);
     } else if (selectedId === null) {
       fitToContent(map);
     }
-  }, [identity, fitToContent, focusPoint?.latitud, focusPoint?.longitud, selectedId]);
+  }, [identity, fitToContent, focusLatitude, focusLongitude, selectedId]);
 
   useEffect(() => {
     if (selectedId === null || !mapRef.current) return;
@@ -311,7 +314,7 @@ function GoogleTrackingMap({
                   <span className="relative">{label}</span>
                 </span>
                 <span className="-mt-px h-0 w-0 border-x-[7px] border-t-[10px] border-x-transparent" style={{ borderTopColor: color }} />
-                <span className="mt-1 max-w-[160px] truncate rounded bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-slate-900 shadow">
+                <span className="absolute bottom-full left-1/2 max-w-[160px] -translate-x-1/2 -translate-y-1 truncate rounded bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-slate-900 shadow">
                   {person.nombre}
                 </span>
               </button>
