@@ -459,6 +459,7 @@ function SelectedTechnicianCard({
         lng: location.longitud,
       }}
       zIndex={2000}
+      anchor="point"
     >
       <div
         className="pointer-events-auto absolute bottom-12 left-1/2 -translate-x-1/2"
