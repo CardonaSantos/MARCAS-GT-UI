@@ -148,6 +148,36 @@ export function useOrderListState() {
     [filters, table, updateUrl],
   );
 
+  // Nunca mantener una visita elegida para otro cliente/vendedor.
+  const setPersonFilter = useCallback(
+    (key: "clienteId" | "vendedorId", value: number | null) => {
+      if (filters.state[key] === value) return;
+      filters.patch({ [key]: value, visitaId: null });
+      table.resetPage();
+      updateUrl({ [key]: value, visitaId: null, page: 1 });
+    },
+    [filters, table, updateUrl],
+  );
+
+  // El backend da prioridad a soloAbiertos sobre estado; se excluyen.
+  const setOrderState = useCallback(
+    (value: OrderState | null) => {
+      filters.patch({ estado: value, soloAbiertos: null });
+      table.resetPage();
+      updateUrl({ estado: value, soloAbiertos: null, page: 1 });
+    },
+    [filters, table, updateUrl],
+  );
+
+  const setOpenOrders = useCallback(
+    (value: boolean | null) => {
+      filters.patch({ soloAbiertos: value, ...(value ? { estado: null } : {}) });
+      table.resetPage();
+      updateUrl({ soloAbiertos: value, ...(value ? { estado: null } : {}), page: 1 });
+    },
+    [filters, table, updateUrl],
+  );
+
   const resetFilters = useCallback(() => {
     filters.setState({
       estado: null,
@@ -307,18 +337,17 @@ export function useOrderListState() {
       table.handleDebouncedSearch(value);
       updateUrl({ search: value || null, page: 1 });
     },
-    setEstado: (value: OrderState | null) => setFilter("estado", value),
+    setEstado: setOrderState,
     setEstadoPago: (value: OrderPaymentState | null) =>
       setFilter("estadoPago", value),
     setCondicionPago: (value: OrderPaymentCondition | null) =>
       setFilter("condicionPago", value),
-    setClienteId: (value: number | null) => setFilter("clienteId", value),
-    setVendedorId: (value: number | null) => setFilter("vendedorId", value),
+    setClienteId: (value: number | null) => setPersonFilter("clienteId", value),
+    setVendedorId: (value: number | null) => setPersonFilter("vendedorId", value),
     setVisitaId: (value: number | null) => setFilter("visitaId", value),
     setFechaDesde: (value: string) => setFilter("fechaDesde", value),
     setFechaHasta: (value: string) => setFilter("fechaHasta", value),
-    setSoloAbiertos: (value: boolean | null) =>
-      setFilter("soloAbiertos", value),
+    setSoloAbiertos: setOpenOrders,
     resetFilters,
   };
 }

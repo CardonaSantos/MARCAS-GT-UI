@@ -26,5 +26,7 @@ jobs:
         run: node scripts/check-user-registration.mjs
       - name: Check login contracts
         run: node scripts/check-login.mjs
+      - name: Check order filters
+        run: node scripts/check-order-filters.mjs
       - name: TypeScript and Vite build
         run: npm run build

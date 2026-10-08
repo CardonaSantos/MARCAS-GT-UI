@@ -66,135 +66,183 @@ const conditionOptions = ORDER_PAYMENT_CONDITIONS.map((value) => ({
 
 const openOptions = [
   { value: "all", label: "Todos los pedidos" },
-  { value: "open", label: "Sólo abiertos" },
+  { value: "open", label: "Solo abiertos" },
 ];
 
-export function OrderFilters({
-  search,
-  estado,
-  estadoPago,
-  condicionPago,
-  clienteId,
-  vendedorId,
-  visitaId,
-  fechaDesde,
-  fechaHasta,
-  soloAbiertos,
-  onSearchChange,
-  onSearchDebouncedChange,
-  onEstadoChange,
-  onEstadoPagoChange,
-  onCondicionPagoChange,
-  onClienteChange,
-  onVendedorChange,
-  onVisitaChange,
-  onFechaDesdeChange,
-  onFechaHastaChange,
-  onSoloAbiertosChange,
-  onReset,
-}: OrderFiltersProps) {
+const labelClass =
+  "mb-1.5 block text-xs font-medium text-[hsl(var(--app-muted-foreground))]";
+
+export function OrderFilters(props: OrderFiltersProps) {
   const hasFilters =
-    Boolean(search) ||
-    estado !== null ||
-    estadoPago !== null ||
-    condicionPago !== null ||
-    clienteId !== null ||
-    vendedorId !== null ||
-    visitaId !== null ||
-    Boolean(fechaDesde) ||
-    Boolean(fechaHasta) ||
-    soloAbiertos !== null;
+    Boolean(props.search.trim()) ||
+    [
+      props.estado,
+      props.estadoPago,
+      props.condicionPago,
+      props.clienteId,
+      props.vendedorId,
+      props.visitaId,
+      props.soloAbiertos,
+    ].some((value) => value !== null) ||
+    Boolean(props.fechaDesde || props.fechaHasta);
+
+  const visitEnabled = props.clienteId !== null || props.vendedorId !== null;
 
   return (
-    <div className="grid w-full gap-2 md:grid-cols-2 xl:grid-cols-4">
-      <AppSearchInput
-        value={search}
-        onValueChange={onSearchChange}
-        onDebouncedChange={onSearchDebouncedChange}
-        placeholder="Buscar número, cliente, vendedor o producto..."
-      />
-
-      <AppSingleSelect<OrderState>
-        value={estado}
-        options={stateOptions}
-        onChange={onEstadoChange}
-        placeholder="Estado del pedido"
-      />
-
-      <AppSingleSelect<OrderPaymentState>
-        value={estadoPago}
-        options={paymentStateOptions}
-        onChange={onEstadoPagoChange}
-        placeholder="Estado de pago"
-      />
-
-      <AppSingleSelect<OrderPaymentCondition>
-        value={condicionPago}
-        options={conditionOptions}
-        onChange={onCondicionPagoChange}
-        placeholder="Condición de pago"
-      />
-
-      <OrderCustomerSelect
-        value={clienteId}
-        onChange={onClienteChange}
-        placeholder="Cliente"
-      />
-
-      <OrderSellerSelect
-        value={vendedorId}
-        onChange={onVendedorChange}
-        placeholder="Vendedor"
-      />
-
-      <OrderVisitSelect
-        value={visitaId}
-        clienteId={clienteId}
-        vendedorId={vendedorId}
-        onChange={onVisitaChange}
-        placeholder={
-          clienteId || vendedorId ? "Visita" : "Selecciona cliente o vendedor"
-        }
-        isDisabled={!clienteId && !vendedorId}
-      />
-
-      <AppSingleSelect
-        value={soloAbiertos ? "open" : "all"}
-        options={openOptions}
-        isClearable={false}
-        isSearchable={false}
-        onChange={(value) =>
-          onSoloAbiertosChange(value === "open" ? true : null)
-        }
-      />
-
-      <AppDatePicker
-        value={fechaDesde}
-        outputFormat="iso"
-        boundary="startOfDay"
-        aria-label="Fecha inicial"
-        onChange={(value) => onFechaDesdeChange(value ?? "")}
-      />
-
-      <AppDatePicker
-        value={fechaHasta}
-        outputFormat="iso"
-        boundary="endOfDay"
-        aria-label="Fecha final"
-        onChange={(value) => onFechaHastaChange(value ?? "")}
-      />
-
-      <div className="md:col-span-2 flex justify-end">
+    <div className="flex w-full min-w-0 flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold">Filtros de pedidos</h3>
+          <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+            Encuentra pedidos por cliente, vendedor, estado o fecha de creación.
+          </p>
+        </div>
         <AppButton
+          type="button"
           variant="secondary"
           size="sm"
           leftIcon={<RotateCcw />}
           disabled={!hasFilters}
-          onClick={onReset}
+          onClick={props.onReset}
         >
           Limpiar filtros
         </AppButton>
       </div>
+
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="min-w-0">
+          <label className={labelClass} htmlFor="orders-search">Buscar pedido</label>
+          <AppSearchInput
+            id="orders-search"
+            value={props.search}
+            onValueChange={props.onSearchChange}
+            onDebouncedChange={props.onSearchDebouncedChange}
+            placeholder="Número, cliente, vendedor o producto"
+          />
+        </div>
+
+        <div className="min-w-0">
+          <label className={labelClass} htmlFor="orders-state">Estado del pedido</label>
+          <AppSingleSelect<OrderState>
+            inputId="orders-state"
+            value={props.estado}
+            options={stateOptions}
+            onChange={props.onEstadoChange}
+            placeholder="Todos los estados"
+          />
+        </div>
+
+        <div className="min-w-0">
+          <label className={labelClass} htmlFor="orders-customer">Cliente</label>
+          <OrderCustomerSelect
+            inputId="orders-customer"
+            value={props.clienteId}
+            onChange={props.onClienteChange}
+            placeholder="Todos los clientes"
+          />
+        </div>
+
+        <div className="min-w-0">
+          <label className={labelClass} htmlFor="orders-seller">Vendedor</label>
+          <OrderSellerSelect
+            inputId="orders-seller"
+            value={props.vendedorId}
+            onChange={props.onVendedorChange}
+            placeholder="Todos los vendedores"
+          />
+        </div>
+      </div>
+
+      <fieldset className="min-w-0 rounded-md border border-[hsl(var(--app-border))] p-3">
+        <legend className="px-1 text-xs font-semibold">Pago y seguimiento</legend>
+        <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="min-w-0">
+            <label className={labelClass} htmlFor="orders-payment-state">Estado de pago</label>
+            <AppSingleSelect<OrderPaymentState>
+              inputId="orders-payment-state"
+              value={props.estadoPago}
+              options={paymentStateOptions}
+              onChange={props.onEstadoPagoChange}
+              placeholder="Todos los estados de pago"
+            />
+          </div>
+
+          <div className="min-w-0">
+            <label className={labelClass} htmlFor="orders-payment-condition">Condición de pago</label>
+            <AppSingleSelect<OrderPaymentCondition>
+              inputId="orders-payment-condition"
+              value={props.condicionPago}
+              options={conditionOptions}
+              onChange={props.onCondicionPagoChange}
+              placeholder="Todas las condiciones"
+            />
+          </div>
+
+          <div className="min-w-0">
+            <label className={labelClass} htmlFor="orders-visit">Visita vinculada</label>
+            <OrderVisitSelect
+              inputId="orders-visit"
+              value={props.visitaId}
+              clienteId={props.clienteId}
+              vendedorId={props.vendedorId}
+              onChange={props.onVisitaChange}
+              placeholder={visitEnabled ? "Todas las visitas" : "Selecciona cliente o vendedor"}
+              isDisabled={!visitEnabled}
+            />
+          </div>
+
+          <div className="min-w-0">
+            <label className={labelClass} htmlFor="orders-only-open">Tipo de pedidos</label>
+            <AppSingleSelect
+              inputId="orders-only-open"
+              value={props.soloAbiertos ? "open" : "all"}
+              options={openOptions}
+              isClearable={false}
+              isSearchable={false}
+              onChange={(value) =>
+                props.onSoloAbiertosChange(value === "open" ? true : null)
+              }
+            />
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+          Al elegir un nuevo cliente o vendedor, se restablece la visita vinculada.
+          El filtro «Solo abiertos» reemplaza cualquier estado de pedido específico.
+        </p>
+      </fieldset>
+
+      <fieldset className="min-w-0 rounded-md border border-[hsl(var(--app-border))] p-3">
+        <legend className="px-1 text-xs font-semibold">Fecha de creación del pedido</legend>
+        <p className="mb-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+          Filtra por el día en que se registró el pedido, no por su fecha de entrega o pago.
+        </p>
+        <div className="grid min-w-0 max-w-2xl gap-3 sm:grid-cols-2">
+          <div className="min-w-0">
+            <label className={labelClass} htmlFor="orders-created-from">Desde</label>
+            <AppDatePicker
+              id="orders-created-from"
+              value={props.fechaDesde}
+              outputFormat="iso"
+              boundary="startOfDay"
+              aria-label="Fecha de creación del pedido desde"
+              maxDate={props.fechaHasta || undefined}
+              onChange={(value) => props.onFechaDesdeChange(value ?? "")}
+            />
+          </div>
+          <div className="min-w-0">
+            <label className={labelClass} htmlFor="orders-created-to">Hasta</label>
+            <AppDatePicker
+              id="orders-created-to"
+              value={props.fechaHasta}
+              outputFormat="iso"
+              boundary="endOfDay"
+              aria-label="Fecha de creación del pedido hasta"
+              minDate={props.fechaDesde || undefined}
+              onChange={(value) => props.onFechaHastaChange(value ?? "")}
+            />
+          </div>
+        </div>
+      </fieldset>
     </div>
   );
 }
