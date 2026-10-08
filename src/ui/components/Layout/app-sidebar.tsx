@@ -182,20 +182,18 @@ function SidebarGroupItem({
   pathname,
   collapsed,
   onNavigate,
-  adminAccordion = false,
-  defaultExpanded = false,
+  alwaysExpanded = false,
 }: {
   item: MarcasRoute;
   pathname: string;
   collapsed: boolean;
   onNavigate: () => void;
-  /** Solo ADMIN empieza con grupos cerrados para reducir el ruido visual. */
-  adminAccordion?: boolean;
-  defaultExpanded?: boolean;
+  /** ADMIN muestra todas las secciones siempre visibles. */
+  alwaysExpanded?: boolean;
 }) {
   const active = hasActiveChild(pathname, item);
   const sublistId = useId();
-  const [open, setOpen] = useState(() => !adminAccordion || active || defaultExpanded);
+  const [open, setOpen] = useState(true);
   useEffect(() => {
     if (active) {
       setOpen(true);
@@ -206,26 +204,37 @@ function SidebarGroupItem({
     return (
       <div className="space-y-1">
         <SidebarTooltip label={item.label}>
-          <button
-            type="button"
-            onClick={() => setOpen((current) => !current)}
-            aria-expanded={open}
-            aria-controls={sublistId}
-            aria-label={item.label}
-            title={item.label}
-            className={cn(
-              appSidebarGroupTriggerVariants({
-                active,
-                collapsed: true,
-              }),
-              "overflow-hidden",
-            )}
-          >
-            <RouteIcon icon={item.icon} />
-          </button>
+          {alwaysExpanded ? (
+            <div
+              role="heading"
+              aria-level={2}
+              title={item.label}
+              className={cn(
+                appSidebarGroupTriggerVariants({ active, collapsed: true }),
+                "overflow-hidden",
+              )}
+            >
+              <RouteIcon icon={item.icon} />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setOpen((current) => !current)}
+              aria-expanded={open}
+              aria-controls={sublistId}
+              aria-label={item.label}
+              title={item.label}
+              className={cn(
+                appSidebarGroupTriggerVariants({ active, collapsed: true }),
+                "overflow-hidden",
+              )}
+            >
+              <RouteIcon icon={item.icon} />
+            </button>
+          )}
         </SidebarTooltip>
 
-        {open ? (
+        {alwaysExpanded || open ? (
           <div id={sublistId} className="space-y-1">
             {item.submenu?.map((subItem) => (
               <SidebarItem
@@ -245,36 +254,49 @@ function SidebarGroupItem({
 
   return (
     <div className="space-y-1">
-      <button
-        type="button"
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-        aria-controls={sublistId}
-        className={cn(
-          appSidebarGroupTriggerVariants({
-            active,
-            collapsed: false,
-          }),
-          "overflow-hidden",
-        )}
-      >
-        <RouteIcon icon={item.icon} />
-
-        <SidebarLabel collapsed={false} className="flex-1 truncate text-left">
-          {item.label}
-        </SidebarLabel>
-
-        <ChevronDown
-          size={14}
-          aria-hidden="true"
+      {alwaysExpanded ? (
+        <div
+          role="heading"
+          aria-level={2}
           className={cn(
-            "shrink-0 transition-transform duration-200",
-            open && "rotate-180",
+            appSidebarGroupTriggerVariants({ active, collapsed: false }),
+            "overflow-hidden",
           )}
-        />
-      </button>
+        >
+          <RouteIcon icon={item.icon} />
+          <SidebarLabel collapsed={false} className="flex-1 truncate text-left">
+            {item.label}
+          </SidebarLabel>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          aria-expanded={open}
+          aria-controls={sublistId}
+          className={cn(
+            appSidebarGroupTriggerVariants({ active, collapsed: false }),
+            "overflow-hidden",
+          )}
+        >
+          <RouteIcon icon={item.icon} />
 
-      {open ? (
+          <SidebarLabel collapsed={false} className="flex-1 truncate text-left">
+            {item.label}
+          </SidebarLabel>
+
+          <ChevronDown
+            size={14}
+            aria-hidden="true"
+            className={cn(
+              "shrink-0 transition-transform duration-200",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+      )}
+
+      {alwaysExpanded || open ? (
         <div id={sublistId} className={appSidebarSubListVariants()}>
           <div className={appSidebarSubListInnerVariants()}>
             {item.submenu?.map((subItem) => (
@@ -306,10 +328,6 @@ export function AppSidebar() {
   const role = useStore((state) => state.userRol);
   const displayedRoutes = getMarcasRoutesByRole(role);
   const isAdmin = role === "ADMIN";
-  const hasSelectedSection = displayedRoutes.some((item) =>
-    hasActiveChild(location.pathname, item),
-  );
-
   const handleNavigate = useCallback(() => {
     closeMobile();
   }, [closeMobile]);
@@ -351,8 +369,7 @@ export function AppSidebar() {
                     pathname={location.pathname}
                     collapsed={collapsed}
                     onNavigate={handleNavigate}
-                    adminAccordion={isAdmin}
-                    defaultExpanded={isAdmin && !hasSelectedSection && item.label === "Inicio"}
+                    alwaysExpanded={isAdmin}
                   />
                 );
               }

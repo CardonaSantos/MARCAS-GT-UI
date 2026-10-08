@@ -69,6 +69,21 @@ const groupLabels = [...admin.matchAll(/^    label: "([^"]+)",$/gm)].map(match =
 assert.equal(groupLabels.length, 12, "El menú de ADMIN debe tener doce grupos operativos");
 assert.equal(new Set(groupLabels).size, 12, "Hay grupos duplicados");
 
+for (const section of [
+  "Inventario y bodegas",
+  "Operaciones de bodega",
+  "Personal y seguimiento",
+]) assert.ok(groupLabels.includes(section), `Sección poco clara o ausente: ${section}`);
+
+const sidebar = readFileSync("src/ui/components/Layout/app-sidebar.tsx", "utf8");
+assert.ok(sidebar.includes("alwaysExpanded={isAdmin}"),
+  "El menú ADMIN debe permanecer desplegado.");
+assert.ok(sidebar.includes("alwaysExpanded || open"),
+  "Los grupos del ADMIN no deben cerrarse automáticamente.");
+assert.ok(!sidebar.includes("adminAccordion"),
+  "El administrador ya no utiliza el acordeón inicial.");
+
+
 for (const required of [
   'exactPaths: ["/marcas-gt/inventario"]',
   'exactPaths: ["/marcas-gt/tracking"]',

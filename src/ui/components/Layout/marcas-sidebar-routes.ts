@@ -91,7 +91,7 @@ const adminRoutes: MarcasRoute[] = [
       },
       {
         icon: Calendar,
-        label: "Registro de prospectos",
+        label: "Historial de prospectos",
         href: "/marcas-gt/historial-prospectos",
       },
       {
@@ -101,7 +101,7 @@ const adminRoutes: MarcasRoute[] = [
       },
       {
         icon: MapPin,
-        label: "Registro de visitas",
+        label: "Historial de visitas",
         href: "/marcas-gt/historial-visitas",
       },
     ],
@@ -180,7 +180,7 @@ const adminRoutes: MarcasRoute[] = [
   },
   {
     icon: Boxes,
-    label: "Stock y bodegas",
+    label: "Inventario y bodegas",
     submenu: [
       {
         icon: Building2,
@@ -196,7 +196,7 @@ const adminRoutes: MarcasRoute[] = [
       },
       {
         icon: Boxes,
-        label: "Consultar disponibilidad",
+        label: "Disponibilidad de stock",
         href: "/marcas-gt/inventario/disponibilidad",
       },
       {
@@ -206,14 +206,14 @@ const adminRoutes: MarcasRoute[] = [
       },
       {
         icon: FileClock,
-        label: "Movimientos",
+        label: "Movimientos de inventario",
         href: "/marcas-gt/inventario/movimientos",
       },
     ],
   },
   {
     icon: ArrowRightLeft,
-    label: "Operación de bodega",
+    label: "Operaciones de bodega",
     submenu: [
       {
         icon: ClipboardList,
@@ -331,7 +331,7 @@ const adminRoutes: MarcasRoute[] = [
   },
   {
     icon: UserCog,
-    label: "Equipo y jornadas",
+    label: "Personal y seguimiento",
     submenu: [
       {
         icon: UserCog,
