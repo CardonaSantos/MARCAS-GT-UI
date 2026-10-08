@@ -24,6 +24,8 @@ export const marcasEndpoints = {
   providers: {
     root: "/provider",
     detail: (id: number) => `/provider/${id}`,
+    // DELETE /provider/:id was previously wired to removeAll().
+    deleteOne: (id: number) => `/provider/delete-provider/${id}`,
   },
 
   customers: {
