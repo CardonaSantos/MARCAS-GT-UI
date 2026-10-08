@@ -57,11 +57,6 @@ export function createTrackingHistoryColumns(): ColumnDef<
           <div className="truncate text-xs font-semibold">
             {row.original.tecnico.nombre}
           </div>
-          <div className={`truncate text-[10px] ${muted}`}>
-            {row.original.tecnico.telefono ??
-              row.original.tecnico.correo ??
-              "—"}
-          </div>
         </div>
       ),
     },

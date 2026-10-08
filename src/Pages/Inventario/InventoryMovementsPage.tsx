@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+// import { Info } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
@@ -7,7 +7,7 @@ import { useInventoryMovements } from "@/features/inventario/api/inventory.queri
 import { useInventoryMovementState } from "@/features/inventario/common/use-inventory-movement-state";
 import { InventoryMovementFilters } from "@/features/inventario/components/inventory-movement-filters";
 import { InventoryMovementTable } from "@/features/inventario/components/inventory-movement-table";
-import { AppCard } from "@/ui/components/app/primitives/app-card";
+// import { AppCard } from "@/ui/components/app/primitives/app-card";
 import { AppContainer } from "@/ui/components/app/primitives/app-container";
 import { AppStack } from "@/ui/components/app/primitives/app-stack";
 
@@ -31,15 +31,6 @@ export default function InventoryMovementsPage() {
           backTo={backTo}
           backLabel="Volver a inventario"
         />
-
-        {!state.hasRequiredContext ? (
-          <AppCard
-            title="Selecciona producto y bodega"
-            description="El backend actual no incluye producto ni bodega dentro de cada fila del movimiento. Ambos filtros son obligatorios en esta vista para que cada registro tenga contexto inequívoco."
-            icon={<Info />}
-            size="sm"
-          />
-        ) : null}
 
         <InventoryMovementTable
           data={query.data?.data ?? []}

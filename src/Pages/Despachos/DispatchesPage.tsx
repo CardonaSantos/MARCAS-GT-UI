@@ -56,7 +56,7 @@ export default function DispatchesPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Despachos"
-          description="Planifica preparación, reserva inventario y registra salidas físicas con auditoría e idempotencia."
+          description="Planifica preparación, reserva inventario y registra salidas físicas con auditoría."
           actions={
             <>
               <AppButton asChild variant="secondary" size="sm">
@@ -136,18 +136,14 @@ export default function DispatchesPage() {
               programadoHasta={state.filters.programadoHasta}
               soloPendientes={state.filters.soloPendientes}
               soloAtrasados={state.filters.soloAtrasados}
-              conPendientePreparacion={
-                state.filters.conPendientePreparacion
-              }
+              conPendientePreparacion={state.filters.conPendientePreparacion}
               conPendienteDespacho={state.filters.conPendienteDespacho}
               onSearchChange={state.table.setSearch}
               onSearchDebouncedChange={state.table.setServerSearch}
               onEstadoChange={(value) => state.setFilter("estado", value)}
               onBodegaChange={(value) => state.setFilter("bodegaId", value)}
               onClienteChange={(value) => state.setFilter("clienteId", value)}
-              onVendedorChange={(value) =>
-                state.setFilter("vendedorId", value)
-              }
+              onVendedorChange={(value) => state.setFilter("vendedorId", value)}
               onCreadoPorChange={(value) =>
                 state.setFilter("creadoPorId", value)
               }

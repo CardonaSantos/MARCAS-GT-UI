@@ -50,7 +50,9 @@ export default function RequisitionReceiptsPage() {
   const [recibidoPorId, setRecibidoPorId] = useState<number | null>(null);
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
-  const [retryReceipt, setRetryReceipt] = useState<RequisitionReceipt | null>(null);
+  const [retryReceipt, setRetryReceipt] = useState<RequisitionReceipt | null>(
+    null,
+  );
 
   const filters = useMemo(
     () => ({
@@ -63,7 +65,16 @@ export default function RequisitionReceiptsPage() {
       fechaDesde: fechaDesde || undefined,
       fechaHasta: fechaHasta || undefined,
     }),
-    [pageIndex, pageSize, estado, bodegaId, proveedorId, recibidoPorId, fechaDesde, fechaHasta],
+    [
+      pageIndex,
+      pageSize,
+      estado,
+      bodegaId,
+      proveedorId,
+      recibidoPorId,
+      fechaDesde,
+      fechaHasta,
+    ],
   );
 
   const query = useRequisitionReceiptList(filters);
@@ -180,7 +191,7 @@ export default function RequisitionReceiptsPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Recepciones de requisiciones"
-          description="Consulta recepciones físicas y recupera operaciones fallidas sin duplicar movimientos de inventario."
+          description=""
           backTo="/marcas-gt/requisiciones"
           backLabel="Volver a requisiciones"
         />
@@ -234,7 +245,9 @@ export default function RequisitionReceiptsPage() {
               <AppSingleSelect<number>
                 value={recibidoPorId}
                 options={(usersQuery.data ?? [])
-                  .filter((item) => item.rol === "ADMIN" || item.rol === "BODEGA")
+                  .filter(
+                    (item) => item.rol === "ADMIN" || item.rol === "BODEGA",
+                  )
                   .map((item) => ({
                     value: item.id,
                     label: item.nombre,
@@ -308,10 +321,19 @@ export default function RequisitionReceiptsPage() {
         >
           {retryReceipt ? (
             <div className="space-y-2 text-sm">
-              <p><strong>Recepción:</strong> #{retryReceipt.id}</p>
-              <p><strong>Requisición:</strong> #{retryReceipt.requisicionId}</p>
-              <p><strong>Unidades:</strong> {retryReceipt.unidades}</p>
-              <p><strong>Error:</strong> {retryReceipt.errorAplicacion ?? "No disponible"}</p>
+              <p>
+                <strong>Recepción:</strong> #{retryReceipt.id}
+              </p>
+              <p>
+                <strong>Requisición:</strong> #{retryReceipt.requisicionId}
+              </p>
+              <p>
+                <strong>Unidades:</strong> {retryReceipt.unidades}
+              </p>
+              <p>
+                <strong>Error:</strong>{" "}
+                {retryReceipt.errorAplicacion ?? "No disponible"}
+              </p>
             </div>
           ) : null}
         </AppConfirmDialog>

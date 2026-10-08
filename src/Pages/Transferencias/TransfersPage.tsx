@@ -36,7 +36,7 @@ export default function TransfersPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Transferencias"
-          description="Mueve mercadería entre bodegas con salida física, tránsito y recepción controlada."
+          description="Mover mercadería entre bodegas con salida física, tránsito y recepción."
           actions={
             <div className="flex flex-wrap gap-2">
               <AppButton asChild variant="secondary" size="sm">

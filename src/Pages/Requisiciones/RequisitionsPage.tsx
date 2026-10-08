@@ -40,7 +40,7 @@ export default function RequisitionsPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Requisiciones"
-          description="Planifica abastecimiento desde proveedores y registra la recepción física que realmente incrementa inventario."
+          description=""
           actions={
             <div className="flex flex-wrap gap-2">
               <AppButton asChild variant="secondary" size="sm">

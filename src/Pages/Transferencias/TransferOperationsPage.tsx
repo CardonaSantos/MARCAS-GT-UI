@@ -77,8 +77,7 @@ export default function TransferOperationsPage() {
   const receiptMutation = useRegisterTransferReceipt();
 
   const meta = query.data?.meta;
-  const retryBusy =
-    outboundMutation.isPending || receiptMutation.isPending;
+  const retryBusy = outboundMutation.isPending || receiptMutation.isPending;
 
   const reset = () => {
     setPageIndex(0);
@@ -128,7 +127,7 @@ export default function TransferOperationsPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Operaciones de transferencias"
-          description="Supervisa salidas y recepciones físicas, incluyendo operaciones pendientes o fallidas que requieren recuperación."
+          description="Supervisa salidas y recepciones físicas, operaciones pendientes o fallidas."
           backTo="/marcas-gt/transferencias"
           backLabel="Volver a transferencias"
         />
@@ -270,7 +269,8 @@ export default function TransferOperationsPage() {
           {retryOperation ? (
             <div className="space-y-2 text-sm">
               <p>
-                <strong>Transferencia:</strong> #{retryOperation.transferenciaId}
+                <strong>Transferencia:</strong> #
+                {retryOperation.transferenciaId}
               </p>
               <p>
                 <strong>Operación:</strong> #{retryOperation.id}
