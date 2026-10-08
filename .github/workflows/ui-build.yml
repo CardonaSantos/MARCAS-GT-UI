@@ -22,5 +22,7 @@ jobs:
         run: npm ci
       - name: Check administrative sidebar routes
         run: node scripts/check-admin-sidebar.mjs
+      - name: Check user registration
+        run: node scripts/check-user-registration.mjs
       - name: TypeScript and Vite build
         run: npm run build

@@ -1,172 +1,135 @@
-"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Save, UserPlus } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useState } from "react";
-import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { toast } from "sonner";
-
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { useStore } from "@/Context/ContextSucursal";
-const API_URL = import.meta.env.VITE_API_URL;
+import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
+import { useCreateUser } from "@/features/usuarios/api/user.mutations";
+import { USER_ROLE_OPTIONS, type CreateUserPayload, type MarcasUserRole } from "@/features/usuarios/api/user.types";
+import { createUserSchema, type CreateUserFormValues } from "@/features/usuarios/schemas/user.schemas";
+import { useAppFormHandlers } from "@/ui/components/app/handlers";
+import { AppForm, AppFormInput, AppFormSingleSelect, AppFormSubmit } from "@/ui/components/app/form";
+import { AppAlert } from "@/ui/components/app/primitives/app-alert";
+import { AppButton } from "@/ui/components/app/primitives/app-button";
+import { AppCard } from "@/ui/components/app/primitives/app-card";
+import { AppContainer } from "@/ui/components/app/primitives/app-container";
+import { AppStack } from "@/ui/components/app/primitives/app-stack";
+
+const RETURN_TO = "/marcas-gt/usuarios";
 
 export default function CreateUser() {
   const navigate = useNavigate();
-  const setAuthSession = useStore((state) => state.setAuthSession);
-
-  const [comprobarContraseña, setComprobarContraseña] = useState<string>("");
-  const [formData, setFormData] = useState({
-    nombre: "",
-    correo: "",
-    contrasena: "",
-    rol: "",
-    empresaId: 1,
+  const empresaId = useStore((state) => state.empresaId);
+  const mutation = useCreateUser();
+  const form = useForm<CreateUserFormValues>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      nombre: "",
+      correo: "",
+      contrasena: "",
+      confirmarContrasena: "",
+      rol: undefined,
+    },
+    mode: "onTouched",
   });
+  const handlers = useAppFormHandlers(form);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleRoleChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, rol: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.contrasena != comprobarContraseña) {
-      toast.warning("Verifique su contraseña");
+  const onSubmit = async (values: CreateUserFormValues) => {
+    if (!empresaId || empresaId <= 0) {
+      form.setError("root", {
+        type: "manual",
+        message: "Tu sesión no tiene una empresa válida. Vuelve a iniciar sesión.",
+      });
       return;
     }
 
-    if (formData.contrasena.length < 8) {
-      toast.warning("La contraseña debe ser mayor a 8 caracteres");
-      return; // Detener si la contraseña es corta
-    }
-
-    if (
-      !formData.correo ||
-      !formData.nombre ||
-      !formData.contrasena ||
-      !formData.rol
-    ) {
-      toast.warning("Faltan campos por llenar");
-      return;
-    }
+    const payload: CreateUserPayload = {
+      nombre: values.nombre,
+      correo: values.correo,
+      contrasena: values.contrasena,
+      rol: values.rol,
+      empresaId,
+    };
 
     try {
-      const response = await axios.post(`${API_URL}/users`, formData);
-
-      if (
-        response.status === 201 &&
-        response.data.authToken &&
-        response.data.usuario
-      ) {
-        setAuthSession({
-          authToken: response.data.authToken,
-          usuario: response.data.usuario,
-        });
-
-        toast.success("Usuario creado");
-        navigate("/marcas-gt/dashboard");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Error al crear el usuario. Intente de nuevo.");
+      // POST /users devuelve authToken del nuevo usuario. Se ignora
+      // intencionalmente para conservar la sesión del administrador.
+      await mutation.mutateAsync(payload);
+      handlers.reset();
+      navigate(RETURN_TO, { replace: true });
+    } catch {
+      // El hook muestra el error. Mantener los campos para corregirlos.
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full">
-      <Card className="w-full max-w-md md:max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Registro de Usuario</CardTitle>
-          <CardDescription>Crea una nueva cuenta de usuario.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="nombre">Nombre</Label>
-                <Input
-                  id="nombre"
-                  name="nombre"
-                  placeholder="Ingrese su nombre"
-                  required
-                  onChange={handleInputChange}
+    <AppContainer size="xl" paddingX="none">
+      <AppStack gap="lg">
+        <FeaturePageHeader
+          title="Registrar usuario"
+          description="Registra una cuenta para la empresa actual y asigna su rol operativo."
+          backTo={RETURN_TO}
+          backLabel="Volver a usuarios"
+        />
+
+        {!empresaId || empresaId <= 0 ? (
+          <AppAlert tone="danger" title="Empresa no disponible"
+            description="No puedes crear usuarios sin una empresa válida en tu sesión." />
+        ) : null}
+
+        <AppForm form={form} onSubmit={onSubmit}>
+          <AppStack gap="md">
+            <AppCard title="Datos de acceso" icon={<UserPlus />} size="sm"
+              description="Datos de identificación y contraseña inicial.">
+              <div className="grid gap-4 md:grid-cols-2">
+                <AppFormInput<CreateUserFormValues>
+                  name="nombre" label="Nombre completo" required
+                  placeholder="Nombre del empleado" autoComplete="name" maxLength={120}
+                />
+                <AppFormInput<CreateUserFormValues>
+                  name="correo" label="Correo electrónico" required
+                  type="email" placeholder="correo@empresa.com" autoComplete="off"
+                />
+                <AppFormInput<CreateUserFormValues>
+                  name="contrasena" label="Contraseña" type="password" required
+                  autoComplete="new-password" hint="Mínimo 8 caracteres."
+                />
+                <AppFormInput<CreateUserFormValues>
+                  name="confirmarContrasena" label="Confirmar contraseña"
+                  type="password" required autoComplete="new-password"
                 />
               </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="correo">Correo electrónico</Label>
-                <Input
-                  id="correo"
-                  name="correo"
-                  placeholder="ejemplo@gmail.com"
-                  type="email"
-                  required
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="contrasena">Contraseña</Label>
-                <Input
-                  id="contrasena"
-                  name="contrasena"
-                  type="password"
-                  required
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="comprobarContrasena">
-                  Comprobar contraseña
-                </Label>
-                <Input
-                  id="comprobarContrasena"
-                  name="comprobarContrasena"
-                  type="password"
-                  required
-                  onChange={(e) => setComprobarContraseña(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="rol">Rol</Label>
-                <Select onValueChange={handleRoleChange} required>
-                  <SelectTrigger id="rol">
-                    <SelectValue placeholder="Seleccione un rol" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="ADMIN">ADMIN</SelectItem>
-                    <SelectItem value="VENDEDOR">VENDEDOR</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            </AppCard>
+
+            <AppCard title="Rol y permisos" size="sm"
+              description="Define el perfil operativo que utilizará la cuenta.">
+              <AppFormSingleSelect<CreateUserFormValues, MarcasUserRole>
+                name="rol" label="Rol del usuario" required
+                options={USER_ROLE_OPTIONS} placeholder="Seleccionar rol"
+                isClearable={false} isSearchable={false}
+              />
+            </AppCard>
+
+            {form.formState.errors.root?.message ? (
+              <AppAlert tone="danger" title="No se pudo registrar el usuario"
+                description={form.formState.errors.root.message} />
+            ) : null}
+
+            <div className="flex justify-end gap-2">
+              <AppButton asChild variant="secondary">
+                <Link to={RETURN_TO}>Cancelar</Link>
+              </AppButton>
+              <AppFormSubmit<CreateUserFormValues>
+                leftIcon={<Save />} loadingText="Registrando..."
+                disabled={!empresaId || mutation.isPending}
+              >
+                Registrar usuario
+              </AppFormSubmit>
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button className="w-full" onClick={handleSubmit}>
-            Registrar
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          </AppStack>
+        </AppForm>
+      </AppStack>
+    </AppContainer>
   );
 }

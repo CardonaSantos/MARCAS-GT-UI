@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { useStore } from "@/Context/ContextSucursal";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
@@ -33,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   UserCog,
+  UserPlus,
   Edit,
   Trash2,
   Key,
@@ -262,6 +264,13 @@ function Users() {
             <UserCog className="h-5 w-5" />
             Gestión de Usuarios
           </CardTitle>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild size="sm">
+              <Link to="/marcas-gt/register">
+                <UserPlus className="h-4 w-4" />
+                Nuevo usuario
+              </Link>
+            </Button>
           <Button
             variant="outline"
             size="sm"
@@ -272,6 +281,7 @@ function Users() {
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Actualizar
           </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">

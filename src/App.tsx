@@ -175,7 +175,6 @@ function App() {
 
           {/* Rutas no protegidas */}
           <Route path="/marcas-gt/login" element={<Login />} />
-          <Route path="/marcas-gt/register" element={<CreateUser />} />
 
           {/* Rutas protegidas con Layout */}
           <Route element={<MarcasLayout />}>
@@ -1127,6 +1126,14 @@ function App() {
               element={
                 <ProtectedRouteAdmin>
                   <Users />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/register"
+              element={
+                <ProtectedRouteAdmin>
+                  <CreateUser />
                 </ProtectedRouteAdmin>
               }
             />
