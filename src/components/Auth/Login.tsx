@@ -1,132 +1,143 @@
-import { useState } from "react";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import {
-  Card,
-  CardContent,
-  // CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL;
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LogIn } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-import logo from "../../assets/images/logoEmpresa.png";
-
-import { toast, Toaster } from "sonner";
+import logo from "@/assets/images/logoEmpresa.png";
 import { useStore } from "@/Context/ContextSucursal";
+import { useLogin } from "@/features/auth/api/auth.mutations";
+import { getLoginHome } from "@/features/auth/api/auth.types";
+import {
+  loginResponseSchema,
+  loginSchema,
+  type LoginFormValues,
+} from "@/features/auth/schemas/login.schemas";
+import { useAppFormHandlers } from "@/ui/components/app/handlers";
+import { AppForm, AppFormInput, AppFormSubmit } from "@/ui/components/app/form";
+import { AppAlert } from "@/ui/components/app/primitives/app-alert";
+import { AppCard } from "@/ui/components/app/primitives/app-card";
+import { AppContainer } from "@/ui/components/app/primitives/app-container";
+import { AppStack } from "@/ui/components/app/primitives/app-stack";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const setAuthSession = useStore((state) => state.setAuthSession);
+  const login = useLogin();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { correo: "", contrasena: "" },
+    mode: "onTouched",
   });
+  const handlers = useAppFormHandlers(form);
 
-  const validateEmail = (email: string) => {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return re.test(email);
-  };
+  const onSubmit = async (values: LoginFormValues) => {
+    form.clearErrors("root");
 
-  const validatePassword = (password: string) => {
-    return password.length >= 8;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors = { email: "", password: "" };
-
-    if (!validateEmail(email)) {
-      newErrors.email = "Ingresa un correco valido";
-    }
-
-    if (!validatePassword(password)) {
-      newErrors.password = "La contraseña debe tener 8 caracteres minimo";
-    }
-
-    setErrors(newErrors);
-
-    if (Object.values(newErrors).every((error) => error === "")) {
-      // Aquí enviarías los datos al backend
-      loginUser();
-    }
-  };
-
-  const loginUser = async () => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        correo: email,
-        contrasena: password,
-      });
+      const response = await login.mutateAsync(values);
+      const parsed = loginResponseSchema.safeParse(response);
 
-      if (response.data.authToken && response.data.usuario) {
-        setAuthSession({
-          authToken: response.data.authToken,
-          usuario: response.data.usuario,
+      if (!parsed.success) {
+        form.setError("root", {
+          type: "server",
+          message: "La respuesta del servidor no contiene una sesión válida.",
         });
-
-        toast.success("Usuario logueado");
-
-        window.location.href = "/marcas-gt/dashboard";
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      toast.warning("Credenciales incorrectas");
+
+      const { authToken, usuario } = parsed.data;
+      if (!usuario.activo) {
+        form.setError("root", {
+          type: "server",
+          message: "Esta cuenta está inactiva. Contacta al administrador.",
+        });
+        return;
+      }
+
+      const empresaId = usuario.empresaId;
+      if (!empresaId) {
+        form.setError("root", {
+          type: "server",
+          message: "Tu cuenta no tiene una empresa asignada. Contacta al administrador.",
+        });
+        return;
+      }
+
+      // Impedir que queden visibles consultas de un usuario anterior
+      // cuando se inicia sesión con otra cuenta en el mismo navegador.
+      queryClient.clear();
+      setAuthSession({ authToken, usuario: { ...usuario, empresaId } });
+      handlers.reset();
+      toast.success("Sesión iniciada correctamente.");
+      navigate(getLoginHome(usuario.rol), { replace: true });
+    } catch {
+      // useLogin ya notifica los errores HTTP; conservar los campos.
     }
   };
-
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full">
-      <Toaster position="top-right" />
-      <Card className="w-full max-w-md md:max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-center">Login</CardTitle>
+    <div className="flex min-h-[100dvh] items-center justify-center px-4 py-8">
+      <AppContainer size="md" paddingX="none" className="w-full">
+        <AppCard
+          size="md"
+          title="Iniciar sesión"
+          description="Accede con las credenciales de tu cuenta de MARCAS."
+          className="mx-auto w-full max-w-md"
+        >
+          <AppStack gap="lg">
+            <div className="flex justify-center">
+              <img
+                src={logo}
+                alt="MARCAS GT"
+                className="h-auto max-h-24 w-auto max-w-[180px] object-contain"
+              />
+            </div>
 
-          <div className="flex justify-center items-center">
-            <img src={logo} alt="Logo" height={90} width={160} />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Ingrese su email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                aria-invalid={errors.email ? "true" : "false"}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Ingrese su contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                aria-invalid={errors.password ? "true" : "false"}
-              />
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password}</p>
-              )}
-            </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            <AppForm form={form} onSubmit={onSubmit}>
+              <AppStack gap="md">
+                <AppFormInput<LoginFormValues>
+                  name="correo"
+                  label="Correo electrónico"
+                  type="email"
+                  autoComplete="username"
+                  placeholder="correo@empresa.com"
+                  required
+                />
+
+                <AppFormInput<LoginFormValues>
+                  name="contrasena"
+                  label="Contraseña"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Ingresa tu contraseña"
+                  required
+                />
+
+                {form.formState.errors.root?.message ? (
+                  <AppAlert
+                    tone="danger"
+                    title="No se pudo iniciar sesión"
+                    description={form.formState.errors.root.message}
+                  />
+                ) : null}
+
+                <AppFormSubmit<LoginFormValues>
+                  className="w-full"
+                  leftIcon={<LogIn />}
+                  loadingText="Verificando..."
+                  disabled={login.isPending}
+                >
+                  Iniciar sesión
+                </AppFormSubmit>
+              </AppStack>
+            </AppForm>
+          </AppStack>
+        </AppCard>
+      </AppContainer>
     </div>
   );
 }

@@ -24,5 +24,7 @@ jobs:
         run: node scripts/check-admin-sidebar.mjs
       - name: Check user registration
         run: node scripts/check-user-registration.mjs
+      - name: Check login contracts
+        run: node scripts/check-login.mjs
       - name: TypeScript and Vite build
         run: npm run build
