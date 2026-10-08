@@ -18,6 +18,7 @@ import {
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 
 import type { TrackingRealtimeView } from "../api/tracking.types";
+import { fitTrackingLiveViewport } from "./tracking-live-viewport";
 
 type TrackingMapControlsProps = {
   rows: TrackingRealtimeView[];
@@ -44,28 +45,7 @@ export function TrackingMapControls({
   const rowsWithLocation = rows.filter((row) => row.ubicacion !== null);
 
   const fitAll = () => {
-    if (rowsWithLocation.length === 0) {
-      return;
-    }
-
-    const bounds = new google.maps.LatLngBounds();
-
-    rowsWithLocation.forEach((row) => {
-      if (!row.ubicacion) {
-        return;
-      }
-
-      bounds.extend({
-        lat: row.ubicacion.latitud,
-        lng: row.ubicacion.longitud,
-      });
-    });
-
-    map.fitBounds(bounds, 64);
-
-    if (rowsWithLocation.length === 1) {
-      map.setZoom(16);
-    }
+    fitTrackingLiveViewport(map, rowsWithLocation);
   };
 
   const toggleMapType = () => {

@@ -9,6 +9,7 @@ import {
 } from "./tracking-google-compat";
 
 import { Flag, MapPinned, Navigation } from "lucide-react";
+import { TrackingAnimatedReplayMarker } from "./tracking-animated-replay-marker";
 
 import { AppBadge } from "@/ui/components/app/primitives/app-badge";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
@@ -150,17 +151,10 @@ export function TrackingAttendanceRouteMap({ locations, cursorPoint = null, play
               </AdvancedMarker>
             ) : null}
 
-            {replayPoint ? (
-              <AdvancedMarker
-                position={{ lat: replayPoint.latitud, lng: replayPoint.longitud }}
-                title="Ubicación seleccionada en la línea de tiempo"
-                zIndex={200}
-              >
-                <div className="flex size-10 items-center justify-center rounded-full border-[3px] border-white bg-emerald-500 text-white shadow-xl ring-2 ring-emerald-400/40">
-                  <Navigation className="h-4 w-4" />
-                </div>
-              </AdvancedMarker>
-            ) : null}
+            <TrackingAnimatedReplayMarker
+              location={replayPoint}
+              route={visibleLocations}
+            />
 
             {last && last.id !== first?.id ? (
               <AdvancedMarker
@@ -282,8 +276,10 @@ function ReplayCamera({ location }: { location: TrackingLocation }) {
   const map = useMap();
   React.useEffect(() => {
     if (!map) return;
-    map.panTo({lat: location.latitud, lng: location.longitud});
-    if ((map.getZoom() ?? 0) < 15) map.setZoom(15);
+    const target = {lat: location.latitud, lng: location.longitud};
+    // Evitar mover la cámara en cada paso si el cursor ya es visible:
+    // se mueve el pin, no todo el mapa.
+    if (!map.getBounds()?.contains(target)) map.panTo(target);
   }, [map, location.latitud, location.longitud]);
   return null;
 }

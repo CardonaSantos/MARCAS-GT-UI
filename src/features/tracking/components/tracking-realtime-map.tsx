@@ -33,6 +33,7 @@ const handleOpenWhatsapp = (value: string) => "https://wa.me/" + value.replace(/
 import type { TrackingRealtimeView } from "../api/tracking.types";
 
 import { TrackingMapControls } from "./tracking-map-controls";
+import { fitTrackingLiveViewport } from "./tracking-live-viewport";
 
 type TrackingRealtimeMapProps = {
   rows: TrackingRealtimeView[];
@@ -227,43 +228,15 @@ function TrackingInitialBounds({
     [rows],
   );
 
-  const previousIdsRef = React.useRef<string | null>(null);
+  const fittedRef = React.useRef<{ map: google.maps.Map; ids: string } | null>(null);
 
   React.useEffect(() => {
-    if (!map || selectedId !== null) {
-      return;
-    }
-
-    if (previousIdsRef.current === idsKey) {
-      return;
-    }
-
-    previousIdsRef.current = idsKey;
-
-    const visibleRows = rows.filter((row) => row.ubicacion !== null);
-
-    if (visibleRows.length === 0) {
-      return;
-    }
-
-    const bounds = new google.maps.LatLngBounds();
-
-    visibleRows.forEach((row) => {
-      if (!row.ubicacion) {
-        return;
-      }
-
-      bounds.extend({
-        lat: row.ubicacion.latitud,
-        lng: row.ubicacion.longitud,
-      });
-    });
-
-    map.fitBounds(bounds, 64);
-
-    if (visibleRows.length === 1) {
-      map.setZoom(16);
-    }
+    if (!map || selectedId !== null) return;
+    // Solo recalcular cuando cambia el conjunto de usuarios o se reemplaza
+    // la instancia del mapa. Un heartbeat NO altera el zoom del operador.
+    if (fittedRef.current?.map === map && fittedRef.current.ids === idsKey) return;
+    fittedRef.current = { map, ids: idsKey };
+    fitTrackingLiveViewport(map, rows);
   }, [idsKey, map, rows, selectedId]);
 
   return null;
