@@ -11,6 +11,7 @@ export const marcasEndpoints = {
 
   categories: {
     root: "/categories",
+    detail: (id: number) => `/categories/${id}`,
   },
 
   products: {

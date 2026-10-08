@@ -30,5 +30,7 @@ jobs:
         run: node scripts/check-order-filters.mjs
       - name: Check product registration structure
         run: node scripts/check-create-product.mjs
+      - name: Check category management
+        run: node scripts/check-categories.mjs
       - name: TypeScript and Vite build
         run: npm run build
