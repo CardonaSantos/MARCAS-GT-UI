@@ -9,6 +9,10 @@ export const marcasEndpoints = {
     changePassword: (id: number) => `/users/change-password/${id}`,
   },
 
+  categories: {
+    root: "/categories",
+  },
+
   products: {
     root: "/product",
     search: "/product/search",

@@ -24,6 +24,7 @@ export function createQueryKeys(scope: string) {
 export const marcasQueryKeys = {
   bodegas: createQueryKeys("bodegas"),
   productos: createQueryKeys("productos"),
+  categorias: createQueryKeys("categorias"),
   proveedores: createQueryKeys("proveedores"),
   usuarios: createQueryKeys("usuarios"),
   clientes: createQueryKeys("clientes"),
