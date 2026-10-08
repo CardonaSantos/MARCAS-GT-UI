@@ -43,11 +43,14 @@ function FitToContent({ coordinates, signature }: {coordinates: LatLngExpression
   return null;
 }
 
-function FocusEmployee({ coordinate }: {coordinate: LatLngExpression | null}) {
+function FocusEmployee({ coordinate, selectedId }: {coordinate: LatLngExpression | null; selectedId: number | null}) {
   const map = useMap();
+  const latest = useRef(coordinate);
+  latest.current = coordinate;
+  // Follow an explicit selection, not every GPS heartbeat.
   useEffect(() => {
-    if (coordinate) map.flyTo(coordinate, Math.max(map.getZoom(), 14), { duration: 0.45 });
-  }, [map, coordinate]);
+    if (latest.current) map.flyTo(latest.current, Math.max(map.getZoom(), 14), { duration: 0.45 });
+  }, [map, selectedId]);
   return null;
 }
 
@@ -85,7 +88,7 @@ export function TrackingMap({ employees = [], segments = [], selectedId = null, 
         </LayersControl>
         <ScaleControl position="bottomleft" />
         <FitToContent coordinates={coordinates} signature={identity} />
-        <FocusEmployee coordinate={focus} />
+        <FocusEmployee coordinate={focus} selectedId={selectedId} />
         {validSegments.map((segment, index) => (
           <Polyline
             key={segment.id}

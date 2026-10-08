@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CalendarDays, MapPinned, Route, Timer, TriangleAlert } from "lucide-react";
+import { CalendarDays, MapPinned, Route, Timer } from "lucide-react";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import { useTrackingAttendance, useTrackingLocations } from "@/features/tracking/api/tracking.queries";
 import {
