@@ -1,10 +1,6 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
-import {
-  useFieldArray,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 
 import { useStore } from "@/Context/ContextSucursal";
 import { useVisitSelectables } from "@/features/common/catalogs/catalog.queries";
@@ -102,11 +98,7 @@ export function OrderFormFields() {
 
   return (
     <AppStack gap="md">
-      <AppCard
-        title="Datos comerciales"
-        description="Cliente, vendedor, visita relacionada y condición de pago."
-        size="sm"
-      >
+      <AppCard title="Datos comerciales" description="" size="sm">
         <AppGrid cols={{ base: 1, md: 2 }} gap="md">
           <OrderCustomerFormSelect<OrderFormValues>
             name="clienteId"
@@ -188,7 +180,8 @@ export function OrderFormFields() {
         <AppStack gap="sm">
           {fields.length === 0 ? (
             <div className="rounded-md border border-dashed border-[hsl(var(--app-border))] p-6 text-center text-sm text-[hsl(var(--app-muted-foreground))]">
-              El borrador puede guardarse sin productos. Agrega al menos uno antes de solicitar validación.
+              El borrador puede guardarse sin productos. Agrega al menos uno
+              antes de solicitar validación.
             </div>
           ) : null}
 

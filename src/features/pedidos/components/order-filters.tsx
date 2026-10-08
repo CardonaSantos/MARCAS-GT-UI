@@ -93,9 +93,6 @@ export function OrderFilters(props: OrderFiltersProps) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-sm font-semibold">Filtros de pedidos</h3>
-          <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
-            Encuentra pedidos por cliente, vendedor, estado o fecha de creación.
-          </p>
         </div>
         <AppButton
           type="button"
@@ -111,7 +108,9 @@ export function OrderFilters(props: OrderFiltersProps) {
 
       <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="min-w-0">
-          <label className={labelClass} htmlFor="orders-search">Buscar pedido</label>
+          <label className={labelClass} htmlFor="orders-search">
+            Buscar pedido
+          </label>
           <AppSearchInput
             id="orders-search"
             value={props.search}
@@ -122,7 +121,9 @@ export function OrderFilters(props: OrderFiltersProps) {
         </div>
 
         <div className="min-w-0">
-          <label className={labelClass} htmlFor="orders-state">Estado del pedido</label>
+          <label className={labelClass} htmlFor="orders-state">
+            Estado del pedido
+          </label>
           <AppSingleSelect<OrderState>
             inputId="orders-state"
             value={props.estado}
@@ -133,7 +134,9 @@ export function OrderFilters(props: OrderFiltersProps) {
         </div>
 
         <div className="min-w-0">
-          <label className={labelClass} htmlFor="orders-customer">Cliente</label>
+          <label className={labelClass} htmlFor="orders-customer">
+            Cliente
+          </label>
           <OrderCustomerSelect
             inputId="orders-customer"
             value={props.clienteId}
@@ -143,7 +146,9 @@ export function OrderFilters(props: OrderFiltersProps) {
         </div>
 
         <div className="min-w-0">
-          <label className={labelClass} htmlFor="orders-seller">Vendedor</label>
+          <label className={labelClass} htmlFor="orders-seller">
+            Vendedor
+          </label>
           <OrderSellerSelect
             inputId="orders-seller"
             value={props.vendedorId}
@@ -154,10 +159,14 @@ export function OrderFilters(props: OrderFiltersProps) {
       </div>
 
       <fieldset className="min-w-0 rounded-md border border-[hsl(var(--app-border))] p-3">
-        <legend className="px-1 text-xs font-semibold">Pago y seguimiento</legend>
+        <legend className="px-1 text-xs font-semibold">
+          Pago y seguimiento
+        </legend>
         <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className="min-w-0">
-            <label className={labelClass} htmlFor="orders-payment-state">Estado de pago</label>
+            <label className={labelClass} htmlFor="orders-payment-state">
+              Estado de pago
+            </label>
             <AppSingleSelect<OrderPaymentState>
               inputId="orders-payment-state"
               value={props.estadoPago}
@@ -168,7 +177,9 @@ export function OrderFilters(props: OrderFiltersProps) {
           </div>
 
           <div className="min-w-0">
-            <label className={labelClass} htmlFor="orders-payment-condition">Condición de pago</label>
+            <label className={labelClass} htmlFor="orders-payment-condition">
+              Condición de pago
+            </label>
             <AppSingleSelect<OrderPaymentCondition>
               inputId="orders-payment-condition"
               value={props.condicionPago}
@@ -179,20 +190,28 @@ export function OrderFilters(props: OrderFiltersProps) {
           </div>
 
           <div className="min-w-0">
-            <label className={labelClass} htmlFor="orders-visit">Visita vinculada</label>
+            <label className={labelClass} htmlFor="orders-visit">
+              Visita vinculada
+            </label>
             <OrderVisitSelect
               inputId="orders-visit"
               value={props.visitaId}
               clienteId={props.clienteId}
               vendedorId={props.vendedorId}
               onChange={props.onVisitaChange}
-              placeholder={visitEnabled ? "Todas las visitas" : "Selecciona cliente o vendedor"}
+              placeholder={
+                visitEnabled
+                  ? "Todas las visitas"
+                  : "Selecciona cliente o vendedor"
+              }
               isDisabled={!visitEnabled}
             />
           </div>
 
           <div className="min-w-0">
-            <label className={labelClass} htmlFor="orders-only-open">Tipo de pedidos</label>
+            <label className={labelClass} htmlFor="orders-only-open">
+              Tipo de pedidos
+            </label>
             <AppSingleSelect
               inputId="orders-only-open"
               value={props.soloAbiertos ? "open" : "all"}
@@ -205,20 +224,17 @@ export function OrderFilters(props: OrderFiltersProps) {
             />
           </div>
         </div>
-        <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
-          Al elegir un nuevo cliente o vendedor, se restablece la visita vinculada.
-          El filtro «Solo abiertos» reemplaza cualquier estado de pedido específico.
-        </p>
       </fieldset>
 
       <fieldset className="min-w-0 rounded-md border border-[hsl(var(--app-border))] p-3">
-        <legend className="px-1 text-xs font-semibold">Fecha de creación del pedido</legend>
-        <p className="mb-2 text-xs text-[hsl(var(--app-muted-foreground))]">
-          Filtra por el día en que se registró el pedido, no por su fecha de entrega o pago.
-        </p>
+        <legend className="px-1 text-xs font-semibold">
+          Fecha de creación del pedido
+        </legend>
         <div className="grid min-w-0 max-w-2xl gap-3 sm:grid-cols-2">
           <div className="min-w-0">
-            <label className={labelClass} htmlFor="orders-created-from">Desde</label>
+            <label className={labelClass} htmlFor="orders-created-from">
+              Desde
+            </label>
             <AppDatePicker
               id="orders-created-from"
               value={props.fechaDesde}
@@ -230,7 +246,9 @@ export function OrderFilters(props: OrderFiltersProps) {
             />
           </div>
           <div className="min-w-0">
-            <label className={labelClass} htmlFor="orders-created-to">Hasta</label>
+            <label className={labelClass} htmlFor="orders-created-to">
+              Hasta
+            </label>
             <AppDatePicker
               id="orders-created-to"
               value={props.fechaHasta}

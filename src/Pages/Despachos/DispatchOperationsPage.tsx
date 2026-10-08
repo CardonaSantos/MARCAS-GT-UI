@@ -82,7 +82,7 @@ export default function DispatchOperationsPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Operaciones de despacho"
-          description="Audita las sagas de reserva, salida y liberación. Las operaciones fallidas deben reintentarse, no duplicarse."
+          description="Audita las sagas de reserva, salida y liberación."
           backTo={
             (location.state as { from?: string } | null)?.from ??
             "/marcas-gt/despachos"
@@ -134,9 +134,7 @@ export default function DispatchOperationsPage() {
               />
               <DispatchUserSelect
                 value={usuarioId}
-                onChange={(value) =>
-                  update({ usuarioId: value, page: 1 })
-                }
+                onChange={(value) => update({ usuarioId: value, page: 1 })}
                 placeholder="Usuario"
               />
               <AppDatePicker

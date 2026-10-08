@@ -21,7 +21,11 @@ function emptyLine(): TransferDraftLine {
   };
 }
 
-export type TransferAvailabilityStatus = { productoId: number; bodegaOrigenId: number; disponible: number | null };
+export type TransferAvailabilityStatus = {
+  productoId: number;
+  bodegaOrigenId: number;
+  disponible: number | null;
+};
 
 function TransferLineAvailability({
   productoId,
@@ -39,10 +43,13 @@ function TransferLineAvailability({
     Boolean(productoId && bodegaOrigenId),
   );
 
-  const warehouse = query.data?.bodegas.find((item) => item.bodegaId === bodegaOrigenId);
+  const warehouse = query.data?.bodegas.find(
+    (item) => item.bodegaId === bodegaOrigenId,
+  );
   const disponible = query.isSuccess ? (warehouse?.disponible ?? 0) : null;
   useEffect(() => {
-    if (productoId && bodegaOrigenId) onAvailabilityChange?.({ productoId, bodegaOrigenId, disponible });
+    if (productoId && bodegaOrigenId)
+      onAvailabilityChange?.({ productoId, bodegaOrigenId, disponible });
   }, [productoId, bodegaOrigenId, disponible, onAvailabilityChange]);
 
   if (!productoId || !bodegaOrigenId) {
@@ -56,7 +63,9 @@ function TransferLineAvailability({
   if (query.isLoading || query.isError) {
     return (
       <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-        {query.isError ? "No se pudo consultar disponibilidad." : "Consultando disponibilidad..."}
+        {query.isError
+          ? "No se pudo consultar disponibilidad."
+          : "Consultando disponibilidad..."}
       </p>
     );
   }
@@ -64,14 +73,21 @@ function TransferLineAvailability({
   const available = disponible ?? 0;
   const quantity = Number(requested);
   const remaining =
-    Number.isFinite(quantity) && quantity > 0 ? available - quantity : available;
-  const enough = Number.isFinite(quantity) && quantity > 0
-    ? available >= quantity
-    : true;
+    Number.isFinite(quantity) && quantity > 0
+      ? available - quantity
+      : available;
+  const enough =
+    Number.isFinite(quantity) && quantity > 0 ? available >= quantity : true;
 
   return (
     <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-      <span className={enough ? "text-[hsl(var(--app-muted-foreground))]" : "font-medium text-red-500"}>
+      <span
+        className={
+          enough
+            ? "text-[hsl(var(--app-muted-foreground))]"
+            : "font-medium text-red-500"
+        }
+      >
         Disponible en origen: {available}
       </span>
       {Number.isFinite(quantity) && quantity > 0 ? (
@@ -110,9 +126,7 @@ export function TransferForm({
   );
 
   const origin = bodegas.find((item) => item.id === value.bodegaOrigenId);
-  const destination = bodegas.find(
-    (item) => item.id === value.bodegaDestinoId,
-  );
+  const destination = bodegas.find((item) => item.id === value.bodegaDestinoId);
   const totalUnits = value.detalles.reduce((total, line) => {
     const quantity = Number(line.cantidadSolicitada);
     return total + (Number.isFinite(quantity) ? quantity : 0);
@@ -143,7 +157,10 @@ export function TransferForm({
       >
         <div className="grid items-end gap-3 md:grid-cols-[1fr_auto_1fr]">
           <div>
-            <label htmlFor="transfer-origin" className="mb-1 block text-xs font-medium">
+            <label
+              htmlFor="transfer-origin"
+              className="mb-1 block text-xs font-medium"
+            >
               Bodega origen *
             </label>
             <AppSingleSelect<number>
@@ -159,9 +176,7 @@ export function TransferForm({
                     item.nombre +
                     (item.esPrincipal ? " · Principal" : ""),
                 }))}
-              onChange={(next) =>
-                onChange({ ...value, bodegaOrigenId: next })
-              }
+              onChange={(next) => onChange({ ...value, bodegaOrigenId: next })}
               placeholder="Seleccionar origen"
               isDisabled={disabled}
             />
@@ -172,7 +187,10 @@ export function TransferForm({
           </div>
 
           <div>
-            <label htmlFor="transfer-destination" className="mb-1 block text-xs font-medium">
+            <label
+              htmlFor="transfer-destination"
+              className="mb-1 block text-xs font-medium"
+            >
               Bodega destino *
             </label>
             <AppSingleSelect<number>
@@ -188,9 +206,7 @@ export function TransferForm({
                     item.nombre +
                     (item.esPrincipal ? " · Principal" : ""),
                 }))}
-              onChange={(next) =>
-                onChange({ ...value, bodegaDestinoId: next })
-              }
+              onChange={(next) => onChange({ ...value, bodegaDestinoId: next })}
               placeholder="Seleccionar destino"
               isDisabled={disabled}
             />
@@ -200,17 +216,15 @@ export function TransferForm({
         {origin && destination ? (
           <div className="mt-3 rounded-md border border-[hsl(var(--app-border))] p-3 text-sm">
             <span className="font-medium">{origin.nombre}</span>
-            <span className="mx-2 text-[hsl(var(--app-muted-foreground))]">→</span>
+            <span className="mx-2 text-[hsl(var(--app-muted-foreground))]">
+              →
+            </span>
             <span className="font-medium">{destination.nombre}</span>
           </div>
         ) : null}
       </AppCard>
 
-      <AppCard
-        title="Productos a trasladar"
-        description="La UI consulta la disponibilidad actual del origen. El server volverá a validarla al preparar la transferencia."
-        size="sm"
-      >
+      <AppCard title="Productos a trasladar" description="" size="sm">
         <div className="space-y-2">
           {value.detalles.length === 0 ? (
             <AppAlert

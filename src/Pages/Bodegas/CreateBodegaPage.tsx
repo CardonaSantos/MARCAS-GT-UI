@@ -92,7 +92,7 @@ export default function CreateBodegaPage() {
                 <AppFormSingleSelect<CreateBodegaFormValues, number>
                   name="responsableId"
                   label="Responsable"
-                  description="Sólo se muestran usuarios activos con rol ADMIN o BODEGA."
+                  description=""
                   options={responsibleOptions}
                   placeholder="Seleccionar responsable"
                   isLoading={responsibleQuery.isLoading}
@@ -101,7 +101,7 @@ export default function CreateBodegaPage() {
                 <AppFormSwitch<CreateBodegaFormValues>
                   name="esPrincipal"
                   fieldLabel="Bodega principal"
-                  fieldDescription="Si no existe una bodega principal, el backend establecerá automáticamente la primera."
+                  fieldDescription=""
                   label="Establecer como principal"
                 />
               </AppStack>

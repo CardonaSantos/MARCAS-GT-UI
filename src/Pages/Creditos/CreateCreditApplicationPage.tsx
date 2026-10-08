@@ -67,7 +67,7 @@ export default function CreateCreditApplicationPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Nueva solicitud de crédito"
-          description="Abre un expediente para un pedido CREDITO pendiente de validación."
+          description=""
           backTo={backTo}
           backLabel="Volver a solicitudes"
         />

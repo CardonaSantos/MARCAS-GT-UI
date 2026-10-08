@@ -30,15 +30,21 @@ export default function CreateTransferPage() {
 
   const [draft, setDraft] = useState<TransferDraft>(() => newTransferDraft());
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [availability, setAvailability] = useState<Record<string, number | null>>({});
-  const onAvailabilityChange = useCallback((status: TransferAvailabilityStatus) => {
-    const lookup = `${status.bodegaOrigenId}:${status.productoId}`;
-    setAvailability((previous) =>
-      Object.prototype.hasOwnProperty.call(previous, lookup) && previous[lookup] === status.disponible
-        ? previous
-        : { ...previous, [lookup]: status.disponible },
-    );
-  }, []);
+  const [availability, setAvailability] = useState<
+    Record<string, number | null>
+  >({});
+  const onAvailabilityChange = useCallback(
+    (status: TransferAvailabilityStatus) => {
+      const lookup = `${status.bodegaOrigenId}:${status.productoId}`;
+      setAvailability((previous) =>
+        Object.prototype.hasOwnProperty.call(previous, lookup) &&
+        previous[lookup] === status.disponible
+          ? previous
+          : { ...previous, [lookup]: status.disponible },
+      );
+    },
+    [],
+  );
 
   const bodegasQuery = useBodegaSelectables({ limit: 100 });
   const productsQuery = useProductSelectables();
@@ -47,7 +53,8 @@ export default function CreateTransferPage() {
   const errors = useMemo(() => validateTransferDraft(draft), [draft]);
   const availabilityError = draft.detalles.some((line) => {
     if (!draft.bodegaOrigenId || !line.productoId) return false;
-    const available = availability[`${draft.bodegaOrigenId}:${line.productoId}`];
+    const available =
+      availability[`${draft.bodegaOrigenId}:${line.productoId}`];
     return available == null || Number(line.cantidadSolicitada) > available;
   });
   const canReview = errors.length === 0 && !availabilityError;
@@ -72,7 +79,7 @@ export default function CreateTransferPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Nueva transferencia"
-          description="Crea un borrador de traslado interno. Guardarlo todavía no reserva ni mueve inventario."
+          description=""
           backTo={backTo}
           backLabel="Volver a transferencias"
           actions={
@@ -132,8 +139,7 @@ export default function CreateTransferPage() {
             <p>
               <strong>Unidades:</strong>{" "}
               {draft.detalles.reduce(
-                (total, line) =>
-                  total + (Number(line.cantidadSolicitada) || 0),
+                (total, line) => total + (Number(line.cantidadSolicitada) || 0),
                 0,
               )}
             </p>

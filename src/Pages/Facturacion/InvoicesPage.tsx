@@ -54,14 +54,20 @@ export default function InvoicesPage() {
           actions={
             <>
               <AppButton asChild variant="secondary" size="sm">
-                <Link to="/marcas-gt/facturacion/cuentas-por-cobrar" state={{ from: currentUrl }}>
+                <Link
+                  to="/marcas-gt/facturacion/cuentas-por-cobrar"
+                  state={{ from: currentUrl }}
+                >
                   <Landmark className="h-4 w-4" />
                   Cuentas por cobrar
                 </Link>
               </AppButton>
               {role !== "VENDEDOR" ? (
                 <AppButton asChild variant="secondary" size="sm">
-                  <Link to="/marcas-gt/facturacion/reportes/operacion" state={{ from: currentUrl }}>
+                  <Link
+                    to="/marcas-gt/facturacion/reportes/operacion"
+                    state={{ from: currentUrl }}
+                  >
                     <BarChart3 className="h-4 w-4" />
                     Reporte operativo
                   </Link>
@@ -69,7 +75,10 @@ export default function InvoicesPage() {
               ) : null}
               {canOperate ? (
                 <AppButton asChild variant="secondary" size="sm">
-                  <Link to="/marcas-gt/facturacion/configuracion-fiscal" state={{ from: currentUrl }}>
+                  <Link
+                    to="/marcas-gt/facturacion/configuracion-fiscal"
+                    state={{ from: currentUrl }}
+                  >
                     <Settings2 className="h-4 w-4" />
                     Configuración fiscal
                   </Link>
@@ -77,7 +86,10 @@ export default function InvoicesPage() {
               ) : null}
               {canOperate ? (
                 <AppButton asChild variant="primary" size="sm">
-                  <Link to="/marcas-gt/facturacion/facturas/nueva" state={{ from: currentUrl }}>
+                  <Link
+                    to="/marcas-gt/facturacion/facturas/nueva"
+                    state={{ from: currentUrl }}
+                  >
                     <FilePlus2 className="h-4 w-4" />
                     Nueva factura
                   </Link>
@@ -90,7 +102,7 @@ export default function InvoicesPage() {
         <AppAlert
           tone="info"
           title="FEL todavía sin certificación externa"
-          description="La UI permite crear borradores y preparar el DTE. No mostrará acciones falsas de certificación mientras Grupo CDS no esté habilitado en el servidor."
+          description="Crear borradores y preparar el DTE. Certificación FEL pendiente."
         />
 
         {summaryCompatible ? (
@@ -129,15 +141,29 @@ export default function InvoicesPage() {
               onSearchChange={state.table.setSearch}
               onSearchDebouncedChange={state.table.setServerSearch}
               onEstadoChange={(value) => state.setFilter("estado", value)}
-              onEstadoFiscalChange={(value) => state.setFilter("estadoFiscal", value)}
+              onEstadoFiscalChange={(value) =>
+                state.setFilter("estadoFiscal", value)
+              }
               onClienteChange={(value) => state.setFilter("clienteId", value)}
               onVendedorChange={(value) => state.setFilter("vendedorId", value)}
-              onCondicionPagoChange={(value) => state.setFilter("condicionPago", value)}
-              onSoloPendientesFelChange={(value) => state.setFilter("soloPendientesFel", value)}
-              onSoloErroresFelChange={(value) => state.setFilter("soloErroresFel", value)}
-              onSoloInciertasChange={(value) => state.setFilter("soloInciertas", value)}
-              onFechaDesdeChange={(value) => state.setFilter("fechaDesde", value)}
-              onFechaHastaChange={(value) => state.setFilter("fechaHasta", value)}
+              onCondicionPagoChange={(value) =>
+                state.setFilter("condicionPago", value)
+              }
+              onSoloPendientesFelChange={(value) =>
+                state.setFilter("soloPendientesFel", value)
+              }
+              onSoloErroresFelChange={(value) =>
+                state.setFilter("soloErroresFel", value)
+              }
+              onSoloInciertasChange={(value) =>
+                state.setFilter("soloInciertas", value)
+              }
+              onFechaDesdeChange={(value) =>
+                state.setFilter("fechaDesde", value)
+              }
+              onFechaHastaChange={(value) =>
+                state.setFilter("fechaHasta", value)
+              }
               onReset={state.resetFilters}
             />
           }

@@ -62,7 +62,8 @@ export default function Login() {
       if (!empresaId) {
         form.setError("root", {
           type: "server",
-          message: "Tu cuenta no tiene una empresa asignada. Contacta al administrador.",
+          message:
+            "Tu cuenta no tiene una empresa asignada. Contacta al administrador.",
         });
         return;
       }
@@ -84,9 +85,9 @@ export default function Login() {
       <AppContainer size="md" paddingX="none" className="w-full">
         <AppCard
           size="md"
-          title="Iniciar sesión"
-          description="Accede con las credenciales de tu cuenta de MARCAS."
-          className="mx-auto w-full max-w-md"
+          title=""
+          description=""
+          className="mx-auto w-full max-w-md text-center p-2"
         >
           <AppStack gap="lg">
             <div className="flex justify-center">

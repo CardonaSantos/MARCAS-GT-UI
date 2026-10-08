@@ -37,7 +37,7 @@ export default function CreditApplicationsPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Solicitudes de crédito"
-          description="Gestiona el expediente de crédito vinculado a pedidos CREDITO."
+          description="Gestionar el expediente de crédito vinculado a pedidos CREDITO."
           actions={
             <>
               <AppButton asChild variant="secondary" size="sm">

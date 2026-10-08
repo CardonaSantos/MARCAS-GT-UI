@@ -8,9 +8,7 @@ import { useProductSelectables } from "@/features/common/catalogs/catalog.querie
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import { getReturnRoute } from "@/features/common/navigation/route-state";
 import { useCreateOrder } from "@/features/pedidos/api/order.mutations";
-import {
-  toCreateOrderPayload,
-} from "@/features/pedidos/common/order.mappers";
+import { toCreateOrderPayload } from "@/features/pedidos/common/order.mappers";
 import { validateOrderDraftDiscounts } from "@/features/pedidos/common/order-form.utils";
 import { OrderFormFields } from "@/features/pedidos/components/order-form-fields";
 import {
@@ -80,7 +78,7 @@ export default function CreateOrderPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Nuevo pedido"
-          description="Crea un borrador comercial. Los precios son resueltos por el backend al guardar."
+          description=""
           backTo={backTo}
           backLabel="Volver a pedidos"
         />

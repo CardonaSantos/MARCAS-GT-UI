@@ -14,10 +14,7 @@ import { AppGrid } from "@/ui/components/app/primitives/app-grid";
 import { AppSearchInput } from "@/ui/components/app/primitives/app-search-input";
 import { AppStack } from "@/ui/components/app/primitives/app-stack";
 
-import {
-  useCreditOrderOptions,
-  useCreditPolicy,
-} from "../api/credit.queries";
+import { useCreditOrderOptions, useCreditPolicy } from "../api/credit.queries";
 import type { CreditApplicationFormValues } from "../schemas/credit.schemas";
 import { CreditPolicyFormSelect } from "./credit-selects";
 
@@ -79,11 +76,7 @@ export function CreditApplicationFormFields({
 
   return (
     <AppStack gap="md">
-      <AppCard
-        title="Pedido a crédito"
-        description="La solicitud se vincula a un pedido CREDITO pendiente de validación."
-        size="sm"
-      >
+      <AppCard title="Pedido a crédito" description="" size="sm">
         <AppStack gap="md">
           {!lockOrder ? (
             <AppSearchInput
@@ -152,11 +145,7 @@ export function CreditApplicationFormFields({
         </AppStack>
       </AppCard>
 
-      <AppCard
-        title="Condiciones solicitadas"
-        description="El monto debe coincidir con el total vigente del pedido. El anticipo no aplica en crédito puro."
-        size="sm"
-      >
+      <AppCard title="Condiciones solicitadas" description="" size="sm">
         <AppGrid cols={{ base: 1, md: 2 }} gap="md">
           <AppFormInput<CreditApplicationFormValues>
             name="montoSolicitado"
@@ -228,14 +217,6 @@ export function CreditApplicationFormFields({
             maxLength={1000}
             rows={4}
             placeholder="Contexto adicional de la solicitud."
-          />
-        </div>
-
-        <div className="mt-4">
-          <AppAlert
-            tone="info"
-            title="Crédito puro"
-            description="No se solicita anticipo en este flujo. El backend registra el anticipo propuesto en Q0.00."
           />
         </div>
       </AppCard>
