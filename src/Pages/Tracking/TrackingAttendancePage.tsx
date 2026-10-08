@@ -7,8 +7,7 @@ import {
   trackingBusinessDate, trackingCoordinateValid, trackingDateTime, trackingDuration,
 } from "@/features/tracking/api/tracking.types";
 import type { TrackingLocation } from "@/features/tracking/api/tracking.types";
-import { TrackingMap } from "@/features/tracking/components/tracking-map";
-import type { MapSegment } from "@/features/tracking/components/tracking-map";
+import { TrackingAttendanceRouteMap } from "@/features/tracking/components/tracking-attendance-route-map";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppCard } from "@/ui/components/app/primitives/app-card";
@@ -52,27 +51,6 @@ export default function TrackingAttendancePage() {
   // At first render the cursor is at the end: show the employee at the latest known GPS point.
   const selectedPoint: TrackingLocation | undefined = visiblePoints[visiblePoints.length - 1];
 
-  const segments = useMemo<MapSegment[]>(() => {
-    const buckets = new Map<number, TrackingLocation[]>();
-    points.forEach((point) => {
-      const key = point.sesionTrackingId ?? 0;
-      const bucket = buckets.get(key) ?? [];
-      bucket.push(point);
-      buckets.set(key, bucket);
-    });
-    return Array.from(buckets.entries()).map(([id, series]) => ({ id, points: series }));
-  }, [points]);
-  const playedSegments = useMemo<MapSegment[] | undefined>(() => {
-    if (cursor === null) return undefined;
-    const groups = new Map<number, TrackingLocation[]>();
-    visiblePoints.forEach((point) => {
-      const id = point.sesionTrackingId ?? 0;
-      const group = groups.get(id) ?? [];
-      group.push(point);
-      groups.set(id, group);
-    });
-    return Array.from(groups.entries()).map(([id, series]) => ({ id, points: series }));
-  }, [cursor, visiblePoints]);
   const total = locationQuery.data?.pages[0]?.total ?? 0;
   const loaded = loadedCount;
   const loadingRoute = locationQuery.isPending || (locationQuery.hasNextPage && loaded < autoLoadLimit);
@@ -119,7 +97,7 @@ export default function TrackingAttendancePage() {
                 ))}
               </div>
             </AppCard>
-            <AppCard title="Recorrido GPS" description="Los tramos se separan por sesión; los puntos se ordenan por fecha de captura, no por recepción en el servidor." size="sm">
+            <div className="space-y-3">
               <div className="mb-3 flex flex-wrap items-center gap-3">
                 <AppButton variant="secondary" size="sm" onClick={() => { setSessionId(undefined); setCursor(null); }} disabled={!sessionId}>Todas las sesiones</AppButton>
                 <label className="flex items-center gap-2 text-xs">
@@ -135,15 +113,11 @@ export default function TrackingAttendancePage() {
                   Reconstruyendo recorrido: {loaded} de {total} puntos GPS cargados…
                 </p>
               ) : null}
-              <TrackingMap height={490} segments={segments} playbackSegments={playedSegments}
-                focusPoint={cursor !== null ? selectedPoint ?? null : null}
-                employees={selectedPoint ? [{
-                  id: -1,
-                  nombre: (detail.usuario.nombre || "Empleado") + (cursor === null ? " · última ubicación" : " · ubicación seleccionada"),
-                  rol: detail.usuario.rol,
-                  latitud: selectedPoint.latitud, longitud: selectedPoint.longitud,
-                  capturadoEn: selectedPoint.capturadoEn, precision: selectedPoint.precision,
-                }] : []} />
+              <TrackingAttendanceRouteMap
+                locations={points}
+                playedLocations={cursor === null ? null : visiblePoints}
+                cursorPoint={cursor === null ? null : selectedPoint ?? null}
+              />
               {points.length > 0 ? (
                 <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
                   {cursor === null
@@ -176,7 +150,7 @@ export default function TrackingAttendancePage() {
                   </AppButton>
                 ) : null}
               </div>
-            </AppCard>
+            </div>
             <AppAlert tone="neutral" title="Criterio de auditoría"
               description="El trazado une muestras GPS disponibles de una misma sesión. No equivale a una ruta vial certificada; la precisión del GPS, los intervalos sin reporte y las ubicaciones ausentes pueden alterar su representación." />
           </>
