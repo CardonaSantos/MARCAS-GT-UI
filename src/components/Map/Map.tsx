@@ -1,10 +1,10 @@
 import {
   GoogleMap,
-  useLoadScript,
   Marker,
   InfoWindow,
 } from "@react-google-maps/api";
 import React, { useCallback, useMemo, useState } from "react";
+import { GoogleMapsProvider } from "@/features/common/maps/google-maps-provider";
 
 import dayjs from "dayjs";
 import "dayjs/locale/es";
@@ -107,14 +107,14 @@ export const InfoWindowContent: React.FC<InfoWindowContentProps> = ({
   );
 };
 
-const MyGoogleMap: React.FC<MyGoogleMapProps> = ({ locations }) => {
+const MyGoogleMap: React.FC<MyGoogleMapProps> = ({ locations }) => (
+  <GoogleMapsProvider><MyGoogleMapContent locations={locations} /></GoogleMapsProvider>
+);
+
+const MyGoogleMapContent: React.FC<MyGoogleMapProps> = ({ locations }) => {
   const [selectedLocation, setSelectedLocation] =
     useState<LocationReceived | null>(null);
   const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
-
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyD_hzrV-YS5EaHDm-UK3jL0ny6gsJoj_18",
-  });
 
   const mapContainerStyle = useMemo(
     () => ({
@@ -135,10 +135,6 @@ const MyGoogleMap: React.FC<MyGoogleMapProps> = ({ locations }) => {
   const mapOptions = useMemo(
     () => ({
       mapTypeControl: true,
-      mapTypeControlOptions: {
-        style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-        position: window.google.maps.ControlPosition.TOP_LEFT,
-      },
       streetViewControl: false,
       fullscreenControl: true,
     }),
@@ -154,9 +150,6 @@ const MyGoogleMap: React.FC<MyGoogleMapProps> = ({ locations }) => {
     setSelectedLocation(location);
     setIsInfoWindowOpen(true);
   }, []);
-
-  if (loadError) return <div>Error loading maps</div>;
-  if (!isLoaded) return <div>Loading Maps...</div>;
 
   return (
     <GoogleMap

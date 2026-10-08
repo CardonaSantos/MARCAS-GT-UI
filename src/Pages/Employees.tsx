@@ -16,11 +16,11 @@ import { useSocket } from "@/Context/SocketProvider ";
 //-------------------------------------------------
 import {
   GoogleMap,
-  useLoadScript,
   Marker,
   InfoWindow,
 } from "@react-google-maps/api";
 import React, { useCallback, useMemo } from "react";
+import { GoogleMapsProvider } from "@/features/common/maps/google-maps-provider";
 
 import dayjs from "dayjs";
 import "dayjs/locale/es";
@@ -196,13 +196,6 @@ const Employees: React.FC = () => {
     setSelectedLocation(null);
   }, []);
 
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyD_hzrV-YS5EaHDm-UK3jL0ny6gsJoj_18",
-  });
-
-  if (loadError) return <div>Error cargando el mapa.</div>;
-  if (!isLoaded) return <div>Cargando mapa...</div>;
-
   const InfoWindowContent: React.FC<{ location: LocationReceived }> = ({
     location,
   }) => {
@@ -274,6 +267,7 @@ const Employees: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 relative overflow-hidden">
+            <GoogleMapsProvider>
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
               zoom={13}
@@ -302,6 +296,7 @@ const Employees: React.FC = () => {
                 </InfoWindow>
               )}
             </GoogleMap>
+          </GoogleMapsProvider>
           </div>
         </CardContent>
       </Card>
