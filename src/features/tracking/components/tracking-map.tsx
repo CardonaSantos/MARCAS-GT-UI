@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { GoogleMap, InfoWindow, Marker, Polyline } from "@react-google-maps/api";
+import { GoogleMap, InfoWindow, Marker, OverlayView, Polyline } from "@react-google-maps/api";
 import { Layers, LocateFixed, Maximize2, Minus, Plus } from "lucide-react";
 
 import { GoogleMapsProvider } from "@/features/common/maps/google-maps-provider";
@@ -30,6 +30,8 @@ type Props = {
   playbackSegments?: MapSegment[];
   selectedId?: number | null;
   onSelect?: (id: number) => void;
+  /** When replaying, follow the explicit timeline cursor instead of fitting the full route. */
+  focusPoint?: { latitud: number; longitud: number } | null;
   height?: number;
 };
 
@@ -50,23 +52,12 @@ function toCoordinate(point: { latitud: number; longitud: number }): MapCoordina
   return { lat: point.latitud, lng: point.longitud };
 }
 
-function personMarkerIcon(person: MapEmployee, selected: boolean): google.maps.Icon {
-  // Native Google marker icons remain reliably visible at any zoom and map type.
-  const color = person.stale ? "#d97706" : person.rol === "ADMIN"
-    ? "#e11d48" : person.rol === "REPARTIDOR" ? "#d97706" : "#059669";
-  const stroke = selected ? "#38bdf8" : "#ffffff";
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="74" viewBox="0 0 64 74">
-    <path d="M32 69 23 49a25 25 0 1 1 18 0Z" fill="${color}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round"/>
-    <circle cx="32" cy="28" r="19" fill="${color}" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
-  </svg>`;
-  return {
-    url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-    scaledSize: new google.maps.Size(selected ? 58 : 52, selected ? 67 : 60),
-    anchor: new google.maps.Point(selected ? 29 : 26, selected ? 64 : 58),
-    labelOrigin: new google.maps.Point(selected ? 29 : 26, selected ? 26 : 23),
-  };
+function personColor(person: MapEmployee): string {
+  if (person.stale) return "#d97706";
+  if (person.rol === "ADMIN") return "#e11d48";
+  if (person.rol === "REPARTIDOR") return "#d97706";
+  return "#059669";
 }
-
 
 function MapAction({ label, onClick, children }: {
   label: string;
@@ -92,6 +83,7 @@ function GoogleTrackingMap({
   playbackSegments,
   selectedId = null,
   onSelect,
+  focusPoint = null,
   height = 500,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -126,8 +118,7 @@ function GoogleTrackingMap({
     [validSegments, validEmployees],
   );
 
-  // Stable identity: coordinates change frequently with GPS heartbeats.
-  // Only joining/leaving workers or sessions triggers an automatic fit.
+  // Only joining/leaving workers or loaded-route changes triggers an automatic fit.
   const identity = useMemo(
     () =>
       validSegments.map((segment) => segment.id + ":" + segment.points.length).sort().join(":") +
@@ -139,6 +130,9 @@ function GoogleTrackingMap({
   currentCoordinates.current = coordinates;
   const currentEmployees = useRef(validEmployees);
   currentEmployees.current = validEmployees;
+  const selectedPerson = validEmployees.find((person) => person.id === selectedId);
+  const selectedLatitude = selectedPerson?.latitud;
+  const selectedLongitude = selectedPerson?.longitud;
 
   const fitToContent = useCallback((map: google.maps.Map) => {
     const points = currentCoordinates.current;
@@ -150,7 +144,7 @@ function GoogleTrackingMap({
     }
     const bounds = new google.maps.LatLngBounds();
     points.forEach((point) => bounds.extend(point));
-    map.fitBounds(bounds, 55);
+    map.fitBounds(bounds, 80);
   }, []);
 
   const onMapLoad = useCallback((map: google.maps.Map) => {
@@ -162,17 +156,26 @@ function GoogleTrackingMap({
     mapRef.current = null;
   }, []);
 
+  // CRM-style camera: fit once per route change, then follow only a selected
+  // person or an explicit replay point. Do not recenter on every background GPS.
   useEffect(() => {
-    if (mapRef.current) fitToContent(mapRef.current);
-  }, [identity, fitToContent]);
+    const map = mapRef.current;
+    if (!map) return;
+    if (focusPoint && trackingCoordinateValid(focusPoint)) {
+      map.panTo(toCoordinate(focusPoint));
+      if ((map.getZoom() ?? 0) < 16) map.setZoom(16);
+    } else if (selectedId === null) {
+      fitToContent(map);
+    }
+  }, [identity, fitToContent, focusPoint?.latitud, focusPoint?.longitud, selectedId]);
 
   useEffect(() => {
     if (selectedId === null || !mapRef.current) return;
     const selected = currentEmployees.current.find((person) => person.id === selectedId);
     if (!selected) return;
     mapRef.current.panTo(toCoordinate(selected));
-    if ((mapRef.current.getZoom() ?? 0) < 14) mapRef.current.setZoom(14);
-  }, [selectedId]);
+    if ((mapRef.current.getZoom() ?? 0) < 16) mapRef.current.setZoom(16);
+  }, [selectedId, selectedLatitude, selectedLongitude]);
 
   useEffect(() => {
     if (openedId !== null && !validEmployees.some((person) => person.id === openedId)) {
@@ -277,25 +280,44 @@ function GoogleTrackingMap({
           ));
         })}
 
-        {validEmployees.map((person) => (
-          <Marker
-            key={"person-" + person.id}
-            position={toCoordinate(person)}
-            title={person.nombre + " · " + person.rol + " · GPS " + trackingDateTime(person.capturadoEn)}
-            zIndex={selectedId === person.id ? 200 : 100}
-            icon={personMarkerIcon(person, selectedId === person.id)}
-            label={{
-              text: (person.nombre.trim().charAt(0) || "?").toUpperCase(),
-              color: "#ffffff",
-              fontSize: selectedId === person.id ? "17px" : "16px",
-              fontWeight: "700",
-            }}
-            onClick={() => {
-              setOpenedId(person.id);
-              onSelect?.(person.id);
-            }}
-          />
-        ))}
+        {validEmployees.map((person) => {
+          const selected = selectedId === person.id;
+          const label = (person.nombre.trim().charAt(0) || "?").toUpperCase();
+          const color = personColor(person);
+          return (
+            <OverlayView
+              key={"person-" + person.id}
+              position={toCoordinate(person)}
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            >
+              <button
+                type="button"
+                aria-label={"Ver ubicación de " + person.nombre}
+                title={person.nombre + " · " + person.rol + " · GPS " + trackingDateTime(person.capturadoEn)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setOpenedId(person.id);
+                  onSelect?.(person.id);
+                }}
+                className="group relative flex flex-col items-center focus-visible:outline-none"
+                style={{ transform: "translate(-50%, -100%)", zIndex: selected ? 200 : 100 }}
+              >
+                <span
+                  className={"relative flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-white text-lg font-bold text-white shadow-xl ring-offset-2 transition-transform group-hover:scale-110 " +
+                    (selected ? "scale-110 ring-2 ring-sky-400" : "")}
+                  style={{ backgroundColor: color }}
+                >
+                  {selected ? <span className="absolute -inset-2 animate-ping rounded-full bg-sky-400/30" /> : null}
+                  <span className="relative">{label}</span>
+                </span>
+                <span className="-mt-px h-0 w-0 border-x-[7px] border-t-[10px] border-x-transparent" style={{ borderTopColor: color }} />
+                <span className="mt-1 max-w-[160px] truncate rounded bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-slate-900 shadow">
+                  {person.nombre}
+                </span>
+              </button>
+            </OverlayView>
+          );
+        })}
 
         {infoEmployee ? (
           <InfoWindow

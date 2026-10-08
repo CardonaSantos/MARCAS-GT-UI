@@ -117,8 +117,14 @@ export default function TrackingLivePage() {
                 latitud: item.ubicacion!.latitud, longitud: item.ubicacion!.longitud,
                 capturadoEn: item.ubicacion!.capturadoEn, precision: item.ubicacion!.precision,
                 descripcion: "Jornada #" + item.tracking.asistenciaId,
+                stale: !Number.isFinite(new Date(item.ubicacion!.capturadoEn ?? item.ubicacion!.recibidoEn).getTime()) ||
+                  Date.now() - new Date(item.ubicacion!.capturadoEn ?? item.ubicacion!.recibidoEn).getTime() >= 15 * 60_000,
               }))}
               selectedId={selectedId} onSelect={setSelectedId} />
+            {!query.isLoading && entries.length > 0 && mapped.length === 0 ? (
+              <AppAlert tone="warning" title="Las sesiones activas todavía no tienen GPS"
+                description="El servidor solo devuelve la ubicación actual cuando hay puntos registrados. Las sesiones históricas, finalizadas o expiradas se consultan en Historial." />
+            ) : null}
             {selected ? (
               <AppCard title={selected.usuario.nombre} description={selected.usuario.rol + " · Sesión #" + selected.tracking.sesionId} size="sm">
                 <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">

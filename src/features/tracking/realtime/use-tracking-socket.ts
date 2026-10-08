@@ -44,12 +44,16 @@ export function useTrackingSocket(): Connection {
         const withoutPrevious = previous.filter((item) => item.usuario.id !== payload.usuario.id);
         return [...withoutPrevious, payload];
       });
+      void queryClient.invalidateQueries({
+        queryKey: marcasQueryKeys.tracking.details(),
+      });
     });
 
     socket.on("tracking:state-changed", () => {
       // A session can finish or expire: refetch removes it from the active map.
       void queryClient.invalidateQueries({ queryKey: trackingRealtimeKey });
       void queryClient.invalidateQueries({ queryKey: marcasQueryKeys.tracking.lists() });
+      void queryClient.invalidateQueries({ queryKey: marcasQueryKeys.tracking.details() });
     });
 
     return () => {

@@ -8,6 +8,7 @@ import type {
 } from "./tracking.types";
 
 export const trackingRealtimeKey = marcasQueryKeys.tracking.custom("realtime");
+export const TRACKING_LOCATION_PAGE_SIZE = 1000;
 
 export function useTrackingRealtime() {
   return API.useQuery<TrackingRealtimeView[]>({
@@ -42,10 +43,11 @@ export function useTrackingLocations(asistenciaId: number, sesionTrackingId?: nu
     queryFn: ({ pageParam, signal }) =>
       marcasApi.get<TrackingPage<TrackingLocation>>(
         marcasEndpoints.tracking.attendanceLocations(asistenciaId),
-        { params: { page: pageParam, limit: 500, sesionTrackingId }, signal },
+        { params: { page: pageParam, limit: TRACKING_LOCATION_PAGE_SIZE, sesionTrackingId }, signal },
       ),
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
     staleTime: 30_000,
+    refetchOnWindowFocus: false,
   });
 }

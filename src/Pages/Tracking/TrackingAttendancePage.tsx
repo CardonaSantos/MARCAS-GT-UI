@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { CalendarDays, MapPinned, Route, Timer } from "lucide-react";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
-import { useTrackingAttendance, useTrackingLocations } from "@/features/tracking/api/tracking.queries";
+import { TRACKING_LOCATION_PAGE_SIZE, useTrackingAttendance, useTrackingLocations } from "@/features/tracking/api/tracking.queries";
 import {
   trackingBusinessDate, trackingCoordinateValid, trackingDateTime, trackingDuration,
 } from "@/features/tracking/api/tracking.types";
@@ -26,6 +26,17 @@ export default function TrackingAttendancePage() {
   const detailQuery = useTrackingAttendance(asistenciaId);
   const locationQuery = useTrackingLocations(asistenciaId, sessionId);
   const detail = detailQuery.data;
+  // Historical queries are chronological and paginated in the server. Loading
+  // just page 1 produces a misleading route and an incorrect "last position".
+  // Load up to 20k automatically; larger journeys remain explicitly pageable.
+  const autoLoadLimit = 20_000;
+  const loadedCount = locationQuery.data?.pages.reduce((sum, page) => sum + page.items.length, 0) ?? 0;
+  useEffect(() => {
+    if (locationQuery.hasNextPage && !locationQuery.isFetching && !locationQuery.isError &&
+        loadedCount < autoLoadLimit) {
+      void locationQuery.fetchNextPage();
+    }
+  }, [loadedCount, locationQuery.hasNextPage, locationQuery.isFetching, locationQuery.isError, locationQuery.fetchNextPage]);
 
   const points = useMemo(() => (locationQuery.data?.pages.flatMap((page) => page.items) ?? [])
     .filter((point) => trackingCoordinateValid(point))
@@ -63,7 +74,8 @@ export default function TrackingAttendancePage() {
     return Array.from(groups.entries()).map(([id, series]) => ({ id, points: series }));
   }, [cursor, visiblePoints]);
   const total = locationQuery.data?.pages[0]?.total ?? 0;
-  const loaded = locationQuery.data?.pages.reduce((sum, page) => sum + page.items.length, 0) ?? 0;
+  const loaded = loadedCount;
+  const loadingRoute = locationQuery.isPending || (locationQuery.hasNextPage && loaded < autoLoadLimit);
 
   if (!validId) return <AppAlert tone="danger" title="Identificador de jornada inválido" />;
 
@@ -118,7 +130,13 @@ export default function TrackingAttendancePage() {
               </div>
               {locationQuery.isError ? <AppAlert tone="danger" title="No se pudieron cargar las coordenadas"
                 description={locationQuery.error instanceof Error ? locationQuery.error.message : "Reintenta consultar el recorrido."} /> : null}
+              {loadingRoute && !locationQuery.isError ? (
+                <p className="mb-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+                  Reconstruyendo recorrido: {loaded} de {total} puntos GPS cargados…
+                </p>
+              ) : null}
               <TrackingMap height={490} segments={segments} playbackSegments={playedSegments}
+                focusPoint={cursor !== null ? selectedPoint ?? null : null}
                 employees={selectedPoint ? [{
                   id: -1,
                   nombre: (detail.usuario.nombre || "Empleado") + (cursor === null ? " · última ubicación" : " · ubicación seleccionada"),
@@ -129,14 +147,14 @@ export default function TrackingAttendancePage() {
               {points.length > 0 ? (
                 <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
                   {cursor === null
-                    ? "Recorrido completo de las sesiones cargadas. El marcador identifica la última ubicación GPS."
+                    ? "Recorrido de las sesiones cargadas. El marcador identifica el último punto recibido dentro del conjunto cargado."
                     : "Recorrido completo atenuado; el tramo resaltado y el marcador muestran el avance hasta el punto seleccionado."}
                 </p>
               ) : null}
               <div className="mt-3 space-y-2">
                 <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
                   Puntos cargados: {loaded} de {total}. Visibles con filtro: {points.length}.
-                  {loaded < total ? " El recorrido aún es parcial: carga el resto para auditarlo completo." : ""}
+                  {loaded < total ? " Recorrido parcial; las páginas restantes se cargan automáticamente hasta 20 000 puntos." : ""}
                 </p>
                 {points.length > 0 ? (
                   <div className="space-y-2">
@@ -151,10 +169,10 @@ export default function TrackingAttendancePage() {
                     <AppButton variant="secondary" size="sm" disabled={cursor === null} onClick={() => setCursor(null)}>Mostrar recorrido completo cargado</AppButton>
                   </div>
                 ) : null}
-                {locationQuery.hasNextPage ? (
+                {locationQuery.hasNextPage && loaded >= autoLoadLimit ? (
                   <AppButton variant="secondary" size="sm" disabled={locationQuery.isFetchingNextPage}
                     onClick={() => { void locationQuery.fetchNextPage(); setCursor(null); }}>
-                    {locationQuery.isFetchingNextPage ? "Cargando puntos…" : "Cargar 500 puntos más"}
+                    {locationQuery.isFetchingNextPage ? "Cargando puntos…" : "Cargar " + TRACKING_LOCATION_PAGE_SIZE + " puntos más"}
                   </AppButton>
                 ) : null}
               </div>
