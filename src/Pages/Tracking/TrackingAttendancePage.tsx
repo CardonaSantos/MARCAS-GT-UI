@@ -38,18 +38,30 @@ export default function TrackingAttendancePage() {
   const maxIndex = Math.max(0, points.length - 1);
   const selectedIndex = cursor === null ? maxIndex : Math.min(cursor, maxIndex);
   const visiblePoints = cursor === null ? points : points.slice(0, selectedIndex + 1);
-  const selectedPoint: TrackingLocation | undefined = cursor === null ? undefined : visiblePoints[visiblePoints.length - 1];
+  // At first render the cursor is at the end: show the employee at the latest known GPS point.
+  const selectedPoint: TrackingLocation | undefined = visiblePoints[visiblePoints.length - 1];
 
   const segments = useMemo<MapSegment[]>(() => {
     const buckets = new Map<number, TrackingLocation[]>();
-    visiblePoints.forEach((point) => {
+    points.forEach((point) => {
       const key = point.sesionTrackingId ?? 0;
       const bucket = buckets.get(key) ?? [];
       bucket.push(point);
       buckets.set(key, bucket);
     });
     return Array.from(buckets.entries()).map(([id, series]) => ({ id, points: series }));
-  }, [visiblePoints]);
+  }, [points]);
+  const playedSegments = useMemo<MapSegment[] | undefined>(() => {
+    if (cursor === null) return undefined;
+    const groups = new Map<number, TrackingLocation[]>();
+    visiblePoints.forEach((point) => {
+      const id = point.sesionTrackingId ?? 0;
+      const group = groups.get(id) ?? [];
+      group.push(point);
+      groups.set(id, group);
+    });
+    return Array.from(groups.entries()).map(([id, series]) => ({ id, points: series }));
+  }, [cursor, visiblePoints]);
   const total = locationQuery.data?.pages[0]?.total ?? 0;
   const loaded = locationQuery.data?.pages.reduce((sum, page) => sum + page.items.length, 0) ?? 0;
 
@@ -106,12 +118,21 @@ export default function TrackingAttendancePage() {
               </div>
               {locationQuery.isError ? <AppAlert tone="danger" title="No se pudieron cargar las coordenadas"
                 description={locationQuery.error instanceof Error ? locationQuery.error.message : "Reintenta consultar el recorrido."} /> : null}
-              <TrackingMap height={490} segments={segments}
+              <TrackingMap height={490} segments={segments} playbackSegments={playedSegments}
                 employees={selectedPoint ? [{
-                  id: -1, nombre: "Punto seleccionado", rol: "Histórico",
+                  id: -1,
+                  nombre: (detail.usuario.nombre || "Empleado") + (cursor === null ? " · última ubicación" : " · ubicación seleccionada"),
+                  rol: detail.usuario.rol,
                   latitud: selectedPoint.latitud, longitud: selectedPoint.longitud,
                   capturadoEn: selectedPoint.capturadoEn, precision: selectedPoint.precision,
                 }] : []} />
+              {points.length > 0 ? (
+                <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+                  {cursor === null
+                    ? "Recorrido completo de las sesiones cargadas. El marcador identifica la última ubicación GPS."
+                    : "Recorrido completo atenuado; el tramo resaltado y el marcador muestran el avance hasta el punto seleccionado."}
+                </p>
+              ) : null}
               <div className="mt-3 space-y-2">
                 <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
                   Puntos cargados: {loaded} de {total}. Visibles con filtro: {points.length}.
