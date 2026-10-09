@@ -20,7 +20,7 @@ import { AppStack } from "@/ui/components/app/primitives/app-stack";
 export default function CreditApplicationsPage() {
   const location = useLocation();
   const role = useStore((state) => state.userRol);
-  const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canWrite = role === "ADMIN" || role === "VENDEDOR" || role === "BODEGA";
   const state = useCreditListState();
 
   const listQuery = useCreditApplications(state.queryFilters);
