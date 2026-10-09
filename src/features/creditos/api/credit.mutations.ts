@@ -181,6 +181,28 @@ export function useReviewCreditReference() {
   });
 }
 
+export function useUploadCreditDocument() {
+  return API.useMutation<
+    { result: { id: number }; solicitud: CreditDetail },
+    { id: number; file: File; tipo: string; observaciones?: string }
+  >({
+    method: "POST",
+    endpoint: ({ id }) => marcasEndpoints.creditos.applications.documentUpload(id),
+    body: ({ file, tipo, observaciones }) => {
+      const form = new FormData();
+      form.append("archivo", file, file.name);
+      form.append("tipo", tipo);
+      form.append("observaciones", observaciones ?? "");
+      return form;
+    },
+    invalidateKeys: creditInvalidations,
+    options: {
+      onSuccess: () => toast.success("Documento privado adjuntado."),
+      onError: mutationError,
+    },
+  });
+}
+
 export function useAddCreditDocument() {
   return API.useMutation<
     { result: unknown; solicitud: CreditDetail },
