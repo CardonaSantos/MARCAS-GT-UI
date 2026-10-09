@@ -192,6 +192,7 @@ export function PaymentTable(props: Props) {
       error={props.error}
       onRetry={props.onRetry}
       toolbar={props.toolbar}
+      toolbarClassName="sm:items-start [&>div:first-child]:w-full [&>div:first-child]:flex-1"
       paginationMode="server"
       pagination={props.pagination}
       stickyHeader
