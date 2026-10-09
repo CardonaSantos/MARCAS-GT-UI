@@ -72,7 +72,7 @@ export function useCustomerDirectoryState() {
   return {
     filters, draftSearch, setDraftSearch,
     setFilter, setSearch, setPagination, setSorting, clear,
-    sorting: [{ id: filters.sortBy, desc: filters.sortDir }] as SortingState,
+    sorting: [{ id: filters.sortBy, desc: filters.sortDir === "desc" }] as SortingState,
     pagination: { pageIndex: filters.page - 1, pageSize: filters.limit } as PaginationState,
   };
 }

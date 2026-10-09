@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Departamento, Municipio } from "../Customers";
+import type { CustomerDepartment as Departamento, CustomerMunicipality as Municipio } from "@/features/clientes/api/customer.types";
 import {
   Dialog,
   DialogContent,
