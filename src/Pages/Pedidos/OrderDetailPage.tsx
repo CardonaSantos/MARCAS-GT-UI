@@ -285,7 +285,7 @@ export default function OrderDetailPage() {
                           onChange={setCreditPolicy}
                           placeholder="Sin política específica"
                           activeOnly
-                          clearable
+                          isClearable
                         />
                       </div>
                     </div>
