@@ -159,6 +159,8 @@ export const marcasEndpoints = {
 
     applications: {
       root: "/creditos/solicitudes",
+      requestFromOrder: (id: number) => `/creditos/solicitudes/desde-pedido/${id}/solicitar`,
+      approveWithSchedule: (id: number) => `/creditos/solicitudes/${id}/aprobar-con-cuotas`,
       summary: "/creditos/solicitudes/resumen",
       detail: (id: number) => `/creditos/solicitudes/${id}`,
       events: (id: number) => `/creditos/solicitudes/${id}/eventos`,
