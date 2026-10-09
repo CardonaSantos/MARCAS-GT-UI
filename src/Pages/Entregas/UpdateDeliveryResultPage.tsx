@@ -293,9 +293,9 @@ export default function UpdateDeliveryResultPage() {
                     leftIcon={<Save />}
                     loadingText="Guardando..."
                     disableWhenInvalid
-                    disabled={!query.data.acciones.puedeEditarResultado}
+                    disabled={!query.data.acciones.puedeEditarResultado || locating}
                   >
-                    Guardar resultado
+                    {query.data.estado === "PENDIENTE" ? "Guardar atención y resultado" : "Guardar cambios"}
                   </AppFormSubmit>
                 </div>
               </AppStack>
