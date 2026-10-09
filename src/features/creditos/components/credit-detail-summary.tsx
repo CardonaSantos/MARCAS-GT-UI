@@ -69,8 +69,15 @@ export function CreditDetailSummary({ credit }: { credit: CreditDetail }) {
 
         <AppCard title="Saldo pendiente" size="sm">
           <p className="text-2xl font-semibold tabular-nums">
-            {formatMoney(credit.cuentasPorCobrar.saldoPendiente)}
+            {credit.cuentasPorCobrar.cantidad === 0
+              ? "—"
+              : formatMoney(credit.cuentasPorCobrar.saldoPendiente)}
           </p>
+          {credit.cuentasPorCobrar.cantidad === 0 ? (
+            <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
+              Sin CxC generadas. Las cuotas se activarán tras entregar el pedido.
+            </p>
+          ) : null}
         </AppCard>
       </AppGrid>
 

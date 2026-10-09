@@ -485,6 +485,13 @@ const warehouseRoutes: MarcasRoute[] = [
     href: "/marcas-gt/pedidos",
   },
   {
+    icon: CreditCard,
+    label: "Solicitudes de crédito",
+    href: "/marcas-gt/creditos",
+    exactPaths: ["/marcas-gt/creditos"],
+    activePaths: ["/marcas-gt/creditos/solicitudes"],
+  },
+  {
     icon: Boxes,
     label: "Operación de bodega",
     submenu: [

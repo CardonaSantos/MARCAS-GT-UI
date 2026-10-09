@@ -1,4 +1,8 @@
 import { ExternalLink, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
+import { marcasApi } from "@/API/api";
+import { marcasEndpoints } from "@/API/routes/endpoints";
+import { getApiErrorMessage } from "@/lib/api-error";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -27,6 +31,21 @@ export function CreditDocumentsTable({
   const location = useLocation();
   const returnTo = location.pathname + location.search;
 
+  const openDocument = (documentId: number) => {
+    const popup = window.open("about:blank", "_blank");
+    if (popup) popup.opener = null;
+    void marcasApi.get<{ url: string }>(
+      marcasEndpoints.creditos.applications.documentFile(creditId, documentId),
+    ).then(({ url }) => {
+      if (!/^https:\/\//i.test(url)) throw new Error("El documento no tiene un enlace seguro.");
+      if (popup && !popup.closed) popup.location.replace(url);
+      else window.open(url, "_blank", "noopener,noreferrer");
+    }).catch((error: unknown) => {
+      popup?.close();
+      toast.error(getApiErrorMessage(error));
+    });
+  };
+
   const columns: ColumnDef<CreditDocument, unknown>[] = [
     {
       accessorKey: "tipo",
@@ -40,15 +59,17 @@ export function CreditDocumentsTable({
       size: 260,
       meta: { grow: true },
       cell: ({ row }) => (
-        <a
-          href={row.original.url}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex max-w-full items-center gap-1.5 font-medium text-[hsl(var(--app-primary))] hover:underline"
+        <button
+          type="button"
+          onClick={() => openDocument(row.original.id)}
+          className="inline-flex max-w-full items-center gap-1.5 text-left font-medium text-[hsl(var(--app-primary))] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--app-ring))]"
+          title="Abrir documento de crédito"
         >
-          <span className="truncate">{row.original.url}</span>
+          <span className="truncate">
+            {row.original.observaciones || "Documento #" + row.original.id}
+          </span>
           <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-        </a>
+        </button>
       ),
     },
     {

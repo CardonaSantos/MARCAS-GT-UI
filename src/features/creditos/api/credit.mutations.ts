@@ -10,6 +10,8 @@ import type {
   AddCreditReferencePayload,
   ActivateCreditPaymentPlanPayload,
   ApproveCreditPayload,
+  ApproveCreditWithSchedulePayload,
+  RequestCreditFromOrderPayload,
   CreateCreditApplicationPayload,
   CreateCreditPaymentPlanPayload,
   CreateCreditPolicyPayload,
@@ -35,6 +37,38 @@ const creditInvalidations = [
   marcasQueryKeys.creditos.all,
   marcasQueryKeys.pedidos.all,
 ];
+
+export function useRequestCreditFromOrder() {
+  return API.useMutation<CreditDetail, {
+    pedidoId: number;
+    payload: RequestCreditFromOrderPayload;
+  }>({
+    method: "POST",
+    endpoint: ({ pedidoId }) => marcasEndpoints.creditos.applications.requestFromOrder(pedidoId),
+    body: ({ payload }) => payload,
+    invalidateKeys: creditInvalidations,
+    options: {
+      onSuccess: () => toast.success("Crédito enviado a autorización."),
+      onError: mutationError,
+    },
+  });
+}
+
+export function useApproveCreditWithSchedule() {
+  return API.useMutation<
+    { creditoId: number; plan: unknown; integracion: unknown },
+    { id: number; payload: ApproveCreditWithSchedulePayload }
+  >({
+    method: "POST",
+    endpoint: ({ id }) => marcasEndpoints.creditos.applications.approveWithSchedule(id),
+    body: ({ payload }) => payload,
+    invalidateKeys: creditInvalidations,
+    options: {
+      onSuccess: () => toast.success("Crédito aprobado y cuotas programadas."),
+      onError: mutationError,
+    },
+  });
+}
 
 export function useCreateCreditApplication() {
   return API.useMutation<CreditDetail, CreateCreditApplicationPayload>({
@@ -142,6 +176,28 @@ export function useReviewCreditReference() {
     invalidateKeys: creditInvalidations,
     options: {
       onSuccess: () => toast.success("Referencia revisada."),
+      onError: mutationError,
+    },
+  });
+}
+
+export function useUploadCreditDocument() {
+  return API.useMutation<
+    { result: { id: number }; solicitud: CreditDetail },
+    { id: number; file: File; tipo: string; observaciones?: string }
+  >({
+    method: "POST",
+    endpoint: ({ id }) => marcasEndpoints.creditos.applications.documentUpload(id),
+    body: ({ file, tipo, observaciones }) => {
+      const form = new FormData();
+      form.append("archivo", file, file.name);
+      form.append("tipo", tipo);
+      form.append("observaciones", observaciones ?? "");
+      return form;
+    },
+    invalidateKeys: creditInvalidations,
+    options: {
+      onSuccess: () => toast.success("Documento privado adjuntado."),
       onError: mutationError,
     },
   });

@@ -8,6 +8,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { useState } from "react";
 
 import { useStore } from "@/Context/ContextSucursal";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
@@ -18,6 +19,9 @@ import {
   useRequestOrderValidation,
 } from "@/features/pedidos/api/order.mutations";
 import { useOrder } from "@/features/pedidos/api/order.queries";
+import { useRequestCreditFromOrder } from "@/features/creditos/api/credit.mutations";
+import { CreditPolicySelect } from "@/features/creditos/components/credit-selects";
+import { AppInput } from "@/ui/components/app/primitives/app-input";
 import {
   ORDER_DETAIL_TABS,
   ORDER_STATE_LABELS,
@@ -53,6 +57,9 @@ export default function OrderDetailPage() {
   const query = useOrder(id);
   const requestValidation = useRequestOrderValidation();
   const confirmOrder = useConfirmOrder();
+  const creditRequest = useRequestCreditFromOrder();
+  const [creditTerm, setCreditTerm] = useState("30");
+  const [creditPolicy, setCreditPolicy] = useState<number | null>(null);
 
   const tabState = useUrlTabState<OrderDetailTab>({
     defaultValue: "resumen",
@@ -64,19 +71,18 @@ export default function OrderDetailPage() {
   const canRegisterPayment = ["ADMIN", "CONTABILIDAD", "VENDEDOR"].includes(
     role ?? "",
   );
-  const canReadCredit = ["ADMIN", "VENDEDOR", "CONTABILIDAD"].includes(
+  const canReadCredit = ["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"].includes(
     role ?? "",
   );
   const linkedCredit =
     order?.solicitudesCredito.find(
       (application) => !["RECHAZADA", "CANCELADA"].includes(application.estado),
     ) ??
-    order?.solicitudesCredito[0] ??
     null;
   const canStartCredit =
-    (role === "ADMIN" || role === "VENDEDOR") &&
+    canWrite &&
     order?.condicionPago === "CREDITO" &&
-    order.estado === "PENDIENTE_VALIDACION" &&
+    ["BORRADOR", "PENDIENTE_VALIDACION"].includes(order.estado) &&
     !linkedCredit;
 
   const canPlanDispatch =
@@ -165,7 +171,7 @@ export default function OrderDetailPage() {
                   </AppButton>
                 ) : null}
 
-                {order.acciones.puedeSolicitarValidacion && canWrite ? (
+                {order.acciones.puedeSolicitarValidacion && canWrite && order.condicionPago !== "CREDITO" ? (
                   <AppConfirmDialog
                     title="Solicitar validación"
                     description="El pedido dejará de ser editable y pasará a revisión. Debe contener al menos un producto."
@@ -230,20 +236,60 @@ export default function OrderDetailPage() {
                 ) : null}
 
                 {canStartCredit ? (
-                  <AppButton asChild variant="primary" size="sm">
-                    <Link
-                      to={
-                        "/marcas-gt/creditos/solicitudes/nueva?pedidoId=" + id
-                      }
-                      state={{
-                        from: currentUrl,
-                        listFrom: backTo,
-                      }}
-                    >
-                      <WalletCards className="h-4 w-4" />
-                      Tramitar crédito
-                    </Link>
-                  </AppButton>
+                  <AppConfirmDialog
+                    title="Solicitar autorización de crédito"
+                    description="El pedido pasará a validación y se generará automáticamente una solicitud para ADMIN."
+                    preset="send"
+                    confirmText="Enviar solicitud"
+                    loadingText="Solicitando..."
+                    confirmDisabled={!Number.isInteger(Number(creditTerm)) ||
+                      Number(creditTerm) < 1 || Number(creditTerm) > 3650}
+                    isLoading={creditRequest.isPending}
+                    trigger={
+                      <AppButton variant="primary" size="sm" leftIcon={<WalletCards />}>
+                        Solicitar crédito
+                      </AppButton>
+                    }
+                    onConfirm={async () => {
+                      await creditRequest.mutateAsync({
+                        pedidoId: id,
+                        payload: {
+                          plazoDias: Number(creditTerm),
+                          politicaId: creditPolicy,
+                        },
+                      });
+                      await query.refetch();
+                    }}
+                  >
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="min-w-0">
+                        <label htmlFor="order-credit-term" className="mb-2 block text-xs font-medium">
+                          Plazo en días
+                        </label>
+                        <AppInput
+                          id="order-credit-term"
+                          type="number"
+                          min={1}
+                          max={3650}
+                          value={creditTerm}
+                          onChange={(event) => setCreditTerm(event.target.value)}
+                          inputMode="numeric"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <label className="mb-2 block text-xs font-medium">
+                          Política (opcional)
+                        </label>
+                        <CreditPolicySelect
+                          value={creditPolicy}
+                          onChange={setCreditPolicy}
+                          placeholder="Sin política específica"
+                          activeOnly
+                          isClearable
+                        />
+                      </div>
+                    </div>
+                  </AppConfirmDialog>
                 ) : null}
 
                 {canRegisterPayment && order.estado !== "CANCELADO" ? (
