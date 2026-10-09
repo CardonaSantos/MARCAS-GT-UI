@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Navigation } from "lucide-react";
+import { LocateFixed, Navigation } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
+import { getCurrentPosition } from "@/features/common/utils/geolocation";
 import {
   getListReturnRoute,
   getReturnRoute,
@@ -42,12 +45,35 @@ export default function StartShipmentRoutePage() {
   const key = useIdempotencyKey("transport-route");
   const query = useShipment(id);
   const mutation = useStartShipmentRoute();
+  const [locating, setLocating] = useState(false);
 
   const form = useForm<ShipmentRouteFormValues>({
     resolver: zodResolver(shipmentRouteSchema),
     defaultValues: { latitud: "", longitud: "" },
     mode: "onTouched",
   });
+
+  const locate = async () => {
+    try {
+      setLocating(true);
+      const position = await getCurrentPosition();
+      form.setValue("latitud", String(position.latitud), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      form.setValue("longitud", String(position.longitud), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      toast.success("Ubicación actual capturada.");
+    } catch (error) {
+      toast.error(error instanceof Error
+        ? error.message
+        : "No se pudo obtener la ubicación.");
+    } finally {
+      setLocating(false);
+    }
+  };
 
   const onSubmit = async (values: ShipmentRouteFormValues) => {
     if (!query.data?.acciones.puedeIniciarRuta) return;
@@ -104,6 +130,21 @@ export default function StartShipmentRoutePage() {
                       type="number"
                       step="any"
                     />
+                  </div>
+                  <div className="mt-3">
+                    <AppButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      leftIcon={<LocateFixed />}
+                      disabled={locating || mutation.isPending}
+                      onClick={() => void locate()}
+                    >
+                      {locating ? "Obteniendo ubicación..." : "Usar ubicación actual"}
+                    </AppButton>
+                    <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+                      Se solicitará permiso al navegador. Puedes iniciar la ruta sin GPS si no está disponible.
+                    </p>
                   </div>
                 </AppCard>
                 <div className="flex justify-end gap-2">

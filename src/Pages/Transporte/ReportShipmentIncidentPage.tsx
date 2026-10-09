@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, LocateFixed } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
+import { getCurrentPosition } from "@/features/common/utils/geolocation";
 import {
   getListReturnRoute,
   getReturnRoute,
@@ -50,6 +53,7 @@ export default function ReportShipmentIncidentPage() {
   const key = useIdempotencyKey("transport-incident");
   const query = useShipment(id);
   const mutation = useReportShipmentIncident();
+  const [locating, setLocating] = useState(false);
 
   const form = useForm<ShipmentIncidentFormValues>({
     resolver: zodResolver(shipmentIncidentSchema),
@@ -62,6 +66,28 @@ export default function ReportShipmentIncidentPage() {
     },
     mode: "onTouched",
   });
+
+  const locate = async () => {
+    try {
+      setLocating(true);
+      const position = await getCurrentPosition();
+      form.setValue("latitud", String(position.latitud), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      form.setValue("longitud", String(position.longitud), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      toast.success("Ubicación actual capturada.");
+    } catch (error) {
+      toast.error(error instanceof Error
+        ? error.message
+        : "No se pudo obtener la ubicación.");
+    } finally {
+      setLocating(false);
+    }
+  };
 
   const onSubmit = async (values: ShipmentIncidentFormValues) => {
     if (!query.data?.acciones.puedeReportarIncidencia) return;
@@ -141,6 +167,21 @@ export default function ReportShipmentIncidentPage() {
                       type="number"
                       step="any"
                     />
+                    <div className="md:col-span-2">
+                      <AppButton
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        leftIcon={<LocateFixed />}
+                        disabled={locating || mutation.isPending}
+                        onClick={() => void locate()}
+                      >
+                        {locating ? "Obteniendo ubicación..." : "Usar ubicación actual"}
+                      </AppButton>
+                      <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+                        Ubicación opcional del incidente; se captura solo cuando la solicitas.
+                      </p>
+                    </div>
                   </div>
                 </AppCard>
                 <div className="flex justify-end gap-2">
