@@ -31,12 +31,13 @@ export function PaymentSummaryCards({ summary }: { summary?: PaymentSummary }) {
           Aún sin verificar
         </p>
       </AppCard>
-      <AppCard title="Disponible sin aplicar" icon={<Banknote />} size="sm">
+      <AppCard title="Anticipos vinculados" icon={<Banknote />} size="sm">
         <p className="text-2xl font-semibold">
-          {summary ? formatMoney(summary.montos.disponibleNoAplicado) : "—"}
+          {summary ? formatMoney(summary.montos.vinculadoPedido ?? "0.00") : "—"}
         </p>
         <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-          Verificado pendiente de CxC
+          Pagos directos reconocidos; libre para CxC:{" "}
+          {summary ? formatMoney(summary.montos.libreCxC ?? summary.montos.disponibleNoAplicado) : "—"}
         </p>
       </AppCard>
     </AppGrid>
