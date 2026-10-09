@@ -295,6 +295,11 @@ export const marcasEndpoints = {
     applications: (id: number) => `/pagos/${id}/aplicaciones`,
     candidateReceivables: (id: number) => `/pagos/${id}/cuentas-candidatas`,
     proofs: (id: number) => `/pagos/${id}/comprobantes`,
+    proofUpload: (id: number) => `/pagos/${id}/comprobantes/archivo`,
+    proofFile: (id: number, proofId: number) =>
+      `/pagos/${id}/comprobantes/${proofId}/archivo`,
+    proofRemove: (id: number, proofId: number) =>
+      `/pagos/${id}/comprobantes/${proofId}`,
     verify: (id: number) => `/pagos/${id}/verificar`,
     reject: (id: number) => `/pagos/${id}/rechazar`,
     revertApplication: (paymentId: number, applicationId: number) =>

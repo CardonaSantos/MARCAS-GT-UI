@@ -15,7 +15,6 @@ import {
   AppDialog,
   AppDialogBody,
   AppDialogContent,
-  AppDialogDescription,
   AppDialogFooter,
   AppDialogHeader,
   AppDialogTitle,

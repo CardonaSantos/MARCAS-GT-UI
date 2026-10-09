@@ -80,6 +80,7 @@ export interface PaymentListItem {
 
 export interface PaymentProof {
   id: number;
+  eliminadoEn?: string | null;
   pagoId: number;
   url: string;
   key: string | null;
