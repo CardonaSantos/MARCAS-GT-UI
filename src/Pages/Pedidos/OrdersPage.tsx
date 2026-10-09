@@ -17,7 +17,7 @@ import { AppStack } from "@/ui/components/app/primitives/app-stack";
 export default function OrdersPage() {
   const location = useLocation();
   const role = useStore((state) => state.userRol);
-  const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canWrite = ["ADMIN", "VENDEDOR", "BODEGA"].includes(role ?? "");
   const state = useOrderListState();
 
   const listQuery = useOrders(state.queryFilters);
