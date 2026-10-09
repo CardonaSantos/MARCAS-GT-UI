@@ -38,13 +38,17 @@ export function ProductCatalogTable(props: Props) {
     {
       id: "imagen",
       header: "Foto",
-      size: 62,
+      size: 72,
       enableSorting: false,
       cell: ({ row }) => (
-        <img src={row.original.imagenPrincipal || placeholder}
-          alt={`Producto ${row.original.nombre}`}
-          className="h-9 w-9 rounded-md border border-[hsl(var(--app-border))] object-contain"
-          loading="lazy" />
+        <div className="flex items-center justify-center py-1">
+          <img
+            src={row.original.imagenPrincipal || placeholder}
+            alt={`Producto ${row.original.nombre}`}
+            className="h-9 w-9 shrink-0 rounded-md border border-[hsl(var(--app-border))] object-contain"
+            loading="lazy"
+          />
+        </div>
       ),
     },
     {
@@ -58,9 +62,6 @@ export function ProductCatalogTable(props: Props) {
           className="block min-w-0 text-left hover:underline">
           <span className="block truncate font-medium text-[hsl(var(--app-primary))]">
             {row.original.nombre}
-          </span>
-          <span className="block truncate text-xs text-[hsl(var(--app-muted-foreground))]">
-            {row.original.codigoProducto}
           </span>
         </button>
       ),
@@ -167,7 +168,7 @@ export function ProductCatalogTable(props: Props) {
       paginationMode="server"
       pagination={props.pagination}
       stickyHeader
-      density="xs"
+      density="sm"
       responsiveMode="cards"
       enableColumnVisibility
       enableColumnPinning

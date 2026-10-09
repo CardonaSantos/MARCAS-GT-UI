@@ -353,12 +353,18 @@ export function AppDataTable<TData>({
     !hasPinnedColumns &&
     visibleColumns.length > 0;
 
+  // En listas pequeñas, las filas se distribuyen según su altura natural.
+  // Reservar una altura virtual fija provoca que imágenes y controles se solapen.
+  const shouldVirtualizeRows =
+    enableVirtualization && !isLoading && rows.length > 40;
+
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => estimateRowHeight ?? getEstimatedRowHeight(density),
+    measureElement: (element) => element.getBoundingClientRect().height,
     overscan,
-    enabled: enableVirtualization && !isLoading && rows.length > 0,
+    enabled: shouldVirtualizeRows,
   });
 
   const columnVirtualizer = useVirtualizer({
@@ -495,7 +501,11 @@ export function AppDataTable<TData>({
     </div>
   );
 
-  const renderRow = (row: Row<TData>, virtualStart?: number) => {
+  const renderRow = (
+    row: Row<TData>,
+    virtualStart?: number,
+    virtualIndex?: number,
+  ) => {
     const cellByColumnId = new Map(
       row.getVisibleCells().map((cell) => [cell.column.id, cell]),
     );
@@ -504,6 +514,10 @@ export function AppDataTable<TData>({
       <div
         key={row.id}
         role="row"
+        data-index={shouldVirtualizeRows ? virtualIndex : undefined}
+        ref={shouldVirtualizeRows && virtualStart !== undefined
+          ? rowVirtualizer.measureElement
+          : undefined}
         data-state={row.getIsSelected() ? "selected" : undefined}
         className={cn(
           appDataTableRowVariants({
@@ -512,7 +526,7 @@ export function AppDataTable<TData>({
             selected: row.getIsSelected(),
             clickable: Boolean(onRowClick),
           }),
-          enableVirtualization &&
+          shouldVirtualizeRows &&
             virtualStart !== undefined &&
             "absolute left-0 top-0",
         )}
@@ -520,7 +534,7 @@ export function AppDataTable<TData>({
           gridTemplateColumns,
           width: tableWidth,
           minWidth: tableMinWidth,
-          ...(enableVirtualization && virtualStart !== undefined
+          ...(shouldVirtualizeRows && virtualStart !== undefined
             ? {
                 transform: `translateY(${virtualStart}px)`,
               }
@@ -576,7 +590,7 @@ export function AppDataTable<TData>({
   };
 
   const renderBody = () => {
-    if (enableVirtualization) {
+    if (shouldVirtualizeRows) {
       const virtualRows = rowVirtualizer.getVirtualItems();
 
       return (
@@ -594,7 +608,7 @@ export function AppDataTable<TData>({
 
             if (!row) return null;
 
-            return renderRow(row, virtualRow.start);
+            return renderRow(row, virtualRow.start, virtualRow.index);
           })}
         </div>
       );

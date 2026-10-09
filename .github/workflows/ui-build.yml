@@ -36,5 +36,7 @@ jobs:
         run: node scripts/check-providers.mjs
       - name: Check product catalog
         run: node scripts/check-product-catalog.mjs
+      - name: Check shared data table layout
+        run: node scripts/check-app-data-table-layout.mjs
       - name: TypeScript and Vite build
         run: npm run build
