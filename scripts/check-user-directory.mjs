@@ -1,0 +1,32 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const read = (path) => readFileSync(path, "utf8");
+const dir = "src/features/usuarios/";
+const app = read("src/App.tsx");
+const endpoints = read("src/API/routes/endpoints.ts");
+const page = read("src/Pages/Users.tsx");
+const queries = read(dir + "api/user.queries.ts");
+const mutations = read(dir + "api/user.mutations.ts");
+const state = read(dir + "common/use-user-directory-state.ts");
+const filters = read(dir + "components/user-directory-filters.tsx");
+const table = read(dir + "components/user-directory-table.tsx");
+const editor = read(dir + "components/user-edit-dialog.tsx");
+const passwords = read(dir + "components/user-password-dialog.tsx");
+assert.ok(app.includes('path="/marcas-gt/usuarios"') && app.includes("<ProtectedRouteAdmin>"));
+assert.ok(endpoints.includes('directory: "/users/directorio"'));
+assert.ok(endpoints.includes('selectables: "/users/seleccionables"'));
+assert.ok(queries.includes("API.useQuery<UserDirectoryPage>"));
+assert.ok(queries.includes("params: { ...filters }"));
+assert.ok(state.includes("useSearchParams") && state.includes("setSorting"));
+assert.ok(filters.includes("AppSearchInput") && filters.includes("AppSingleSelect"));
+assert.ok(table.includes("AppDataTable<SystemUser>"));
+assert.ok(table.includes('paginationMode="server"') && table.includes('responsiveMode="cards"'));
+assert.ok(table.includes("createAppRowActionsColumn"));
+assert.ok(editor.includes("AppFormSwitch") && editor.includes("editUserSchema"));
+assert.ok(passwords.includes("resetPasswordSchema") && passwords.includes("adminPassword"));
+assert.ok(mutations.includes("useChangeUserPassword") && mutations.includes("useSetUserActive"));
+assert.ok(page.includes("UserEditDialog") && page.includes("UserPasswordDialog"));
+for (const forbidden of ["axios", "contrasenaActualizar", "delete-all"]) {
+  assert.ok(!page.includes(forbidden), `No permitido en página: ${forbidden}`);
+}
+console.log("Usuarios: contratos, filtros, tabla responsive, seguridad de formularios y diálogos correctos.");
