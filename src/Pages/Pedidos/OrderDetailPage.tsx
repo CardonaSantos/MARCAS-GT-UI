@@ -60,7 +60,7 @@ export default function OrderDetailPage() {
   });
 
   const order = query.data;
-  const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canWrite = ["ADMIN", "VENDEDOR", "BODEGA"].includes(role ?? "");
   const canRegisterPayment = ["ADMIN", "CONTABILIDAD", "VENDEDOR"].includes(
     role ?? "",
   );
