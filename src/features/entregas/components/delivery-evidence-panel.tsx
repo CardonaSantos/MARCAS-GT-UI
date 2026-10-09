@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ExternalLink, Paperclip, Trash2, Upload } from "lucide-react";
-import { useRef, useState } from "react";
+import { Camera, ExternalLink, FileImage, FileText, Paperclip, Trash2, Upload, UploadCloud, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -18,6 +18,7 @@ import {
 } from "@/ui/components/app/form";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppCard } from "@/ui/components/app/primitives/app-card";
+import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppConfirmDialog } from "@/ui/components/app/primitives/app-confirm-dialog";
 import { AppDataTable } from "@/ui/components/app/table/app-data-table";
 import { createAppRowActionsColumn } from "@/ui/components/app/table/app-table-row-actions";
@@ -50,7 +51,9 @@ export function DeliveryEvidencePanel({
   const addMutation = useUploadDeliveryEvidence();
   const removeMutation = useRemoveDeliveryEvidence();
   const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [confirmUpload, setConfirmUpload] = useState(false);
   const [uploadKey, setUploadKey] = useState("");
   const [pendingDelete, setPendingDelete] = useState<DeliveryEvidence | null>(null);
@@ -61,13 +64,28 @@ export function DeliveryEvidencePanel({
     mode: "onTouched",
   });
 
+  useEffect(() => {
+    if (!file || !file.type.startsWith("image/")) {
+      setPreviewUrl(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  const clearFile = () => {
+    setFile(null);
+    if (fileRef.current) fileRef.current.value = "";
+    if (cameraRef.current) cameraRef.current.value = "";
+  };
+
   const onFileChange = (next: File | null) => {
-    if (!next) { setFile(null); return; }
+    if (!next) return;
     if (next.size === 0 || next.size > 10 * 1024 * 1024 ||
         !["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(next.type)) {
-      toast.error("Selecciona una imagen JPG, PNG, WebP o PDF de hasta 10 MB.");
-      if (fileRef.current) fileRef.current.value = "";
-      setFile(null);
+      toast.error("Selecciona JPG, PNG, WebP o PDF de hasta 10 MB. Las fotos HEIC no son compatibles.");
+      clearFile();
       return;
     }
     setFile(next);
@@ -92,8 +110,7 @@ export function DeliveryEvidencePanel({
       descripcion: values.descripcion?.trim(),
       claveIdempotencia: uploadKey,
     });
-    setFile(null);
-    if (fileRef.current) fileRef.current.value = "";
+    clearFile();
     form.reset({ tipo: "FOTO", descripcion: "" });
   };
 
@@ -179,11 +196,11 @@ export function DeliveryEvidencePanel({
       {canAdd ? (
         <AppCard
           title="Agregar evidencia"
-          description="Firma, fotografía o documento privado en DigitalOcean Spaces. JPG, PNG, WebP o PDF (máximo 10 MB)."
+          description="Adjunta una fotografía, firma o documento desde tu teléfono o computadora."
           size="sm"
         >
           <AppForm form={form} onSubmit={onSubmit}>
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <AppFormSingleSelect<DeliveryEvidenceFormValues, string>
                 name="tipo"
                 label="Tipo"
@@ -193,20 +210,95 @@ export function DeliveryEvidencePanel({
                 }))}
                 required
               />
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium">Archivo *</label>
+
+              <div className="min-w-0 space-y-2">
+                <span className="block text-xs font-medium">Archivo *</span>
                 <input
                   ref={fileRef}
-                  accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
                   type="file"
-                  className="block w-full rounded-md border border-[hsl(var(--app-border))] bg-transparent px-3 py-2 text-sm"
+                  accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
+                  className="sr-only"
+                  aria-label="Seleccionar archivo de evidencia"
                   onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
                 />
+                <input
+                  ref={cameraRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="sr-only"
+                  aria-label="Tomar fotografía de evidencia con la cámara"
+                  onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
+                />
+
+                <div className="rounded-md border border-dashed border-[hsl(var(--app-border))] p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    <AppButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      leftIcon={<UploadCloud />}
+                      onClick={() => fileRef.current?.click()}
+                      disabled={addMutation.isPending}
+                      className="w-full sm:w-auto"
+                    >
+                      Seleccionar archivo
+                    </AppButton>
+                    <AppButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      leftIcon={<Camera />}
+                      onClick={() => cameraRef.current?.click()}
+                      disabled={addMutation.isPending}
+                      className="w-full sm:w-auto"
+                    >
+                      Tomar foto
+                    </AppButton>
+                  </div>
+                  <p className="mt-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+                    JPG, PNG, WebP o PDF · máximo 10 MB
+                  </p>
+
+                  {file ? (
+                    <div className="mt-3 flex min-w-0 items-center gap-3 rounded-md border border-[hsl(var(--app-border))] p-2" aria-live="polite">
+                      {previewUrl ? (
+                        <img
+                          src={previewUrl}
+                          alt="Vista previa del archivo seleccionado"
+                          className="h-16 w-16 shrink-0 rounded object-cover"
+                        />
+                      ) : file.type === "application/pdf" ? (
+                        <FileText aria-hidden="true" className="h-8 w-8 shrink-0 text-[hsl(var(--app-muted-foreground))]" />
+                      ) : (
+                        <FileImage aria-hidden="true" className="h-8 w-8 shrink-0 text-[hsl(var(--app-muted-foreground))]" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-medium" title={file.name}>{file.name}</p>
+                        <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                          {Math.max(1, Math.round(file.size / 1024)).toLocaleString("es-GT")} KB · Listo para adjuntar
+                        </p>
+                      </div>
+                      <AppButton
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearFile}
+                        disabled={addMutation.isPending}
+                        aria-label="Quitar archivo seleccionado"
+                        title="Quitar archivo"
+                      >
+                        <X className="h-4 w-4" />
+                      </AppButton>
+                    </div>
+                  ) : null}
+                </div>
               </div>
+
               <div className="md:col-span-2">
                 <AppFormTextarea<DeliveryEvidenceFormValues>
                   name="descripcion"
-                  label="Descripción"
+                  label="Descripción (opcional)"
                   rows={2}
                   maxLength={1000}
                 />
@@ -217,6 +309,8 @@ export function DeliveryEvidencePanel({
                 leftIcon={<Upload />}
                 loadingText="Subiendo..."
                 disableWhenInvalid
+                disabled={!file || addMutation.isPending}
+                className="w-full sm:w-auto"
               >
                 Adjuntar evidencia
               </AppFormSubmit>
@@ -244,7 +338,11 @@ export function DeliveryEvidencePanel({
         contentCard
       >
         {file ? (
-          <p className="text-sm">{file.name} · {Math.max(1, Math.round(file.size / 1024))} KB</p>
+          <div className="min-w-0 space-y-1 text-sm">
+            <p className="break-all"><strong>Archivo:</strong> {file.name}</p>
+            <p><strong>Tipo:</strong> {DELIVERY_EVIDENCE_TYPE_LABELS[form.getValues("tipo")]}</p>
+            <p><strong>Tamaño:</strong> {Math.max(1, Math.round(file.size / 1024))} KB</p>
+          </div>
         ) : null}
       </AppConfirmDialog>
       <AppConfirmDialog
