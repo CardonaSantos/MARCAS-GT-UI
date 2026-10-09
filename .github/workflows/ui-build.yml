@@ -34,5 +34,7 @@ jobs:
         run: node scripts/check-categories.mjs
       - name: Check provider management
         run: node scripts/check-providers.mjs
+      - name: Check product catalog
+        run: node scripts/check-product-catalog.mjs
       - name: TypeScript and Vite build
         run: npm run build

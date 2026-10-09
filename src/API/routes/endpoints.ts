@@ -18,6 +18,11 @@ export const marcasEndpoints = {
     root: "/product",
     search: "/product/search",
     inventoryCatalog: "/product/get-product-to-inventary",
+    catalog: "/product/catalogo",
+    catalogDetail: (id: number) => `/product/catalogo/${id}`,
+    uploadImages: (id: number) => `/product/update-images-product/${id}`,
+    deleteImage: (productId: number, imageId: number) =>
+      `/product/delete-one-image-product/${productId}/image/${imageId}`,
     detail: (id: number) => `/product/${id}`,
   },
 

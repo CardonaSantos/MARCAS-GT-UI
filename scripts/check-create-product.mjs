@@ -52,6 +52,6 @@ assert.ok(page.indexOf("await createProduct.mutateAsync") < page.indexOf("handle
 assert.ok(!page.includes("axios"));
 assert.ok(!page.includes("VITE_API_URL"));
 assert.ok(routes.includes('path="/marcas-gt/crear-productos"'));
-assert.ok(read("src/Pages/ViewProducts.tsx").includes('from "./Tools/cropImage"'),
-  "Keep legacy image tool import usable until editing view is migrated.");
+assert.ok(read("src/features/productos/components/product-catalog-edit-dialog.tsx").includes('useProductImages'),
+  "El editor de productos debe reutilizar el hook de recorte e imágenes.");
 console.log("Crear producto: endpoint, contrato, categorías, imágenes, formularios y ruta verificados.");
