@@ -97,17 +97,37 @@ export function PaymentTable(props: Props) {
     },
     {
       accessorKey: "montoAplicado",
-      header: "Aplicado",
+      header: "A CxC",
       size: 105,
       meta: { align: "right" },
       cell: ({ row }) => formatMoney(row.original.montoAplicado),
     },
     {
       accessorKey: "montoDisponible",
-      header: "Disponible",
-      size: 105,
+      header: "Saldo / destino",
+      size: 180,
       meta: { align: "right" },
-      cell: ({ row }) => formatMoney(row.original.montoDisponible),
+      cell: ({ row }) => {
+        const payment = row.original;
+        const direct = ["PREPAGO", "CONTRAENTREGA"].includes(
+          payment.pedido?.condicionPago ?? "",
+        );
+        return (
+          <span
+            className="whitespace-nowrap tabular-nums"
+            title={direct
+              ? "Saldo verificado vinculado al pedido, sin aplicación a CxC"
+              : "Saldo pendiente de aplicación a cartera"}
+          >
+            {formatMoney(payment.montoDisponible)}
+            <span className="ml-2 text-xs text-[hsl(var(--app-muted-foreground))]">
+              {payment.estado === "VERIFICADO"
+                ? direct ? (payment.pedido?.condicionPago === "PREPAGO" ? "Anticipo" : "Vinculado") : "CxC"
+                : "Sin verificar"}
+            </span>
+          </span>
+        );
+      },
     },
     {
       accessorKey: "referencia",

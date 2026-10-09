@@ -95,7 +95,7 @@ export function PaymentFilters(props: Props) {
         value={props.soloConSaldoDisponible ? "yes" : "all"}
         options={[
           { value: "all", label: "Todos los pagos" },
-          { value: "yes", label: "Con saldo disponible" },
+          { value: "yes", label: "Libre para aplicar a CxC" },
         ]}
         onChange={(value) =>
           props.onSaldoDisponibleChange(value === "yes" ? true : null)

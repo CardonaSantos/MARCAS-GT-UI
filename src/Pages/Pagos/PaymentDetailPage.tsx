@@ -251,7 +251,9 @@ export default function PaymentDetailPage() {
           onOpenChange={setVerifyOpen}
           preset="success"
           title="Verificar pago"
-          description="Confirma que el dinero realmente fue recibido. Después de verificar, el pago podrá aplicarse a cuentas por cobrar."
+          description={["PREPAGO", "CONTRAENTREGA"].includes(payment?.pedido?.condicionPago ?? "")
+            ? "Confirma que el dinero fue recibido. El pedido reconocerá el pago automáticamente, sin otro cobro ni aplicación manual. Si ya existe una CxC directa compatible, se conciliará."
+            : "Confirma que el dinero realmente fue recibido. Después podrás aplicarlo a las cuentas por cobrar correspondientes."}
           confirmText="Verificar pago"
           loadingText="Verificando..."
           onConfirm={confirmVerify}
