@@ -66,8 +66,7 @@ export default function CreateUser() {
     };
 
     try {
-      // POST /users devuelve authToken del nuevo usuario. Se ignora
-      // intencionalmente para conservar la sesión del administrador.
+      // El API devuelve exclusivamente datos públicos del usuario creado.
       await mutation.mutateAsync(payload);
       handlers.reset();
       navigate(RETURN_TO, { replace: true });
