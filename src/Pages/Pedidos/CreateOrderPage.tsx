@@ -146,7 +146,7 @@ export default function CreateOrderPage() {
                       value={policyId}
                       onChange={setPolicyId}
                       placeholder="Sin política específica"
-                      clearable
+                      isClearable
                     />
                   </div>
                 </AppGrid>
