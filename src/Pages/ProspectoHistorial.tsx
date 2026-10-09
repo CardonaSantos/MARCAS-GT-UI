@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserRoundPlus } from "lucide-react";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
@@ -8,17 +8,17 @@ import { useConvertProspectToCustomer } from "@/features/prospectos/api/prospect
 import { useProspectHistoryState } from "@/features/prospectos/common/use-prospect-history-state";
 import { ProspectHistoryFilters } from "@/features/prospectos/components/prospect-history-filters";
 import { ProspectHistoryTable } from "@/features/prospectos/components/prospect-history-table";
-import { ProspectHistoryDetailDialog } from "@/features/prospectos/components/prospect-history-detail-dialog";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppConfirmDialog } from "@/ui/components/app/primitives/app-confirm-dialog";
 import { AppContainer } from "@/ui/components/app/primitives/app-container";
 import { AppStack } from "@/ui/components/app/primitives/app-stack";
 
 export default function ProspectoHistorial() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const state = useProspectHistoryState();
   const history = useProspectHistory(state.filters);
   const converter = useConvertProspectToCustomer();
-  const [detailId, setDetailId] = useState<number | null>(null);
   const [convertingId, setConvertingId] = useState<number | null>(null);
   const meta = history.data?.meta;
 
@@ -35,7 +35,6 @@ export default function ProspectoHistorial() {
     if (convertingId === null) return;
     await converter.mutateAsync({ id: convertingId });
     setConvertingId(null);
-    setDetailId(null);
   };
 
   return (
@@ -58,7 +57,9 @@ export default function ProspectoHistorial() {
           isFetching={history.isFetching}
           error={history.error}
           onRetry={() => void history.refetch()}
-          onDetail={setDetailId}
+          onDetail={(id) => navigate(`/marcas-gt/historial-prospectos/${id}`, {
+            state: { from: location.pathname + location.search },
+          })}
           onConvert={setConvertingId}
           sorting={state.sorting}
           onSortingChange={state.setSorting}
@@ -79,11 +80,6 @@ export default function ProspectoHistorial() {
               onClear={state.clear}
             />
           }
-        />
-        <ProspectHistoryDetailDialog
-          id={detailId}
-          onClose={() => setDetailId(null)}
-          onConvert={setConvertingId}
         />
         <AppConfirmDialog
           open={convertingId !== null}

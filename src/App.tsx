@@ -26,6 +26,7 @@ import StockDeliveryRecords from "./Pages/StockDeliveryRecords";
 import CreateClient from "./Pages/CreateClient";
 import ProspectoFormulario from "./Pages/ProspectoFormulario";
 import ProspectoHistorial from "./Pages/ProspectoHistorial";
+import ProspectoHistorialDetalle from "./Pages/ProspectoHistorialDetalle";
 import ProspectoUbicacion from "./Pages/MapProspect/ProspectoUbicacion";
 import PdfPage from "./components/PDF/PdfPage";
 // import DeliveryPdfPage from "./components/PDF/DeliveryPdfPage";
@@ -1171,6 +1172,14 @@ function App() {
               element={
                 <ProtectedRouteAdmin>
                   <ProspectoHistorial />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/historial-prospectos/:id"
+              element={
+                <ProtectedRouteAdmin>
+                  <ProspectoHistorialDetalle />
                 </ProtectedRouteAdmin>
               }
             />

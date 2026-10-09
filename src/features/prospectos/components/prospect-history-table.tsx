@@ -36,7 +36,7 @@ interface Props {
 export function ProspectHistoryTable(props: Props) {
   const columns: ColumnDef<ProspectHistoryRow, unknown>[] = [
     {
-      id: "nombreCompleto", header: "Contacto", size: 185,
+      id: "nombreCompleto", header: "Contacto", size: 230, meta: { grow: true },
       cell: ({ row }) => (
         <button type="button" onClick={() => props.onDetail(row.original.id)}
           title="Ver detalles del prospecto"
@@ -48,7 +48,7 @@ export function ProspectHistoryTable(props: Props) {
         </button>
       ),
     },
-    { accessorKey: "empresaTienda", header: "Empresa o tienda", size: 165,
+    { accessorKey: "empresaTienda", header: "Empresa o tienda", size: 190, meta: { grow: true },
       cell: ({ row }) => row.original.empresaTienda || "—" },
     { accessorKey: "telefono", header: "Teléfono", size: 120, enableSorting: false,
       cell: ({ row }) => row.original.telefono || "—" },
@@ -60,7 +60,7 @@ export function ProspectHistoryTable(props: Props) {
       cell: ({ row }) => formatProspectDate(row.original.creadoEn) },
     { id: "duracion", header: "Duración", size: 100, enableSorting: false,
       cell: ({ row }) => formatProspectDuration(row.original.duracionMinutos) },
-    { id: "clienteId", header: "Cliente vinculado", size: 110, enableSorting: false,
+    { id: "clienteId", header: "Vinculación", size: 110, enableSorting: false,
       cell: ({ row }) => row.original.clienteId === null ? "No" : `#${row.original.clienteId}` },
     createAppRowActionsColumn<ProspectHistoryRow>({
       actions: ({ original }) => [
