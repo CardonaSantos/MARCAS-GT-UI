@@ -428,6 +428,7 @@ export interface StartDeliveryPayload {
 }
 
 export interface UpdateDeliveryResultPayload {
+  claveIdempotencia?: string;
   receptorNombre?: string;
   receptorDocumento?: string;
   latitud?: number;
