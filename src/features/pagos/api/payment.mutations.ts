@@ -40,6 +40,52 @@ export function useRegisterPayment() {
   });
 }
 
+
+/** Envía multipart/form-data sin modificar la fachada compartida. */
+export function useUploadPaymentProof() {
+  return API.useMutation<
+    { comprobanteId: number; repetido: boolean },
+    { id: number; file: File; descripcion: string; claveIdempotencia: string }
+  >({
+    method: "POST",
+    endpoint: ({ id }) => marcasEndpoints.pagos.proofUpload(id),
+    body: ({ file, descripcion, claveIdempotencia }) => {
+      const form = new FormData();
+      form.append("archivo", file, file.name);
+      form.append("descripcion", descripcion);
+      form.append("claveIdempotencia", claveIdempotencia);
+      return form;
+    },
+    invalidateKeys: paymentInvalidations,
+    options: {
+      onSuccess: () => toast.success("Comprobante cargado."),
+      onError: mutationError,
+    },
+  });
+}
+
+export function useDeletePaymentProof() {
+  return API.useMutation<
+    { eliminado: boolean; storageDeleted: boolean },
+    { id: number; proofId: number }
+  >({
+    method: "DELETE",
+    endpoint: ({ id, proofId }) => marcasEndpoints.pagos.proofRemove(id, proofId),
+    body: () => undefined,
+    invalidateKeys: paymentInvalidations,
+    options: {
+      onSuccess: (data) => {
+        if (data.storageDeleted) {
+          toast.success("Comprobante eliminado.");
+        } else {
+          toast.warning("Comprobante retirado. La limpieza del archivo está pendiente.");
+        }
+      },
+      onError: mutationError,
+    },
+  });
+}
+
 export function useAddPaymentProof() {
   return API.useMutation<
     PaymentDetail,
