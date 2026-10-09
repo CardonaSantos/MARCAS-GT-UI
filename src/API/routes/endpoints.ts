@@ -58,6 +58,10 @@ export const marcasEndpoints = {
   visits: {
     records: "/date/get-visits-regists",
     detail: (id: number) => `/date/${id}`,
+    workflowOpen: "/date/jornada/abierta",
+    workflowStart: "/date/jornada",
+    workflowFinish: (id: number) => `/date/jornada/${id}/finalizar`,
+    workflowCancel: (id: number) => `/date/jornada/${id}/cancelar`,
   },
 
   notifications: {

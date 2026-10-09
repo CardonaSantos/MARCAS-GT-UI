@@ -1,0 +1,50 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+const read = (file) => readFileSync(file, "utf8");
+const root = "src/features/visitas/";
+const app = read("src/App.tsx");
+const page = read("src/Pages/RegistroVisita.tsx");
+const endpoints = read("src/API/routes/endpoints.ts");
+const queries = read(root + "api/visit-workflow.queries.ts");
+const mutations = read(root + "api/visit-workflow.mutations.ts");
+const types = read(root + "api/visit-workflow.types.ts");
+const schema = read(root + "schemas/visit-workflow.schemas.ts");
+const startForm = read(root + "components/visit-start-form.tsx");
+const activeCard = read(root + "components/visit-active-card.tsx");
+const directory = read(root + "common/use-visit-customer-options.ts");
+const formatters = read(root + "common/visit-workflow.formatters.ts");
+
+assert.ok(app.includes('path="/marcas-gt/visita"'));
+assert.ok(endpoints.includes('workflowOpen: "/date/jornada/abierta"'));
+assert.ok(endpoints.includes('workflowStart: "/date/jornada"'));
+assert.ok(endpoints.includes("workflowFinish") && endpoints.includes("workflowCancel"));
+assert.ok(queries.includes("API.useQuery<VisitRecord | null>"));
+assert.ok(queries.includes("emptyResponseValue: null"));
+assert.ok(mutations.includes("useStartVisit") && mutations.includes("useFinishVisit") &&
+  mutations.includes("useCancelVisit"));
+assert.ok(mutations.includes("marcasQueryKeys.visitas.all"));
+assert.ok(schema.includes("startVisitSchema") && schema.includes("finishVisitSchema") &&
+  schema.includes("cancelVisitSchema"));
+assert.ok(types.includes("VisitRecord") && types.includes("VisitReason"));
+assert.ok(directory.includes("useCustomerDirectory"));
+assert.ok(directory.includes("limit: 20"));
+assert.ok(startForm.includes("AppFormSingleSelect"));
+assert.ok(startForm.includes("AppFormSubmit"));
+assert.ok(startForm.includes("AppCard"));
+assert.ok(activeCard.includes("AppTextarea"));
+assert.ok(activeCard.includes("AppCard"));
+assert.ok(activeCard.includes("onFinish") && activeCard.includes("onCancel"));
+assert.ok(formatters.includes("America/Guatemala"));
+assert.ok(page.includes("AppConfirmDialog"));
+assert.ok(page.includes("useOpenVisit"));
+assert.ok(page.includes("useStartVisit"));
+assert.ok(page.includes("useFinishVisit"));
+assert.ok(page.includes("useCancelVisit"));
+assert.ok(!page.includes("axios"));
+assert.ok(!page.includes("jwtDecode"));
+assert.ok(!page.includes("localStorage"));
+assert.ok(!page.includes("window.location.reload"));
+assert.ok(!page.includes("setTimeout"));
+assert.ok(!page.includes("usuarioId"));
+console.log("Registro de visita: API tipada, recuperación, validaciones y flujo autenticado verificados.");
