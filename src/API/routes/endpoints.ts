@@ -38,6 +38,11 @@ export const marcasEndpoints = {
     simple: "/customers/customer-simple",
     detail: (id: number) => `/customers/${id}`,
   },
+  customerLocation: {
+    departments: "/customer-location/get-departamentos",
+    municipalities: (departmentId: number) =>
+      `/customer-location/get-municipios/${departmentId}`,
+  },
 
   visits: {
     records: "/date/get-visits-regists",

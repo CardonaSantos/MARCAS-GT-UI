@@ -38,5 +38,7 @@ jobs:
         run: node scripts/check-product-catalog.mjs
       - name: Check shared data table layout
         run: node scripts/check-app-data-table-layout.mjs
+      - name: Check customer registration
+        run: node scripts/check-create-customer.mjs
       - name: TypeScript and Vite build
         run: npm run build
