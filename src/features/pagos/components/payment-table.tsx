@@ -41,6 +41,24 @@ export function PaymentTable(props: Props) {
   const location = useLocation();
   const from = location.pathname + location.search;
 
+  // La misma tabla lista prepagos, contraentrega y cobros de cartera.
+  // No mostrar una columna de CxC si la página actual solo contiene
+  // cobros directos que todavía no requieren aplicación contable.
+  const showAccountingColumn = props.data.some((payment) => {
+    const direct = ["PREPAGO", "CONTRAENTREGA"].includes(
+      payment.pedido?.condicionPago ?? "",
+    );
+    return !direct || Number(payment.montoAplicado) > 0;
+  });
+
+  const accountingColumn: ColumnDef<PaymentListItem, unknown> = {
+    accessorKey: "montoAplicado",
+    header: "Aplicado a cartera",
+    size: 135,
+    meta: { align: "right" },
+    cell: ({ row }) => formatMoney(row.original.montoAplicado),
+  };
+
   const columns: ColumnDef<PaymentListItem, unknown>[] = [
     {
       accessorKey: "id",
@@ -95,13 +113,7 @@ export function PaymentTable(props: Props) {
       meta: { align: "right" },
       cell: ({ row }) => formatMoney(row.original.monto),
     },
-    {
-      accessorKey: "montoAplicado",
-      header: "A CxC",
-      size: 105,
-      meta: { align: "right" },
-      cell: ({ row }) => formatMoney(row.original.montoAplicado),
-    },
+    ...(showAccountingColumn ? [accountingColumn] : []),
     {
       accessorKey: "montoDisponible",
       header: "Saldo / destino",
@@ -112,18 +124,33 @@ export function PaymentTable(props: Props) {
         const direct = ["PREPAGO", "CONTRAENTREGA"].includes(
           payment.pedido?.condicionPago ?? "",
         );
+        if (payment.estado !== "VERIFICADO") {
+          // No presentar el valor histórico como saldo disponible para
+          // pagos ANULADOS, RECHAZADOS o todavía PENDIENTES.
+          return (
+            <span
+              className="text-[hsl(var(--app-muted-foreground))]"
+              title="No hay saldo operativo disponible de este pago."
+            >
+              —
+            </span>
+          );
+        }
+
         return (
           <span
             className="whitespace-nowrap tabular-nums"
             title={direct
-              ? "Saldo verificado vinculado al pedido, sin aplicación a CxC"
-              : "Saldo pendiente de aplicación a cartera"}
+              ? "Cobro verificado vinculado al pedido, pendiente de eventual conciliación"
+              : "Saldo disponible para aplicar a cartera"}
           >
             {formatMoney(payment.montoDisponible)}
             <span className="ml-2 text-xs text-[hsl(var(--app-muted-foreground))]">
-              {payment.estado === "VERIFICADO"
-                ? direct ? (payment.pedido?.condicionPago === "PREPAGO" ? "Anticipo" : "Vinculado") : "CxC"
-                : "Sin verificar"}
+              {direct
+                ? payment.pedido?.condicionPago === "PREPAGO"
+                  ? "Anticipo"
+                  : "Vinculado"
+                : "Cartera"}
             </span>
           </span>
         );
