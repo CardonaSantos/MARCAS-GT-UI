@@ -113,7 +113,7 @@ export function VisitHistoryDetailContent({ visit }: { visit: VisitHistoryDetail
                   <Field label="Fecha">{visitDate(sale.timestamp)}</Field>
                   <Field label="Monto">{money(sale.monto)}</Field>
                   <Field label="Total con descuento">{money(sale.montoConDescuento)}</Field>
-                  <Field label="Pago">{sale.metodoPago.replaceAll("_", " ")}</Field>
+                  <Field label="Pago">{sale.metodoPago.replace(/_/g, " ")}</Field>
                   <Field label="Referencia">{sale.referenciaPago}</Field>
                 </dl>
               ))}
@@ -139,8 +139,8 @@ export function VisitHistoryDetailContent({ visit }: { visit: VisitHistoryDetail
                     <Field label="Pedido">{order.numero || `#${order.id}`}</Field>
                     <Field label="Fecha">{visitDate(order.creadoEn)}</Field>
                     <Field label="Total">{money(order.total)}</Field>
-                    <Field label="Estado">{order.estado.replaceAll("_", " ")}</Field>
-                    <Field label="Estado de pago">{order.estadoPago.replaceAll("_", " ")}</Field>
+                    <Field label="Estado">{order.estado.replace(/_/g, " ")}</Field>
+                    <Field label="Estado de pago">{order.estadoPago.replace(/_/g, " ")}</Field>
                   </dl>
                 ))}
               </div>
