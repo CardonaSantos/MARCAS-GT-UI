@@ -515,9 +515,11 @@ export function AppDataTable<TData>({
         key={row.id}
         role="row"
         data-index={shouldVirtualizeRows ? virtualIndex : undefined}
-        ref={shouldVirtualizeRows && virtualStart !== undefined
-          ? rowVirtualizer.measureElement
-          : undefined}
+        ref={
+          shouldVirtualizeRows && virtualStart !== undefined
+            ? rowVirtualizer.measureElement
+            : undefined
+        }
         data-state={row.getIsSelected() ? "selected" : undefined}
         className={cn(
           appDataTableRowVariants({
@@ -613,6 +615,7 @@ export function AppDataTable<TData>({
         </div>
       );
     }
+    //comentairo para comiteo
     return (
       <div
         role="rowgroup"
