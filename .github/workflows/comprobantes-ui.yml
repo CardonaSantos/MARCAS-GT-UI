@@ -1,0 +1,33 @@
+name: Comprobantes UI
+on:
+  pull_request:
+    branches: [update-requerimientos]
+  push:
+    branches: [update-requerimientos, feat-comprobantes-ui-20261009]
+    paths:
+      - "src/Pages/Comprobantes/**"
+      - "src/features/comprobantes/**"
+      - "src/Pages/Despachos/**"
+      - "src/Pages/Entregas/**"
+      - "src/features/despachos/components/**"
+      - "src/features/entregas/components/**"
+      - "src/App.tsx"
+      - "src/API/routes/endpoints.ts"
+      - "scripts/check-operational-receipts.mjs"
+      - ".github/workflows/comprobantes-ui.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/check-operational-receipts.mjs
+      - run: npm run build
