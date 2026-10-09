@@ -38,6 +38,9 @@ export const marcasEndpoints = {
     workflowStart: "/prospecto/jornada",
     workflowFinish: (id: number) => `/prospecto/jornada/${id}/finalizar`,
     workflowCancel: (id: number) => `/prospecto/jornada/${id}/cancelar`,
+    history: "/prospecto/historial",
+    historyDetail: (id: number) => `/prospecto/historial/${id}`,
+    convertToCustomer: (id: number) => `/prospecto/historial/${id}/convertir-cliente`,
   },
   customers: {
     root: "/customers",

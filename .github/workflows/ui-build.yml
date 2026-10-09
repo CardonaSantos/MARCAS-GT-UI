@@ -44,5 +44,7 @@ jobs:
         run: node scripts/check-customer-directory.mjs
       - name: Check prospect workflow
         run: node scripts/check-prospect-workflow.mjs
+      - name: Check prospect history
+        run: node scripts/check-prospect-history.mjs
       - name: TypeScript and Vite build
         run: npm run build
