@@ -67,7 +67,7 @@ function useSellerOptions() {
   const empresaId = useStore((state) => state.empresaId);
   const sellers = (query.data ?? []).filter(
     (user) =>
-      ["ADMIN", "VENDEDOR"].includes(user.rol) &&
+      ["ADMIN", "VENDEDOR", "BODEGA"].includes(user.rol) &&
       (!empresaId || user.empresaId === empresaId),
   );
 
