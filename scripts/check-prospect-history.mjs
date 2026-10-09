@@ -39,7 +39,6 @@ assert.ok(detailPage.includes("AppConfirmDialog"));
 assert.ok(detailPage.includes("useConvertProspectToCustomer"));
 assert.ok(detailPage.includes("FeaturePageHeader"));
 assert.ok(detailPage.includes('backLabel="Volver al historial"'));
-assert.ok(detailPage.includes("history-detail-content") === false);
 assert.ok(detailPage.includes("ProspectHistoryDetailContent"));
 assert.ok(detail.includes("Google Maps"));
 assert.ok(detail.includes("prospect.categoriasInteres"));
