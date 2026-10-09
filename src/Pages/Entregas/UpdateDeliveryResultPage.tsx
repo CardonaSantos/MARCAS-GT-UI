@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LocateFixed, Save } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, type Path } from "react-hook-form";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
+import { createIdempotencyKey } from "@/features/common/utils/idempotency";
 import {
   getListReturnRoute,
   getReturnRoute,
@@ -42,6 +43,7 @@ export default function UpdateDeliveryResultPage() {
   const query = useDelivery(id);
   const mutation = useUpdateDeliveryResult();
   const [locating, setLocating] = useState(false);
+  const submitKey = useRef(createIdempotencyKey("delivery-attention-result"));
 
   const form = useForm<DeliveryResultFormValues>({
     resolver: zodResolver(deliveryResultSchema),
@@ -124,9 +126,31 @@ export default function UpdateDeliveryResultPage() {
       }
     }
 
+    // Si aún no hay GPS, intentamos capturarlo una sola vez al confirmar.
+    // El permiso puede denegarse: no se pierde el resultado físico capturado.
+    let coordinates = values;
+    if (!values.latitud.trim() && !values.longitud.trim()) {
+      try {
+        setLocating(true);
+        const gps = await getCurrentPosition();
+        coordinates = {
+          ...values,
+          latitud: String(gps.latitud),
+          longitud: String(gps.longitud),
+        };
+      } catch {
+        toast.warning("No se obtuvo GPS. Puedes reintentar o finalizar después con ubicación.");
+      } finally {
+        setLocating(false);
+      }
+    }
+
     await mutation.mutateAsync({
       id,
-      payload: toUpdateDeliveryResultPayload(values),
+      payload: {
+        ...toUpdateDeliveryResultPayload(coordinates),
+        claveIdempotencia: submitKey.current,
+      },
     });
     navigate(detailUrl, {
       replace: true,
@@ -138,7 +162,9 @@ export default function UpdateDeliveryResultPage() {
     <AppContainer size="xl" paddingX="none">
       <AppStack gap="lg">
         <FeaturePageHeader
-          title="Registrar resultado"
+          title={query.data?.estado === "PENDIENTE"
+            ? "Atender y registrar resultado"
+            : "Editar resultado"}
           description={
             query.data
               ? "Entrega #" + query.data.id + " · " + query.data.cliente.nombreCompleto
@@ -160,8 +186,10 @@ export default function UpdateDeliveryResultPage() {
               <AppStack gap="md">
                 <AppAlert
                   tone="info"
-                  title="Resultado físico del intento"
-                  description="Registra cuánto recibió y cuánto rechazó el cliente. La suma por línea no puede superar la carga de esta parada."
+                  title="Atención y resultado físico"
+                  description={query.data.estado === "PENDIENTE"
+                    ? "Al guardar se iniciará automáticamente la atención, se registrarán las cantidades y se intentará capturar GPS. Después podrás adjuntar firma o fotografía y finalizar."
+                    : "Actualiza lo recibido y rechazado. La atención ya está iniciada."}
                 />
 
                 <AppCard title="Receptor y ubicación" size="sm">
