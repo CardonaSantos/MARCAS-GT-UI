@@ -40,5 +40,7 @@ jobs:
         run: node scripts/check-app-data-table-layout.mjs
       - name: Check customer registration
         run: node scripts/check-create-customer.mjs
+      - name: Check customer directory
+        run: node scripts/check-customer-directory.mjs
       - name: TypeScript and Vite build
         run: npm run build

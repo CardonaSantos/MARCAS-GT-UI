@@ -37,6 +37,8 @@ export const marcasEndpoints = {
     root: "/customers",
     simple: "/customers/customer-simple",
     detail: (id: number) => `/customers/${id}`,
+    directory: "/customers/directorio",
+    directoryDetail: (id: number) => `/customers/directorio/${id}`,
   },
   customerLocation: {
     departments: "/customer-location/get-departamentos",
