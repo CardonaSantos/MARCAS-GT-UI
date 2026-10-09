@@ -2,8 +2,9 @@ import type {
   ColumnDef,
   PaginationState,
 } from "@tanstack/react-table";
-import { RefreshCcw } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Printer, RefreshCcw } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { dispatchReceiptPath } from "@/features/comprobantes/common/receipt.helpers";
 
 import {
   formatDateTime,
@@ -27,6 +28,7 @@ interface Props {
   error?: unknown;
   onRetryQuery?: () => void;
   canOperate?: boolean;
+  canPrintReceipt?: boolean;
   onRetryOperation?: (id: number) => void;
   retryingOperationId?: number | null;
   pagination?: {
@@ -44,6 +46,7 @@ export function DispatchOperationsTable({
   showDispatch = false,
   ...props
 }: Props) {
+  const navigate = useNavigate();
   const location = useLocation();
   const currentUrl = location.pathname + location.search;
 
@@ -133,6 +136,13 @@ export function DispatchOperationsTable({
     },
     createAppRowActionsColumn<DispatchOperation>({
       actions: (row) => [
+        {
+          label: "Comprobante de salida",
+          icon: <Printer />,
+          hidden: !props.canPrintReceipt || row.original.tipo !== "SALIDA_DESPACHO" || row.original.estado !== "APLICADA",
+          onClick: () => navigate(dispatchReceiptPath(row.original.ordenDespachoId, row.original.id),
+            { state: { from: currentUrl } }),
+        },
         {
           label: "Reintentar operación",
           icon: <RefreshCcw />,
