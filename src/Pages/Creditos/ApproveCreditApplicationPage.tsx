@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
@@ -11,7 +11,7 @@ import {
   getReturnRoute,
 } from "@/features/common/navigation/route-state";
 import { useIdempotencyKey } from "@/features/common/utils/idempotency";
-import { useApproveCreditApplication } from "@/features/creditos/api/credit.mutations";
+import { useApproveCreditWithSchedule } from "@/features/creditos/api/credit.mutations";
 import { useCreditApplication } from "@/features/creditos/api/credit.queries";
 import { toApproveCreditPayload } from "@/features/creditos/common/credit.mappers";
 import {
@@ -30,6 +30,9 @@ import { AppCard } from "@/ui/components/app/primitives/app-card";
 import { AppContainer } from "@/ui/components/app/primitives/app-container";
 import { AppDataState } from "@/ui/components/app/primitives/app-data-state";
 import { AppGrid } from "@/ui/components/app/primitives/app-grid";
+import { AppInput } from "@/ui/components/app/primitives/app-input";
+import { AppSingleSelect } from "@/ui/components/app/primitives/app-single-select";
+import { AppConfirmDialog } from "@/ui/components/app/primitives/app-confirm-dialog";
 import { AppStack } from "@/ui/components/app/primitives/app-stack";
 
 export default function ApproveCreditApplicationPage() {
@@ -43,7 +46,22 @@ export default function ApproveCreditApplicationPage() {
   const key = useIdempotencyKey("credit-approve");
 
   const query = useCreditApplication(id);
-  const mutation = useApproveCreditApplication();
+  const mutation = useApproveCreditWithSchedule();
+  const [frequency, setFrequency] = useState<"MENSUAL" | "QUINCENAL" | "SEMANAL">("MENSUAL");
+  const [installments, setInstallments] = useState("1");
+  const [firstDue, setFirstDue] = useState(() => {
+    const future = new Date();
+    future.setUTCDate(future.getUTCDate() + 30);
+    return future.toISOString().slice(0, 10);
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const installmentCount = Number(installments);
+  const validSchedule = Number.isInteger(installmentCount) &&
+    installmentCount >= 1 && installmentCount <= 120 && Boolean(firstDue);
+  const dueDate = useMemo(() => {
+    const date = new Date(firstDue + "T12:00:00.000Z");
+    return Number.isNaN(date.getTime()) ? null : date;
+  }, [firstDue]);
 
   const form = useForm<CreditApprovalFormValues>({
     resolver: zodResolver(creditApprovalSchema),
@@ -83,15 +101,26 @@ export default function ApproveCreditApplicationPage() {
     readiness.referencias === 0 &&
     readiness.documentos === 0;
 
-  const onSubmit = async (values: CreditApprovalFormValues) => {
-    if (!query.data?.acciones.puedeAprobar || !ready) return;
+  const onSubmit = async (_values: CreditApprovalFormValues) => {
+    if (!query.data?.acciones.puedeAprobar || !ready || !validSchedule || !dueDate) return;
+    setConfirmOpen(true);
+  };
 
-    await mutation.mutateAsync({
+  const confirmApproval = async () => {
+    const values = form.getValues();
+    if (!validSchedule || !dueDate) return;
+    const result = await mutation.mutateAsync({
       id,
-      payload: toApproveCreditPayload(values, key),
+      payload: {
+        ...toApproveCreditPayload(values, key),
+        plan: {
+          frecuencia: frequency,
+          numeroCuotas: installmentCount,
+          primeraFechaVencimiento: dueDate.toISOString(),
+        },
+      },
     });
-
-    navigate(detailUrl, {
+    navigate("/marcas-gt/creditos/cartera/" + result.creditoId + "?tab=plan-pagos", {
       replace: true,
       state: { from: listFrom },
     });
@@ -187,7 +216,72 @@ export default function ApproveCreditApplicationPage() {
                   </div>
                 </AppCard>
 
-                <div className="flex justify-end gap-2">
+                <AppCard
+                  title="Programar cuotas"
+                  description="Se guardará un calendario en borrador al aprobar. Las CxC se activarán automáticamente cuando el pedido esté entregado."
+                  size="sm"
+                >
+                  <AppGrid cols={{ base: 1, md: 3 }} gap="md">
+                    <div className="min-w-0">
+                      <label className="mb-2 block text-xs font-medium">Frecuencia *</label>
+                      <AppSingleSelect<"MENSUAL" | "QUINCENAL" | "SEMANAL">
+                        value={frequency}
+                        onChange={(value) => { if (value) setFrequency(value); }}
+                        options={[
+                          { value: "SEMANAL", label: "Semanal" },
+                          { value: "QUINCENAL", label: "Quincenal" },
+                          { value: "MENSUAL", label: "Mensual" },
+                        ]}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <label htmlFor="installments-count" className="mb-2 block text-xs font-medium">
+                        Número de cuotas *
+                      </label>
+                      <AppInput
+                        id="installments-count"
+                        type="number"
+                        min={1}
+                        max={120}
+                        inputMode="numeric"
+                        value={installments}
+                        aria-invalid={!validSchedule}
+                        onChange={(e) => setInstallments(e.target.value)}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <label htmlFor="first-due-date" className="mb-2 block text-xs font-medium">
+                        Primera fecha de pago *
+                      </label>
+                      <AppInput
+                        id="first-due-date"
+                        type="date"
+                        value={firstDue}
+                        onChange={(e) => setFirstDue(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </AppGrid>
+                  <p className="mt-3 text-xs text-[hsl(var(--app-muted-foreground))]">
+                    La suma se distribuye sin perder centavos. La última cuota absorbe el redondeo.
+                  </p>
+                </AppCard>
+
+                <AppConfirmDialog
+                  open={confirmOpen}
+                  onOpenChange={setConfirmOpen}
+                  title="Aprobar crédito y programar cuotas"
+                  description={"Se autorizará el crédito y se prepararán " + installmentCount +
+                    " cuota(s). Las cuentas por cobrar nacerán al confirmarse la entrega."}
+                  preset="approve"
+                  confirmText="Aprobar y programar"
+                  loadingText="Autorizando..."
+                  isLoading={mutation.isPending}
+                  onConfirm={confirmApproval}
+                  contentCard
+                />
+
+                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <AppButton asChild variant="secondary">
                     <Link to={backTo} state={{ from: listFrom }}>
                       Volver
@@ -197,9 +291,10 @@ export default function ApproveCreditApplicationPage() {
                     leftIcon={<CheckCircle2 />}
                     loadingText="Aprobando..."
                     disableWhenInvalid
-                    disabled={!ready}
+                    disabled={!ready || !validSchedule || mutation.isPending}
+                    className="w-full sm:w-auto"
                   >
-                    Aprobar crédito
+                    Aprobar y programar cuotas
                   </AppFormSubmit>
                 </div>
               </AppStack>
