@@ -83,6 +83,30 @@ export function useAddDeliveryEvidence() {
   });
 }
 
+/** Usa el cargador privado de Archivos (multipart, JPG/PNG/WebP/PDF). */
+export function useUploadDeliveryEvidence() {
+  return API.useMutation<
+    { evidence: { id: number }; entrega: DeliveryView },
+    { id: number; file: File; tipo: string; descripcion?: string; claveIdempotencia: string }
+  >({
+    method: "POST",
+    endpoint: ({ id }) => marcasEndpoints.entregas.evidenceUpload(id),
+    body: ({ file, tipo, descripcion, claveIdempotencia }) => {
+      const form = new FormData();
+      form.append("archivo", file, file.name);
+      form.append("tipo", tipo);
+      form.append("descripcion", descripcion ?? "");
+      form.append("claveIdempotencia", claveIdempotencia);
+      return form;
+    },
+    invalidateKeys: [marcasQueryKeys.entregas.all],
+    options: {
+      onSuccess: () => toast.success("Evidencia cargada a Spaces."),
+      onError: mutationError,
+    },
+  });
+}
+
 export function useRemoveDeliveryEvidence() {
   return API.useMutation<DeliveryView, { id: number; evidenceId: number }>({
     method: "DELETE",
