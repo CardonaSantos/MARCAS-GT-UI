@@ -209,7 +209,7 @@ export default function FinalizeDeliveryPage() {
     });
     navigate(detailUrl, {
       replace: true,
-      state: { from: listFrom },
+      state: { from: listFrom, justFinalized: true },
     });
   };
 
