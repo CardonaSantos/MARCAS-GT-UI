@@ -476,7 +476,7 @@ function App() {
             <Route
               path="/marcas-gt/pedidos/nuevo"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <CreateOrderPage />
                 </ProtectedRouteRoles>
               }
@@ -494,7 +494,7 @@ function App() {
             <Route
               path="/marcas-gt/pedidos/:id/editar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <EditOrderPage />
                 </ProtectedRouteRoles>
               }
@@ -502,7 +502,7 @@ function App() {
             <Route
               path="/marcas-gt/pedidos/:id/cancelar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <CancelOrderPage />
                 </ProtectedRouteRoles>
               }

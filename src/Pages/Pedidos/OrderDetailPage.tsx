@@ -60,7 +60,7 @@ export default function OrderDetailPage() {
   });
 
   const order = query.data;
-  const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canWrite = ["ADMIN", "VENDEDOR", "BODEGA"].includes(role ?? "");
   const canRegisterPayment = ["ADMIN", "CONTABILIDAD", "VENDEDOR"].includes(
     role ?? "",
   );
@@ -75,7 +75,7 @@ export default function OrderDetailPage() {
     order?.solicitudesCredito[0] ??
     null;
   const canStartCredit =
-    canWrite &&
+    (role === "ADMIN" || role === "VENDEDOR") &&
     order?.condicionPago === "CREDITO" &&
     order.estado === "PENDIENTE_VALIDACION" &&
     !linkedCredit;
