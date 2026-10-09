@@ -1,0 +1,31 @@
+name: Users UI contract
+on:
+  push:
+    branches: [update-requerimientos, enhancement-usuarios-20261008]
+    paths:
+      - "src/features/usuarios/**"
+      - "src/Pages/Users.tsx"
+      - "src/API/routes/endpoints.ts"
+      - "src/components/Auth/CreateUser.tsx"
+      - "src/features/common/catalogs/catalog.queries.ts"
+      - "scripts/check-user-directory.mjs"
+      - ".github/workflows/user-directory.yml"
+  pull_request:
+    branches: [update-requerimientos]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  users:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/check-user-registration.mjs
+      - run: node scripts/check-user-directory.mjs
+      - run: npm run build

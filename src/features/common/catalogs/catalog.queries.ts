@@ -65,7 +65,7 @@ export function useProviderSelectables(enabled = true) {
 export function useUserSelectables(enabled = true) {
   return API.useQuery<LegacyUserRecord[], Error, UserSelectable[]>({
     queryKey: marcasQueryKeys.usuarios.custom("selectables"),
-    endpoint: marcasEndpoints.users.root,
+    endpoint: marcasEndpoints.users.selectables,
     options: {
       enabled,
       staleTime: 5 * 60_000,
