@@ -3,7 +3,9 @@ import type {
   PaginationState,
   SortingState,
 } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
+import { Eye, Printer } from "lucide-react";
+import { useStore } from "@/Context/ContextSucursal";
+import { DELIVERY_TERMINAL_STATES, deliveryReceiptPath } from "@/features/comprobantes/common/receipt.helpers";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -41,6 +43,8 @@ interface Props {
 export function DeliveryTable(props: Props) {
   const navigate = useNavigate();
   const location = useLocation();
+  const role = useStore((state) => state.userRol);
+  const canPrint = role === "ADMIN" || role === "BODEGA" || role === "REPARTIDOR";
   const returnTo = location.pathname + location.search;
 
   const go = (id: number) =>
@@ -150,6 +154,13 @@ export function DeliveryTable(props: Props) {
     },
     createAppRowActionsColumn<DeliveryView>({
       actions: (row) => [
+        {
+          label: "Imprimir comprobante",
+          icon: <Printer />,
+          hidden: !canPrint || !DELIVERY_TERMINAL_STATES.has(row.original.estado),
+          onClick: () => navigate(deliveryReceiptPath(row.original.id),
+            { state: { from: returnTo } }),
+        },
         {
           label: "Ver entrega",
           icon: <Eye />,
