@@ -3,7 +3,7 @@ import {
 } from "@react-pdf/renderer";
 
 import type {
-  DeliveryReceiptSnapshot, DispatchReceiptSnapshot, ReceiptFormat,
+  ReceiptFormat,
   ReceiptPreview,
 } from "../api/receipt.types";
 import {
