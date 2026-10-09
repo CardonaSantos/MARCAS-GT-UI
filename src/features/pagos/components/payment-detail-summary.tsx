@@ -57,7 +57,7 @@ export function PaymentDetailSummary({ payment }: { payment: PaymentDetail }) {
           title={payment.pedido?.estadoPago === "PAGADO"
             ? "Pedido pagado: cobro reconocido"
             : "Pago verificado y vinculado al pedido"}
-          description="El pago ya cuenta para el estado comercial del pedido. El saldo sin aplicación a CxC es un anticipo vinculado, no un nuevo cobro pendiente. Si existe una CxC directa compatible al verificar, se concilia automáticamente."
+          description="El pago ya cuenta para el estado comercial del pedido. El saldo sin aplicación a CxC es un cobro vinculado al pedido, no un nuevo cobro pendiente. Si existe una CxC directa compatible al verificar, se concilia automáticamente."
         />
       ) : null}
 
@@ -82,7 +82,7 @@ export function PaymentDetailSummary({ payment }: { payment: PaymentDetail }) {
           </p>
           <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
             {verifiedDirect
-              ? "Anticipo vinculado " + formatMoney(payment.montoVinculadoPedido ?? payment.montoDisponible)
+              ? (payment.pedido?.condicionPago === "PREPAGO" ? "Anticipo vinculado " : "Cobro vinculado ") + formatMoney(payment.montoVinculadoPedido ?? payment.montoDisponible)
               : "Libre para cartera " + formatMoney(payment.montoLibreCxC ?? payment.montoDisponible)}
           </p>
         </AppCard>
@@ -122,7 +122,7 @@ export function PaymentDetailSummary({ payment }: { payment: PaymentDetail }) {
             <Value label="Monto aplicado">
               {formatMoney(payment.montoAplicado)}
             </Value>
-            <Value label={verifiedDirect ? "Anticipo vinculado al pedido" : "Disponible para CxC"}>
+            <Value label={verifiedDirect ? (payment.pedido?.condicionPago === "PREPAGO" ? "Anticipo vinculado al pedido" : "Cobro vinculado al pedido") : "Disponible para CxC"}>
               {formatMoney(verifiedDirect
                 ? payment.montoVinculadoPedido ?? payment.montoDisponible
                 : payment.montoLibreCxC ?? payment.montoDisponible)}
