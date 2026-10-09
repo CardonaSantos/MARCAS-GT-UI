@@ -530,7 +530,7 @@ function App() {
               path="/marcas-gt/creditos"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
                 >
                   <CreditApplicationsPage />
                 </ProtectedRouteRoles>
@@ -539,7 +539,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/nueva"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <CreateCreditApplicationPage />
                 </ProtectedRouteRoles>
               }
@@ -548,7 +548,7 @@ function App() {
               path="/marcas-gt/creditos/solicitudes/:id"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
                 >
                   <CreditApplicationDetailPage />
                 </ProtectedRouteRoles>
@@ -557,7 +557,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/editar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <EditCreditApplicationPage />
                 </ProtectedRouteRoles>
               }
@@ -565,7 +565,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/cancelar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <CancelCreditApplicationPage />
                 </ProtectedRouteRoles>
               }
@@ -573,7 +573,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/aprobar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles roles={["ADMIN"]}>
                   <ApproveCreditApplicationPage />
                 </ProtectedRouteRoles>
               }
@@ -581,7 +581,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/rechazar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles roles={["ADMIN"]}>
                   <RejectCreditApplicationPage />
                 </ProtectedRouteRoles>
               }
@@ -589,7 +589,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/referencias/nueva"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <AddCreditReferencePage />
                 </ProtectedRouteRoles>
               }
@@ -597,7 +597,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/referencias/:referenceId/editar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <EditCreditReferencePage />
                 </ProtectedRouteRoles>
               }
@@ -605,7 +605,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/referencias/:referenceId/revisar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles roles={["ADMIN"]}>
                   <ReviewCreditReferencePage />
                 </ProtectedRouteRoles>
               }
@@ -613,7 +613,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/documentos/nuevo"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <AddCreditDocumentPage />
                 </ProtectedRouteRoles>
               }
@@ -621,7 +621,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/documentos/:documentId/revisar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles roles={["ADMIN"]}>
                   <ReviewCreditDocumentPage />
                 </ProtectedRouteRoles>
               }
@@ -629,7 +629,7 @@ function App() {
             <Route
               path="/marcas-gt/creditos/solicitudes/:id/requisitos/:requirementId/revisar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles roles={["ADMIN"]}>
                   <ReviewCreditRequirementPage />
                 </ProtectedRouteRoles>
               }
@@ -638,7 +638,7 @@ function App() {
               path="/marcas-gt/creditos/politicas"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
                 >
                   <CreditPoliciesPage />
                 </ProtectedRouteRoles>
@@ -656,7 +656,7 @@ function App() {
               path="/marcas-gt/creditos/politicas/:id"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
                 >
                   <CreditPolicyDetailPage />
                 </ProtectedRouteRoles>
@@ -682,7 +682,7 @@ function App() {
               path="/marcas-gt/creditos/cartera"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
                 >
                   <CreditPortfolioPage />
                 </ProtectedRouteRoles>
@@ -692,7 +692,7 @@ function App() {
               path="/marcas-gt/creditos/cartera/:id"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "VENDEDOR", "CONTABILIDAD"]}
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
                 >
                   <CreditPortfolioDetailPage />
                 </ProtectedRouteRoles>
