@@ -65,12 +65,19 @@ export function UserEditDialog({ user, currentUserId, onClose }: Props) {
             <AppFormInput<EditUserFormValues> name="correo" label="Correo electrónico"
               required type="email" autoComplete="off" maxLength={250} />
             <AppFormSingleSelect<EditUserFormValues, MarcasUserRole>
-              name="rol" label="Rol operativo" options={USER_ROLE_OPTIONS}
-              required isClearable={false} isSearchable={false}
-              isDisabled={self} />
-            <AppFormSwitch<EditUserFormValues> name="activo" disabled={self}
-              fieldLabel="Cuenta activa"
-              fieldDescription="Una cuenta inactiva no puede iniciar sesión ni utilizar sesiones anteriores." />
+              name="rol" label="Rol operativo"
+              required
+              options={self ? USER_ROLE_OPTIONS.filter((option) => option.value === "ADMIN") : USER_ROLE_OPTIONS}
+              isClearable={false} isSearchable={false} />
+            {self ? (
+              <p className="text-sm text-[hsl(var(--app-muted-foreground))]">
+                Esta cuenta debe permanecer activa.
+              </p>
+            ) : (
+              <AppFormSwitch<EditUserFormValues> name="activo"
+                fieldLabel="Cuenta activa"
+                fieldDescription="Una cuenta inactiva no puede iniciar sesión ni utilizar sesiones anteriores." />
+            )}
             {self ? <AppAlert tone="info" title="Cuenta del administrador actual"
               description="No puedes desactivar tu propia cuenta ni quitarte el rol administrador." /> : null}
           </AppDialogBody>
