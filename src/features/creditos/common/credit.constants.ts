@@ -261,11 +261,12 @@ export type CreditDetailTab = (typeof CREDIT_DETAIL_TABS)[number];
 export const CREDIT_READ_ROLES = [
   "ADMIN",
   "VENDEDOR",
+  "BODEGA",
   "CONTABILIDAD",
 ] as const;
 
-export const CREDIT_WRITE_ROLES = ["ADMIN", "VENDEDOR"] as const;
-export const CREDIT_REVIEW_ROLES = ["ADMIN", "CONTABILIDAD"] as const;
+export const CREDIT_WRITE_ROLES = ["ADMIN", "VENDEDOR", "BODEGA"] as const;
+export const CREDIT_REVIEW_ROLES = ["ADMIN"] as const;
 
 
 export const CREDIT_PAYMENT_PLAN_FREQUENCIES = [
