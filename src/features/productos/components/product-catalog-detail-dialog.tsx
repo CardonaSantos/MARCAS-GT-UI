@@ -17,7 +17,7 @@ function Movements({ rows }: { rows: CatalogMovement[] }) {
       {rows.map((movement) => (
         <li key={movement.id} className="grid gap-1 py-2 sm:grid-cols-[1fr_auto]">
           <div className="min-w-0">
-            <p className="font-medium">{movement.tipo.replaceAll("_", " ")} · {formatInteger(movement.cantidad)} u.</p>
+            <p className="font-medium">{movement.tipo.replace(/_/g, " ")} · {formatInteger(movement.cantidad)} u.</p>
             <p className="text-[hsl(var(--app-muted-foreground))]">
               {movement.bodega.nombre}
               {movement.proveedor ? ` · Proveedor: ${movement.proveedor.nombre}` : ""}
