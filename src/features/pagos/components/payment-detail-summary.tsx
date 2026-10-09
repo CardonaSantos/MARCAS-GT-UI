@@ -30,6 +30,10 @@ function Value({
 }
 
 export function PaymentDetailSummary({ payment }: { payment: PaymentDetail }) {
+  const directOrder = ["PREPAGO", "CONTRAENTREGA"].includes(
+    payment.pedido?.condicionPago ?? "",
+  );
+  const verifiedDirect = directOrder && payment.estado === "VERIFICADO";
   return (
     <div className="space-y-4">
       {payment.motivoRechazo ? (
@@ -44,6 +48,16 @@ export function PaymentDetailSummary({ payment }: { payment: PaymentDetail }) {
           tone="warning"
           title="Pago anulado"
           description={payment.motivoAnulacion}
+        />
+      ) : null}
+
+      {verifiedDirect ? (
+        <AppAlert
+          tone="info"
+          title={payment.pedido?.estadoPago === "PAGADO"
+            ? "Pedido pagado: cobro reconocido"
+            : "Pago verificado y vinculado al pedido"}
+          description="El pago ya cuenta para el estado comercial del pedido. El saldo sin aplicación a CxC es un anticipo vinculado, no un nuevo cobro pendiente. Si existe una CxC directa compatible al verificar, se concilia automáticamente."
         />
       ) : null}
 
@@ -62,12 +76,14 @@ export function PaymentDetailSummary({ payment }: { payment: PaymentDetail }) {
             {payment.moneda}
           </p>
         </AppCard>
-        <AppCard title="Aplicado" icon={<Landmark />} size="sm">
+        <AppCard title="Aplicado a CxC" icon={<Landmark />} size="sm">
           <p className="text-2xl font-semibold">
             {formatMoney(payment.montoAplicado)}
           </p>
           <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-            Disponible {formatMoney(payment.montoDisponible)}
+            {verifiedDirect
+              ? "Anticipo vinculado " + formatMoney(payment.montoVinculadoPedido ?? payment.montoDisponible)
+              : "Libre para cartera " + formatMoney(payment.montoLibreCxC ?? payment.montoDisponible)}
           </p>
         </AppCard>
         <AppCard title="Cliente" icon={<UserRound />} size="sm">
@@ -106,10 +122,12 @@ export function PaymentDetailSummary({ payment }: { payment: PaymentDetail }) {
             <Value label="Monto aplicado">
               {formatMoney(payment.montoAplicado)}
             </Value>
-            <Value label="Disponible">
-              {formatMoney(payment.montoDisponible)}
+            <Value label={verifiedDirect ? "Anticipo vinculado al pedido" : "Disponible para CxC"}>
+              {formatMoney(verifiedDirect
+                ? payment.montoVinculadoPedido ?? payment.montoDisponible
+                : payment.montoLibreCxC ?? payment.montoDisponible)}
             </Value>
-            <Value label="Aplicaciones">{payment.aplicaciones.length}</Value>
+            <Value label="Aplicaciones contables">{payment.aplicaciones.length}</Value>
             <Value label="Estado pedido">
               {payment.pedido?.estadoPago ?? "—"}
             </Value>
