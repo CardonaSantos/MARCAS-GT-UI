@@ -3,7 +3,7 @@ import type {
   PaginationState,
   SortingState,
 } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
+import { Eye, Printer } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -36,6 +36,7 @@ interface Props {
     onPaginationChange: (value: PaginationState) => void;
   };
   toolbar?: React.ReactNode;
+  canPrintReceipt?: boolean;
 }
 
 export function DispatchTable(props: Props) {
@@ -173,6 +174,13 @@ export function DispatchTable(props: Props) {
     },
     createAppRowActionsColumn<DispatchListItem>({
       actions: (row) => [
+        {
+          label: "Ver comprobantes de salida",
+          icon: <Printer />,
+          hidden: !props.canPrintReceipt || row.original.progreso.unidadesDespachadas <= 0,
+          onClick: () => navigate("/marcas-gt/despachos/" + row.original.id + "?tab=operaciones",
+            { state: { from: returnTo } }),
+        },
         {
           label: "Ver despacho",
           icon: <Eye />,
