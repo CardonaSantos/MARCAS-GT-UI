@@ -486,6 +486,20 @@ export interface CreditPortfolioFilters {
   conSaldoPendiente?: boolean;
 }
 
+export interface RequestCreditFromOrderPayload {
+  plazoDias: number;
+  politicaId?: number | null;
+  motivo?: string | null;
+}
+
+export interface ApproveCreditWithSchedulePayload extends ApproveCreditPayload {
+  plan: {
+    frecuencia: "SEMANAL" | "QUINCENAL" | "MENSUAL";
+    numeroCuotas: number;
+    primeraFechaVencimiento: string;
+  };
+}
+
 export interface CreateCreditApplicationPayload {
   pedidoId: number;
   politicaId?: number | null;
