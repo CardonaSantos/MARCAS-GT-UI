@@ -5,6 +5,7 @@ export const marcasEndpoints = {
 
   users: {
     root: "/users",
+    directory: "/users/directorio",
     detail: (id: number) => `/users/${id}`,
     changePassword: (id: number) => `/users/change-password/${id}`,
   },
