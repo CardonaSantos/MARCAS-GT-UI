@@ -247,6 +247,17 @@ export const marcasEndpoints = {
     observations: (id: number) => `/entregas/${id}/observaciones`,
   },
 
+  comprobantes: {
+    detail: (id: number) => `/comprobantes/${id}`,
+    action: (id: number) => `/comprobantes/${id}/acciones`,
+    dispatchPreview: (dispatchId: number, operationId: number) =>
+      `/comprobantes/despachos/${dispatchId}/salidas/${operationId}/vista-previa`,
+    dispatchIssue: (dispatchId: number, operationId: number) =>
+      `/comprobantes/despachos/${dispatchId}/salidas/${operationId}/emitir`,
+    deliveryPreview: (id: number) => `/comprobantes/entregas/${id}/vista-previa`,
+    deliveryIssue: (id: number) => `/comprobantes/entregas/${id}/emitir`,
+  },
+
   facturacion: {
     invoices: {
       root: "/facturas",
