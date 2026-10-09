@@ -1,4 +1,4 @@
-import { Camera, CheckCircle2, MapPin, PackageCheck, Play, Printer, ReceiptText } from "lucide-react";
+import { Camera, CheckCircle2, MapPin, PackageCheck, Printer, ReceiptText } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
