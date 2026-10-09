@@ -50,6 +50,11 @@ export type ApiQueryDefinition<
   endpoint: string;
   params?: ApiQueryParams;
   request?: Omit<ApiRequestConfig, "params" | "signal">;
+  /**
+   * Valor permitido para una respuesta HTTP exitosa sin cuerpo (204 / vacío).
+   * Se activa solo donde la ausencia de registro sea un resultado válido.
+   */
+  emptyResponseValue?: TQueryFnData;
   options?: ApiUseQueryOptions<TQueryFnData, TError, TData>;
 };
 
@@ -104,6 +109,7 @@ export function createApiHooks(client: ApiClient) {
     endpoint,
     params,
     request,
+    emptyResponseValue,
     options,
   }: ApiQueryDefinition<
     TQueryFnData,
@@ -112,12 +118,18 @@ export function createApiHooks(client: ApiClient) {
   >): UseQueryResult<TData, TError> {
     return useQuery<TQueryFnData, TError, TData, QueryKey>({
       queryKey,
-      queryFn: ({ signal }) =>
-        client.get<TQueryFnData>(endpoint, {
+      queryFn: async ({ signal }) => {
+        const result = await client.get<TQueryFnData>(endpoint, {
           ...request,
           params,
           signal,
-        }),
+        });
+        // TanStack Query rechaza undefined: distinguir el vacío esperado
+        // de una respuesta inesperada sin alterar otras consultas.
+        return result === undefined && emptyResponseValue !== undefined
+          ? emptyResponseValue
+          : result;
+      },
       ...options,
     });
   }

@@ -20,6 +20,12 @@ for (const endpoint of ["/prospecto/jornada/abierto", "/prospecto/jornada",
   "/finalizar", "/cancelar"]) assert.ok(api.includes(endpoint));
 assert.ok(keys.includes('prospectos: createQueryKeys("prospectos")'));
 assert.ok(queries.includes("API.useQuery<ProspectRecord | null>"));
+assert.ok(queries.includes("emptyResponseValue: null"),
+  "Una respuesta vacía del prospecto abierto debe convertirse en null.");
+const apiHooks = read("src/API/createApiHooks.ts");
+assert.ok(apiHooks.includes("emptyResponseValue?: TQueryFnData"));
+assert.ok(apiHooks.includes("result === undefined && emptyResponseValue !== undefined"));
+
 for (const mutation of ["useStartProspect", "useFinishProspect", "useCancelProspect"])
   assert.ok(mutations.includes(mutation));
 assert.ok(mutations.includes("marcasQueryKeys.prospectos.all"));
