@@ -93,6 +93,7 @@ export function RequisitionTable({
       header: "Bodega destino",
       size: 190,
       enableSorting: true,
+      meta: { grow: true },
       cell: ({ row }) =>
         row.original.bodega.codigo + " · " + row.original.bodega.nombre,
     },

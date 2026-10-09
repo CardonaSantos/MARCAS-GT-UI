@@ -102,7 +102,9 @@ export default function ReceiveRequisitionPage() {
         !Number.isFinite(Number(line.costoUnitario)) ||
         Number(line.costoUnitario) < 0
       ) {
-        return "Indica un costo real válido para " + source.producto.nombre + ".";
+        return (
+          "Indica un costo real válido para " + source.producto.nombre + "."
+        );
       }
     }
 
@@ -122,9 +124,7 @@ export default function ReceiveRequisitionPage() {
   const patchLine = (detailId: number, patch: Partial<ReceiptDraftLine>) => {
     setLines((current) =>
       current.map((line) =>
-        line.requisicionDetalleId === detailId
-          ? { ...line, ...patch }
-          : line,
+        line.requisicionDetalleId === detailId ? { ...line, ...patch } : line,
       ),
     );
   };
@@ -201,30 +201,42 @@ export default function ReceiveRequisitionPage() {
             <div className="space-y-4">
               <AppAlert
                 tone="warning"
-                title="Esta operación modifica inventario"
-                description="Sólo confirma cantidades que hayan llegado físicamente. Cada línea aplicada registrará una entrada real en la bodega destino."
+                title=""
+                description="Cada línea aplicada registrará una entrada en la bodega destino."
               />
 
               {validationError ? (
-                <AppAlert tone="danger" title="No se puede registrar todavía" description={validationError} />
+                <AppAlert
+                  tone="danger"
+                  title="No se puede registrar todavía"
+                  description={validationError}
+                />
               ) : null}
 
               <AppCard title="Documento y recepción" size="sm">
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
-                    <label htmlFor="receipt-document" className="mb-1 block text-xs font-medium">
+                    <label
+                      htmlFor="receipt-document"
+                      className="mb-1 block text-xs font-medium"
+                    >
                       Documento de referencia
                     </label>
                     <AppInput
                       id="receipt-document"
                       value={documentoReferencia}
                       maxLength={160}
-                      onChange={(event) => setDocumentoReferencia(event.target.value)}
+                      onChange={(event) =>
+                        setDocumentoReferencia(event.target.value)
+                      }
                       placeholder="Factura, nota de envío, boleta..."
                     />
                   </div>
                   <div>
-                    <label htmlFor="receipt-date" className="mb-1 block text-xs font-medium">
+                    <label
+                      htmlFor="receipt-date"
+                      className="mb-1 block text-xs font-medium"
+                    >
                       Fecha y hora de recepción
                     </label>
                     <AppInput
@@ -235,7 +247,10 @@ export default function ReceiveRequisitionPage() {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label htmlFor="receipt-observations" className="mb-1 block text-xs font-medium">
+                    <label
+                      htmlFor="receipt-observations"
+                      className="mb-1 block text-xs font-medium"
+                    >
                       Observaciones
                     </label>
                     <AppTextarea
@@ -269,7 +284,8 @@ export default function ReceiveRequisitionPage() {
                             {source.producto.codigo} · {source.producto.nombre}
                           </p>
                           <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-                            Completado · {source.cantidadRecibida} de {source.cantidadSolicitada}
+                            Completado · {source.cantidadRecibida} de{" "}
+                            {source.cantidadSolicitada}
                           </p>
                         </div>
                       );
@@ -285,15 +301,23 @@ export default function ReceiveRequisitionPage() {
                             {source.producto.codigo} · {source.producto.nombre}
                           </p>
                           <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-                            Solicitado {source.cantidadSolicitada} · recibido {source.cantidadRecibida}
+                            Solicitado {source.cantidadSolicitada} · recibido{" "}
+                            {source.cantidadRecibida}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-[hsl(var(--app-muted-foreground))]">Pendiente</p>
-                          <p className="mt-1 font-semibold">{source.cantidadPendiente}</p>
+                          <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                            Pendiente
+                          </p>
+                          <p className="mt-1 font-semibold">
+                            {source.cantidadPendiente}
+                          </p>
                         </div>
                         <div>
-                          <label htmlFor={"receipt-qty-" + source.id} className="mb-1 block text-xs font-medium">
+                          <label
+                            htmlFor={"receipt-qty-" + source.id}
+                            className="mb-1 block text-xs font-medium"
+                          >
                             Recibir
                           </label>
                           <AppInput
@@ -304,12 +328,16 @@ export default function ReceiveRequisitionPage() {
                             step={1}
                             value={line.cantidad}
                             onChange={(event) =>
-                              patchLine(source.id, { cantidad: event.target.value })
+                              patchLine(source.id, {
+                                cantidad: event.target.value,
+                              })
                             }
                           />
                         </div>
                         <div>
-                          <p className="text-xs text-[hsl(var(--app-muted-foreground))]">Costo estimado</p>
+                          <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                            Costo estimado
+                          </p>
                           <p className="mt-2 font-medium">
                             {source.costoUnitarioEstimado
                               ? formatMoney(source.costoUnitarioEstimado)
@@ -317,7 +345,10 @@ export default function ReceiveRequisitionPage() {
                           </p>
                         </div>
                         <div>
-                          <label htmlFor={"receipt-cost-" + source.id} className="mb-1 block text-xs font-medium">
+                          <label
+                            htmlFor={"receipt-cost-" + source.id}
+                            className="mb-1 block text-xs font-medium"
+                          >
                             Costo real *
                           </label>
                           <AppInput
@@ -366,12 +397,25 @@ export default function ReceiveRequisitionPage() {
         >
           {requisition ? (
             <div className="space-y-2 text-sm">
-              <p><strong>Requisición:</strong> #{requisition.id}</p>
-              <p><strong>Bodega:</strong> {requisition.bodega.nombre}</p>
-              <p><strong>Proveedor:</strong> {requisition.proveedor?.nombre ?? "—"}</p>
-              <p><strong>Unidades:</strong> {totalUnits}</p>
-              <p><strong>Costo real:</strong> {formatMoney(totalCost)}</p>
-              <p><strong>Documento:</strong> {documentoReferencia.trim() || "—"}</p>
+              <p>
+                <strong>Requisición:</strong> #{requisition.id}
+              </p>
+              <p>
+                <strong>Bodega:</strong> {requisition.bodega.nombre}
+              </p>
+              <p>
+                <strong>Proveedor:</strong>{" "}
+                {requisition.proveedor?.nombre ?? "—"}
+              </p>
+              <p>
+                <strong>Unidades:</strong> {totalUnits}
+              </p>
+              <p>
+                <strong>Costo real:</strong> {formatMoney(totalCost)}
+              </p>
+              <p>
+                <strong>Documento:</strong> {documentoReferencia.trim() || "—"}
+              </p>
             </div>
           ) : null}
         </AppConfirmDialog>

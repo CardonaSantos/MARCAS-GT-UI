@@ -9,24 +9,39 @@ export function ProspectIdentityFields() {
     <AppCard title="Datos del prospecto" icon={<UserRound />} size="sm">
       <AppGrid cols={{ base: 1, sm: 2 }} gap="md">
         <AppFormInput<ProspectFormValues>
-          name="nombreCompleto" label="Nombres"
-          placeholder="Nombre del contacto" maxLength={150}
-          description="Indica un nombre o una empresa para iniciar."
+          name="nombreCompleto"
+          label="Nombres"
+          placeholder="Nombre del contacto"
+          maxLength={150}
+          description=""
         />
         <AppFormInput<ProspectFormValues>
-          name="apellido" label="Apellidos" maxLength={150} placeholder="Apellidos (opcional)"
+          name="apellido"
+          label="Apellidos"
+          maxLength={150}
+          placeholder="Apellidos (opcional)"
         />
         <AppFormInput<ProspectFormValues>
-          name="empresaTienda" label="Empresa o tienda"
-          placeholder="Nombre del negocio" maxLength={200}
+          name="empresaTienda"
+          label="Empresa o tienda"
+          placeholder="Nombre del negocio"
+          maxLength={200}
         />
         <AppFormInput<ProspectFormValues>
-          name="telefono" label="Teléfono" type="tel" autoComplete="tel"
-          maxLength={50} placeholder="Número de contacto"
+          name="telefono"
+          label="Teléfono"
+          type="tel"
+          autoComplete="tel"
+          maxLength={50}
+          placeholder="Número de contacto"
         />
         <AppFormInput<ProspectFormValues>
-          name="correo" label="Correo" type="email" autoComplete="email"
-          maxLength={250} placeholder="correo@empresa.com (opcional)"
+          name="correo"
+          label="Correo"
+          type="email"
+          autoComplete="email"
+          maxLength={250}
+          placeholder="correo@empresa.com (opcional)"
         />
       </AppGrid>
     </AppCard>

@@ -157,7 +157,9 @@ export default function TransferDetailPage() {
               error={operationsQuery.error}
               onRetryQuery={() => void operationsQuery.refetch()}
               onRetryOperation={
-                canOperate ? (operation) => setRetryOperation(operation) : undefined
+                canOperate
+                  ? (operation) => setRetryOperation(operation)
+                  : undefined
               }
             />
           ),
@@ -178,8 +180,7 @@ export default function TransferDetailPage() {
       ]
     : [];
 
-  const retryBusy =
-    outboundMutation.isPending || receiptMutation.isPending;
+  const retryBusy = outboundMutation.isPending || receiptMutation.isPending;
 
   return (
     <AppContainer size="full" paddingX="none">
@@ -189,10 +190,7 @@ export default function TransferDetailPage() {
             transfer ? (
               <span className="inline-flex flex-wrap items-center gap-2">
                 {"Transferencia #" + transfer.id}
-                <AppBadge
-                  tone={transferStateTone(transfer.estado)}
-                  size="xs"
-                >
+                <AppBadge tone={transferStateTone(transfer.estado)} size="xs">
                   {TRANSFER_STATE_LABELS[transfer.estado]}
                 </AppBadge>
               </span>
@@ -302,7 +300,7 @@ export default function TransferDetailPage() {
           onOpenChange={setPrepareOpen}
           preset="warning"
           title="Preparar transferencia"
-          description="El server validará disponibilidad actual en la bodega origen. PREPARAR no reserva ni descuenta inventario."
+          description="Se validará disponibilidad actual en la bodega origen."
           confirmText="Validar y preparar"
           loadingText="Validando..."
           isLoading={prepareMutation.isPending}
@@ -324,9 +322,6 @@ export default function TransferDetailPage() {
               <p>
                 <strong>Unidades:</strong>{" "}
                 {transfer.progreso.unidadesSolicitadas}
-              </p>
-              <p className="text-[hsl(var(--app-muted-foreground))]">
-                La disponibilidad puede cambiar después de preparar porque no existe reserva de stock en V1.
               </p>
             </div>
           ) : null}

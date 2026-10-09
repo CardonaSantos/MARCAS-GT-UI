@@ -109,9 +109,12 @@ export default function ReceiveTransferPage() {
 
   const patchLine = (detailId: number, quantity: string, maximum: number) => {
     const numeric = Number(quantity);
-    const safeQuantity = quantity === "" ? "" : Number.isFinite(numeric)
-      ? String(Math.min(Math.max(Math.trunc(numeric), 0), maximum))
-      : quantity;
+    const safeQuantity =
+      quantity === ""
+        ? ""
+        : Number.isFinite(numeric)
+          ? String(Math.min(Math.max(Math.trunc(numeric), 0), maximum))
+          : quantity;
     setLines((current) =>
       current.map((line) =>
         line.transferenciaDetalleId === detailId
@@ -192,8 +195,8 @@ export default function ReceiveTransferPage() {
             <div className="space-y-4">
               <AppAlert
                 tone="warning"
-                title="Esta operación modifica el inventario destino"
-                description="Confirma únicamente lo recibido físicamente. El costo no se captura aquí: el server reutiliza el costo histórico exacto registrado en la salida."
+                title="Ingreso stock físico a bodega destino"
+                description="Confirma únicamente lo recibido."
               />
 
               {validationError ? (
@@ -251,9 +254,7 @@ export default function ReceiveTransferPage() {
                       rows={3}
                       maxLength={1000}
                       value={observaciones}
-                      onChange={(event) =>
-                        setObservaciones(event.target.value)
-                      }
+                      onChange={(event) => setObservaciones(event.target.value)}
                       placeholder="Condición de recepción, faltantes visibles, responsable..."
                     />
                   </div>
@@ -268,8 +269,7 @@ export default function ReceiveTransferPage() {
                 <div className="space-y-2">
                   {transfer.detalles.map((source) => {
                     const line = lines.find(
-                      (item) =>
-                        item.transferenciaDetalleId === source.id,
+                      (item) => item.transferenciaDetalleId === source.id,
                     );
 
                     if (!line) {
@@ -328,7 +328,11 @@ export default function ReceiveTransferPage() {
                             step={1}
                             value={line.cantidad}
                             onChange={(event) =>
-                              patchLine(source.id, event.target.value, source.cantidadEnTransito)
+                              patchLine(
+                                source.id,
+                                event.target.value,
+                                source.cantidadEnTransito,
+                              )
                             }
                           />
                         </div>
@@ -365,7 +369,7 @@ export default function ReceiveTransferPage() {
           onOpenChange={setReviewOpen}
           preset="warning"
           title="Confirmar recepción física"
-          description="Las cantidades confirmadas incrementarán el inventario de la bodega destino usando el costo histórico de salida."
+          description="Se ingresará stock en la bodega destino."
           confirmText="Registrar recepción"
           loadingText="Aplicando recepción..."
           isLoading={mutation.isPending}
@@ -385,8 +389,7 @@ export default function ReceiveTransferPage() {
                 <strong>Unidades:</strong> {totalUnits}
               </p>
               <p>
-                <strong>Documento:</strong>{" "}
-                {documentoReferencia.trim() || "—"}
+                <strong>Documento:</strong> {documentoReferencia.trim() || "—"}
               </p>
             </div>
           ) : null}

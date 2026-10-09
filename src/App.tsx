@@ -251,7 +251,9 @@ function App() {
             <Route
               path="/marcas-gt/inventario"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <InventoryPage />
                 </ProtectedRouteRoles>
               }
@@ -269,7 +271,9 @@ function App() {
             <Route
               path="/marcas-gt/inventario/movimientos"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <InventoryMovementsPage />
                 </ProtectedRouteRoles>
               }
@@ -277,7 +281,9 @@ function App() {
             <Route
               path="/marcas-gt/inventario/stocks/:id"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <InventoryStockDetailPage />
                 </ProtectedRouteRoles>
               }
@@ -360,7 +366,9 @@ function App() {
             <Route
               path="/marcas-gt/requisiciones"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <RequisitionsPage />
                 </ProtectedRouteRoles>
               }
@@ -376,7 +384,9 @@ function App() {
             <Route
               path="/marcas-gt/requisiciones/recepciones"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <RequisitionReceiptsPage />
                 </ProtectedRouteRoles>
               }
@@ -384,7 +394,9 @@ function App() {
             <Route
               path="/marcas-gt/requisiciones/:id"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <RequisitionDetailPage />
                 </ProtectedRouteRoles>
               }
@@ -409,7 +421,9 @@ function App() {
             <Route
               path="/marcas-gt/transferencias"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <TransfersPage />
                 </ProtectedRouteRoles>
               }
@@ -425,7 +439,9 @@ function App() {
             <Route
               path="/marcas-gt/transferencias/operaciones"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <TransferOperationsPage />
                 </ProtectedRouteRoles>
               }
@@ -433,7 +449,9 @@ function App() {
             <Route
               path="/marcas-gt/transferencias/:id"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <TransferDetailPage />
                 </ProtectedRouteRoles>
               }
@@ -476,7 +494,7 @@ function App() {
             <Route
               path="/marcas-gt/pedidos/nuevo"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <CreateOrderPage />
                 </ProtectedRouteRoles>
               }
@@ -494,7 +512,7 @@ function App() {
             <Route
               path="/marcas-gt/pedidos/:id/editar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <EditOrderPage />
                 </ProtectedRouteRoles>
               }
@@ -685,7 +703,13 @@ function App() {
               path="/marcas-gt/despachos"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <DispatchesPage />
                 </ProtectedRouteRoles>
@@ -703,7 +727,13 @@ function App() {
               path="/marcas-gt/despachos/operaciones"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <DispatchOperationsPage />
                 </ProtectedRouteRoles>
@@ -713,7 +743,13 @@ function App() {
               path="/marcas-gt/despachos/reportes/operacion"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <DispatchOperationalReportPage />
                 </ProtectedRouteRoles>
@@ -731,7 +767,13 @@ function App() {
               path="/marcas-gt/despachos/:id"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <DispatchDetailPage />
                 </ProtectedRouteRoles>
@@ -778,12 +820,17 @@ function App() {
               }
             />
 
-
             <Route
               path="/marcas-gt/transporte"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <Navigate to="/marcas-gt/transporte/envios" replace />
                 </ProtectedRouteRoles>
@@ -793,7 +840,13 @@ function App() {
               path="/marcas-gt/transporte/envios"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <ShipmentsPage />
                 </ProtectedRouteRoles>
@@ -810,7 +863,9 @@ function App() {
             <Route
               path="/marcas-gt/transporte/reportes/operacion"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <TransportOperationalReportPage />
                 </ProtectedRouteRoles>
               }
@@ -819,7 +874,13 @@ function App() {
               path="/marcas-gt/transporte/envios/:id"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <ShipmentDetailPage />
                 </ProtectedRouteRoles>
@@ -876,7 +937,9 @@ function App() {
             <Route
               path="/marcas-gt/transporte/transportistas"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <CarriersPage />
                 </ProtectedRouteRoles>
               }
@@ -900,7 +963,9 @@ function App() {
             <Route
               path="/marcas-gt/transporte/vehiculos"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <VehiclesPage />
                 </ProtectedRouteRoles>
               }
@@ -924,7 +989,9 @@ function App() {
             <Route
               path="/marcas-gt/transporte/conductores"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <DriversPage />
                 </ProtectedRouteRoles>
               }
@@ -946,12 +1013,17 @@ function App() {
               }
             />
 
-
             <Route
               path="/marcas-gt/entregas"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <DeliveriesPage />
                 </ProtectedRouteRoles>
@@ -968,7 +1040,9 @@ function App() {
             <Route
               path="/marcas-gt/entregas/reportes/operacion"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}
+                >
                   <DeliveryOperationalReportPage />
                 </ProtectedRouteRoles>
               }
@@ -985,7 +1059,13 @@ function App() {
               path="/marcas-gt/entregas/:id"
               element={
                 <ProtectedRouteRoles
-                  roles={["ADMIN", "BODEGA", "CONTABILIDAD", "VENDEDOR", "REPARTIDOR"]}
+                  roles={[
+                    "ADMIN",
+                    "BODEGA",
+                    "CONTABILIDAD",
+                    "VENDEDOR",
+                    "REPARTIDOR",
+                  ]}
                 >
                   <DeliveryDetailPage />
                 </ProtectedRouteRoles>
@@ -1016,11 +1096,12 @@ function App() {
               }
             />
 
-
             <Route
               path="/marcas-gt/facturacion"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}
+                >
                   <Navigate to="/marcas-gt/facturacion/facturas" replace />
                 </ProtectedRouteRoles>
               }
@@ -1028,7 +1109,9 @@ function App() {
             <Route
               path="/marcas-gt/facturacion/facturas"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}
+                >
                   <InvoicesPage />
                 </ProtectedRouteRoles>
               }
@@ -1052,7 +1135,9 @@ function App() {
             <Route
               path="/marcas-gt/facturacion/cuentas-por-cobrar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}
+                >
                   <ReceivablesPage />
                 </ProtectedRouteRoles>
               }
@@ -1068,7 +1153,9 @@ function App() {
             <Route
               path="/marcas-gt/facturacion/facturas/:id"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}
+                >
                   <InvoiceDetailPage />
                 </ProtectedRouteRoles>
               }
@@ -1090,11 +1177,12 @@ function App() {
               }
             />
 
-
             <Route
               path="/marcas-gt/pagos"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}
+                >
                   <PaymentsPage />
                 </ProtectedRouteRoles>
               }
@@ -1110,7 +1198,9 @@ function App() {
             <Route
               path="/marcas-gt/pagos/nuevo"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}
+                >
                   <CreatePaymentPage />
                 </ProtectedRouteRoles>
               }
@@ -1118,7 +1208,9 @@ function App() {
             <Route
               path="/marcas-gt/pagos/:id"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "CONTABILIDAD", "VENDEDOR"]}
+                >
                   <PaymentDetailPage />
                 </ProtectedRouteRoles>
               }
@@ -1173,9 +1265,30 @@ function App() {
               }
             />
 
-            <Route path="/marcas-gt/tracking" element={<ProtectedRouteAdmin><TrackingLivePage /></ProtectedRouteAdmin>} />
-            <Route path="/marcas-gt/tracking/historial" element={<ProtectedRouteAdmin><TrackingHistoryPage /></ProtectedRouteAdmin>} />
-            <Route path="/marcas-gt/tracking/jornadas/:id" element={<ProtectedRouteAdmin><TrackingAttendancePage /></ProtectedRouteAdmin>} />
+            <Route
+              path="/marcas-gt/tracking"
+              element={
+                <ProtectedRouteAdmin>
+                  <TrackingLivePage />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/tracking/historial"
+              element={
+                <ProtectedRouteAdmin>
+                  <TrackingHistoryPage />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/tracking/jornadas/:id"
+              element={
+                <ProtectedRouteAdmin>
+                  <TrackingAttendancePage />
+                </ProtectedRouteAdmin>
+              }
+            />
 
             <Route
               path="/marcas-gt/empleados"

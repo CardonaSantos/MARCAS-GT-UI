@@ -1,35 +1,22 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  ArrowRight,
-  Boxes,
-  PackageCheck,
-  Send,
-  Truck,
-} from "lucide-react";
+import { ArrowRight, Boxes, PackageCheck, Send, Truck } from "lucide-react";
 
 import { formatDateTime } from "@/features/common/formatters/value.formatters";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppCard } from "@/ui/components/app/primitives/app-card";
 import { AppDataTable } from "@/ui/components/app/table/app-data-table";
 
-import type {
-  TransferDetail,
-  TransferEvent,
-} from "../api/transfer.types";
+import type { TransferDetail, TransferEvent } from "../api/transfer.types";
 import { TransferProgress } from "./transfer-progress";
 
-export function TransferOverview({
-  transfer,
-}: {
-  transfer: TransferDetail;
-}) {
+export function TransferOverview({ transfer }: { transfer: TransferDetail }) {
   return (
     <div className="space-y-4">
       {transfer.estado === "PREPARADA" ? (
         <AppAlert
           tone="warning"
           title="Lista para salida"
-          description="La disponibilidad fue validada al preparar, pero el inventario NO está reservado. El stock sólo disminuye cuando registras la salida física."
+          description="Disponibilidad validada al preparar, esperando a reservar en stock."
         />
       ) : null}
 
@@ -37,7 +24,7 @@ export function TransferOverview({
         <AppAlert
           tone="info"
           title="Mercadería en tránsito"
-          description="El inventario ya salió de la bodega origen. Sólo aumentará en la bodega destino conforme registres recepciones físicas."
+          description="Bodega destino esperando recepciones."
         />
       ) : null}
 
@@ -167,11 +154,7 @@ export function TransferOverview({
   );
 }
 
-export function TransferProducts({
-  transfer,
-}: {
-  transfer: TransferDetail;
-}) {
+export function TransferProducts({ transfer }: { transfer: TransferDetail }) {
   return (
     <div className="space-y-2">
       {transfer.detalles.map((line) => (

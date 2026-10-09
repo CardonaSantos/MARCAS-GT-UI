@@ -74,8 +74,7 @@ export function TransferOperationsTable({
       accessorKey: "tipo",
       header: "Tipo",
       size: 105,
-      cell: ({ row }) =>
-        TRANSFER_OPERATION_TYPE_LABELS[row.original.tipo],
+      cell: ({ row }) => TRANSFER_OPERATION_TYPE_LABELS[row.original.tipo],
     },
     {
       accessorKey: "estado",
@@ -91,6 +90,8 @@ export function TransferOperationsTable({
       accessorKey: "documentoReferencia",
       header: "Documento",
       size: 150,
+      meta: { grow: true },
+
       cell: ({ row }) => row.original.documentoReferencia ?? "—",
     },
     {
@@ -113,6 +114,7 @@ export function TransferOperationsTable({
       id: "usuario",
       header: "Usuario",
       size: 150,
+      meta: { grow: true },
       cell: ({ row }) => row.original.usuario.nombre,
     },
     {

@@ -3,7 +3,10 @@ import { Link, useLocation } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
-import { useOrders, useOrderSummary } from "@/features/pedidos/api/order.queries";
+import {
+  useOrders,
+  useOrderSummary,
+} from "@/features/pedidos/api/order.queries";
 import { useOrderListState } from "@/features/pedidos/common/use-order-list-state";
 import { OrderFilters } from "@/features/pedidos/components/order-filters";
 import { OrderSummaryCards } from "@/features/pedidos/components/order-summary-cards";
@@ -17,16 +20,13 @@ import { AppStack } from "@/ui/components/app/primitives/app-stack";
 export default function OrdersPage() {
   const location = useLocation();
   const role = useStore((state) => state.userRol);
-  const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canWrite = role === "ADMIN" || role === "VENDEDOR" || role === "BODEGA";
   const state = useOrderListState();
 
   const listQuery = useOrders(state.queryFilters);
   const summaryCompatible =
     state.filters.visitaId === null && state.filters.soloAbiertos !== true;
-  const summaryQuery = useOrderSummary(
-    state.summaryFilters,
-    summaryCompatible,
-  );
+  const summaryQuery = useOrderSummary(state.summaryFilters, summaryCompatible);
   const meta = listQuery.data?.meta;
   const currentUrl = location.pathname + location.search;
 
@@ -39,7 +39,10 @@ export default function OrdersPage() {
           actions={
             canWrite ? (
               <AppButton asChild variant="primary" size="sm">
-                <Link to="/marcas-gt/pedidos/nuevo" state={{ from: currentUrl }}>
+                <Link
+                  to="/marcas-gt/pedidos/nuevo"
+                  state={{ from: currentUrl }}
+                >
                   <Plus className="h-4 w-4" />
                   Nuevo pedido
                 </Link>

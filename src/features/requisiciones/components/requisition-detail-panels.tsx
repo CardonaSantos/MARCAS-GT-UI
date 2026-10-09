@@ -21,14 +21,18 @@ import {
 } from "../common/requisition.constants";
 import { RequisitionProgress } from "./requisition-progress";
 
-export function RequisitionOverview({ requisition }: { requisition: RequisitionDetail }) {
+export function RequisitionOverview({
+  requisition,
+}: {
+  requisition: RequisitionDetail;
+}) {
   return (
     <div className="space-y-4">
       {requisition.estado === "APROBADA" || requisition.estado === "PARCIAL" ? (
         <AppAlert
           tone="info"
           title="Lista para recibir mercadería"
-          description="La aprobación no modifica existencias. El inventario aumenta únicamente cuando se registra una recepción física."
+          description=""
         />
       ) : null}
 
@@ -44,13 +48,17 @@ export function RequisitionOverview({ requisition }: { requisition: RequisitionD
         <AppAlert
           tone="danger"
           title="Requisición cancelada"
-          description={requisition.motivoCancelacion ?? "Sin motivo registrado."}
+          description={
+            requisition.motivoCancelacion ?? "Sin motivo registrado."
+          }
         />
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <AppCard title="Productos" icon={<Boxes />} size="sm">
-          <p className="text-2xl font-semibold">{requisition.progreso.productos}</p>
+          <p className="text-2xl font-semibold">
+            {requisition.progreso.productos}
+          </p>
         </AppCard>
         <AppCard title="Solicitado" icon={<Truck />} size="sm">
           <p className="text-2xl font-semibold">
@@ -88,24 +96,36 @@ export function RequisitionOverview({ requisition }: { requisition: RequisitionD
         <AppCard title="Destino y proveedor" size="sm">
           <dl className="grid gap-4 sm:grid-cols-2">
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Bodega</dt>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Bodega
+              </dt>
               <dd className="mt-1 text-sm font-medium">
                 {requisition.bodega.codigo} · {requisition.bodega.nombre}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Proveedor</dt>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Proveedor
+              </dt>
               <dd className="mt-1 text-sm font-medium">
                 {requisition.proveedor?.nombre ?? "Sin asignar"}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Solicitante</dt>
-              <dd className="mt-1 text-sm font-medium">{requisition.solicitante.nombre}</dd>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Solicitante
+              </dt>
+              <dd className="mt-1 text-sm font-medium">
+                {requisition.solicitante.nombre}
+              </dd>
             </div>
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Creada</dt>
-              <dd className="mt-1 text-sm font-medium">{formatDateTime(requisition.creadoEn)}</dd>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Creada
+              </dt>
+              <dd className="mt-1 text-sm font-medium">
+                {formatDateTime(requisition.creadoEn)}
+              </dd>
             </div>
           </dl>
         </AppCard>
@@ -113,20 +133,36 @@ export function RequisitionOverview({ requisition }: { requisition: RequisitionD
         <AppCard title="Workflow" size="sm">
           <dl className="grid gap-4 sm:grid-cols-2">
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Solicitada</dt>
-              <dd className="mt-1 text-sm font-medium">{formatDateTime(requisition.solicitadaEn)}</dd>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Solicitada
+              </dt>
+              <dd className="mt-1 text-sm font-medium">
+                {formatDateTime(requisition.solicitadaEn)}
+              </dd>
             </div>
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Aprobada</dt>
-              <dd className="mt-1 text-sm font-medium">{formatDateTime(requisition.aprobadaEn)}</dd>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Aprobada
+              </dt>
+              <dd className="mt-1 text-sm font-medium">
+                {formatDateTime(requisition.aprobadaEn)}
+              </dd>
             </div>
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Completada</dt>
-              <dd className="mt-1 text-sm font-medium">{formatDateTime(requisition.completadaEn)}</dd>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Completada
+              </dt>
+              <dd className="mt-1 text-sm font-medium">
+                {formatDateTime(requisition.completadaEn)}
+              </dd>
             </div>
             <div>
-              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">Observaciones</dt>
-              <dd className="mt-1 text-sm font-medium">{requisition.observaciones ?? "—"}</dd>
+              <dt className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Observaciones
+              </dt>
+              <dd className="mt-1 text-sm font-medium">
+                {requisition.observaciones ?? "—"}
+              </dd>
             </div>
           </dl>
         </AppCard>
@@ -135,7 +171,11 @@ export function RequisitionOverview({ requisition }: { requisition: RequisitionD
   );
 }
 
-export function RequisitionProducts({ requisition }: { requisition: RequisitionDetail }) {
+export function RequisitionProducts({
+  requisition,
+}: {
+  requisition: RequisitionDetail;
+}) {
   return (
     <div className="space-y-2">
       {requisition.detalles.map((line) => (
@@ -151,15 +191,21 @@ export function RequisitionProducts({ requisition }: { requisition: RequisitionD
         >
           <div className="grid items-center gap-4 md:grid-cols-4">
             <div>
-              <p className="text-xs text-[hsl(var(--app-muted-foreground))]">Solicitado</p>
+              <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Solicitado
+              </p>
               <p className="mt-1 font-semibold">{line.cantidadSolicitada}</p>
             </div>
             <div>
-              <p className="text-xs text-[hsl(var(--app-muted-foreground))]">Recibido</p>
+              <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Recibido
+              </p>
               <p className="mt-1 font-semibold">{line.cantidadRecibida}</p>
             </div>
             <div>
-              <p className="text-xs text-[hsl(var(--app-muted-foreground))]">Pendiente</p>
+              <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                Pendiente
+              </p>
               <p className="mt-1 font-semibold">{line.cantidadPendiente}</p>
             </div>
             <RequisitionProgress
@@ -208,6 +254,8 @@ export function RequisitionReceiptsTable({
     {
       accessorKey: "documentoReferencia",
       header: "Documento",
+      meta: { grow: true },
+
       size: 150,
       cell: ({ row }) => row.original.documentoReferencia ?? "—",
     },
@@ -227,6 +275,7 @@ export function RequisitionReceiptsTable({
     {
       id: "recibidoPor",
       header: "Recibido por",
+      meta: { grow: true },
       size: 150,
       cell: ({ row }) => row.original.recibidoPor.nombre,
     },

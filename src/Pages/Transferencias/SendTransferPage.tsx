@@ -106,8 +106,8 @@ export default function SendTransferPage() {
             <div className="space-y-4">
               <AppAlert
                 tone="warning"
-                title="La salida es completa"
-                description="V1 envía todos los productos y cantidades de la transferencia. Al confirmar, el inventario disminuirá en la bodega origen; el destino todavía no aumentará."
+                title=""
+                description="Al confirmar, el inventario disminuirá en la bodega origen; bodega destino a la espera de recepción."
               />
 
               {!canSend ? (
@@ -194,9 +194,7 @@ export default function SendTransferPage() {
                       rows={3}
                       maxLength={1000}
                       value={observaciones}
-                      onChange={(event) =>
-                        setObservaciones(event.target.value)
-                      }
+                      onChange={(event) => setObservaciones(event.target.value)}
                       placeholder="Condición de salida, vehículo interno, responsable..."
                     />
                   </div>
@@ -235,8 +233,7 @@ export default function SendTransferPage() {
                 {transfer.progreso.unidadesSolicitadas}
               </p>
               <p>
-                <strong>Documento:</strong>{" "}
-                {documentoReferencia.trim() || "—"}
+                <strong>Documento:</strong> {documentoReferencia.trim() || "—"}
               </p>
             </div>
           ) : null}

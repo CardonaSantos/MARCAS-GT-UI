@@ -42,8 +42,7 @@ export function useRequisitionListState() {
   const table = useAppTableHandlers({
     initialPageIndex:
       (parsePositiveIntParam(searchParams.get("page"), 1) ?? 1) - 1,
-    initialPageSize:
-      parsePositiveIntParam(searchParams.get("limit"), 20) ?? 20,
+    initialPageSize: parsePositiveIntParam(searchParams.get("limit"), 20) ?? 20,
     initialSorting: [
       {
         id:
@@ -56,8 +55,8 @@ export function useRequisitionListState() {
           (parseEnumParam(
             searchParams.get("sortDir"),
             SORT_DIRECTIONS,
-            "desc",
-          ) ?? "desc") === "desc",
+            "asc",
+          ) ?? "asc") === "asc",
       },
     ],
     initialSearch: searchParams.get("search") ?? "",
@@ -67,9 +66,7 @@ export function useRequisitionListState() {
 
   const filters = useAppStateHandlers<FilterState>({
     estado: parseEnumParam(searchParams.get("estado"), REQUISITION_STATES),
-    bodegaDestinoId: parsePositiveIntParam(
-      searchParams.get("bodegaDestinoId"),
-    ),
+    bodegaDestinoId: parsePositiveIntParam(searchParams.get("bodegaDestinoId")),
     proveedorId: parsePositiveIntParam(searchParams.get("proveedorId")),
     solicitanteId: parsePositiveIntParam(searchParams.get("solicitanteId")),
     fechaDesde: searchParams.get("fechaDesde") ?? "",
@@ -148,10 +145,8 @@ export function useRequisitionListState() {
   }, [filters, setSearchParams, table]);
 
   useEffect(() => {
-    const page =
-      parsePositiveIntParam(searchParams.get("page"), 1) ?? 1;
-    const limit =
-      parsePositiveIntParam(searchParams.get("limit"), 20) ?? 20;
+    const page = parsePositiveIntParam(searchParams.get("page"), 1) ?? 1;
+    const limit = parsePositiveIntParam(searchParams.get("limit"), 20) ?? 20;
     const search = searchParams.get("search") ?? "";
     const sortBy =
       parseEnumParam(
@@ -160,11 +155,8 @@ export function useRequisitionListState() {
         "creadoEn",
       ) ?? "creadoEn";
     const sortDir =
-      parseEnumParam(
-        searchParams.get("sortDir"),
-        SORT_DIRECTIONS,
-        "desc",
-      ) ?? "desc";
+      parseEnumParam(searchParams.get("sortDir"), SORT_DIRECTIONS, "desc") ??
+      "desc";
 
     table.setPagination((current) =>
       current.pageIndex === page - 1 && current.pageSize === limit

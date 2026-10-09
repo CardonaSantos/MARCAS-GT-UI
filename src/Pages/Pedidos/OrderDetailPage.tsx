@@ -60,7 +60,7 @@ export default function OrderDetailPage() {
   });
 
   const order = query.data;
-  const canWrite = role === "ADMIN" || role === "VENDEDOR";
+  const canWrite = role === "ADMIN" || role === "VENDEDOR" || role === "BODEGA";
   const canRegisterPayment = ["ADMIN", "CONTABILIDAD", "VENDEDOR"].includes(
     role ?? "",
   );
@@ -69,8 +69,7 @@ export default function OrderDetailPage() {
   );
   const linkedCredit =
     order?.solicitudesCredito.find(
-      (application) =>
-        !["RECHAZADA", "CANCELADA"].includes(application.estado),
+      (application) => !["RECHAZADA", "CANCELADA"].includes(application.estado),
     ) ??
     order?.solicitudesCredito[0] ??
     null;
@@ -84,10 +83,10 @@ export default function OrderDetailPage() {
     (role === "ADMIN" || role === "BODEGA") &&
     Boolean(
       order &&
-        DISPATCHABLE_STATES.includes(
-          order.estado as (typeof DISPATCHABLE_STATES)[number],
-        ) &&
-        order.progreso.unidadesPendientesDespacho > 0,
+      DISPATCHABLE_STATES.includes(
+        order.estado as (typeof DISPATCHABLE_STATES)[number],
+      ) &&
+      order.progreso.unidadesPendientesDespacho > 0,
     );
 
   const tabs = order
@@ -218,10 +217,7 @@ export default function OrderDetailPage() {
                 linkedCredit ? (
                   <AppButton asChild variant="secondary" size="sm">
                     <Link
-                      to={
-                        "/marcas-gt/creditos/solicitudes/" +
-                        linkedCredit.id
-                      }
+                      to={"/marcas-gt/creditos/solicitudes/" + linkedCredit.id}
                       state={{
                         from: currentUrl,
                         listFrom: backTo,
@@ -237,8 +233,7 @@ export default function OrderDetailPage() {
                   <AppButton asChild variant="primary" size="sm">
                     <Link
                       to={
-                        "/marcas-gt/creditos/solicitudes/nueva?pedidoId=" +
-                        id
+                        "/marcas-gt/creditos/solicitudes/nueva?pedidoId=" + id
                       }
                       state={{
                         from: currentUrl,

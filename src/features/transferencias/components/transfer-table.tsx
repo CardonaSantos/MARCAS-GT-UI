@@ -3,12 +3,7 @@ import type {
   PaginationState,
   SortingState,
 } from "@tanstack/react-table";
-import {
-  Eye,
-  PackageCheck,
-  Pencil,
-  Send,
-} from "lucide-react";
+import { Eye, PackageCheck, Pencil, Send } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { formatDateTime } from "@/features/common/formatters/value.formatters";
@@ -95,6 +90,7 @@ export function TransferTable({
       header: "Origen",
       size: 180,
       enableSorting: true,
+      meta: { grow: true },
       cell: ({ row }) =>
         row.original.bodegaOrigen.codigo +
         " · " +
@@ -106,6 +102,7 @@ export function TransferTable({
       header: "Destino",
       size: 180,
       enableSorting: true,
+      meta: { grow: true },
       cell: ({ row }) =>
         row.original.bodegaDestino.codigo +
         " · " +
@@ -177,9 +174,7 @@ export function TransferTable({
           icon: <PackageCheck />,
           hidden:
             !canOperate ||
-            !["EN_TRANSITO", "RECIBIDA_PARCIAL"].includes(
-              row.original.estado,
-            ),
+            !["EN_TRANSITO", "RECIBIDA_PARCIAL"].includes(row.original.estado),
           onClick: () =>
             go("/marcas-gt/transferencias/" + row.original.id + "/recibir"),
         },
