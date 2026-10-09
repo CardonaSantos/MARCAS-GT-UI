@@ -72,6 +72,10 @@ export interface PaymentListItem {
   monto: string;
   montoAplicado: string;
   montoDisponible: string;
+  /** Pago directo verificado vinculado a pedido, pendiente de eventual CxC. */
+  montoVinculadoPedido?: string;
+  /** Disponible para aplicación libre a cartera (no incluye anticipos vinculados). */
+  montoLibreCxC?: string;
   referencia: string | null;
   fechaPago: string;
   comprobantes: number;
@@ -259,6 +263,8 @@ export interface PaymentSummary {
     verificado: string;
     pendiente: string;
     disponibleNoAplicado: string;
+    vinculadoPedido?: string;
+    libreCxC?: string;
   };
 }
 
