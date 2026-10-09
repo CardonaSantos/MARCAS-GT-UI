@@ -5,12 +5,14 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
+import { marcasApi } from "@/API/api";
+import { marcasEndpoints } from "@/API/routes/endpoints";
 import { getReturnRoute } from "@/features/common/navigation/route-state";
 import { createIdempotencyKey } from "@/features/common/utils/idempotency";
 import { useIssueReceipt, useRecordReceiptAction } from "@/features/comprobantes/api/receipt.mutations";
 import { useReceiptPreview } from "@/features/comprobantes/api/receipt.queries";
 import type { ReceiptFormat, ReceiptKind } from "@/features/comprobantes/api/receipt.types";
-import { cleanFilePart, receiptTitle } from "@/features/comprobantes/common/receipt.helpers";
+import { cleanFilePart, isDeliverySnapshot, receiptTitle } from "@/features/comprobantes/common/receipt.helpers";
 import { ReceiptDataSummary } from "@/features/comprobantes/components/receipt-data-summary";
 import { ReceiptPdfDocument } from "@/features/comprobantes/components/receipt-pdf-document";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
@@ -32,6 +34,7 @@ export default function OperationalReceiptPage({ kind }: Props) {
   const [isDesktop, setIsDesktop] = useState(false);
   const [working, setWorking] = useState(false);
   const [issuedOverride, setIssuedOverride] = useState<ReturnType<typeof useIssueReceipt>["data"]>(undefined);
+  const [signatureImage, setSignatureImage] = useState<string | null>(null);
   const preview = useReceiptPreview(kind, id, operationId);
   const issue = useIssueReceipt();
   const action = useRecordReceiptAction();
@@ -41,6 +44,20 @@ export default function OperationalReceiptPage({ kind }: Props) {
   const current = issuedOverride ?? preview.data?.comprobante ?? null;
   const snapshot = current?.snapshot ?? preview.data?.snapshot;
   const number = current?.numero ?? preview.data?.numeroPrevisto ?? "Sin número";
+  // El snapshot del comprobante no se modifica: la firma se lee únicamente
+  // para la representación PDF, mediante un endpoint autenticado de Entregas.
+  const signature = kind === "ENTREGA" && snapshot && isDeliverySnapshot(snapshot)
+    ? snapshot.evidencias.find((e) => e.tipo === "FIRMA" &&
+      e.url.startsWith("spaces://") && Boolean(e.key))
+    : null;
+  const loadSignature = async (): Promise<string | null> => {
+    if (!signature) return null;
+    const result = await marcasApi.get<{ dataUrl: string }>(
+      marcasEndpoints.entregas.evidenceImage(id, signature.id),
+    );
+    return /^data:image\/(?:png|jpeg);base64,/.test(result.dataUrl)
+      ? result.dataUrl : null;
+  };
   const issued = Boolean(current);
   const isValid = Number.isSafeInteger(id) && id > 0 && (kind === "ENTREGA" ||
     (Number.isSafeInteger(operationId) && operationId > 0));
@@ -57,10 +74,25 @@ export default function OperationalReceiptPage({ kind }: Props) {
     setIssuedOverride(undefined);
   }, [kind, id, operationId]);
 
+  useEffect(() => {
+    let active = true;
+    setSignatureImage(null);
+    if (signature) {
+      void loadSignature()
+        .then((dataUrl) => { if (active) setSignatureImage(dataUrl); })
+        .catch(() => { /* El PDF aún mostrará el vínculo digital de la firma. */ });
+    }
+    return () => { active = false; };
+  }, [id, signature?.id, signature?.url]);
+
   const renderBlob = async () => {
     if (!current || !snapshot) throw new Error("Emite primero el comprobante para poder utilizarlo.");
+    let embeddedSignature = signatureImage;
+    if (!embeddedSignature && signature) {
+      embeddedSignature = await loadSignature().catch(() => null);
+    }
     return pdf(<ReceiptPdfDocument snapshot={snapshot} numero={number} format={format}
-      emitidoEn={current.emitidoEn} />).toBlob();
+      emitidoEn={current.emitidoEn} signatureImage={embeddedSignature} />).toBlob();
   };
 
   const logAction = async (
@@ -257,7 +289,7 @@ export default function OperationalReceiptPage({ kind }: Props) {
                       <PDFViewer width="100%" height={format === "A4" ? 750 : 620}
                         showToolbar={false} key={format + number + String(issued)}>
                         <ReceiptPdfDocument snapshot={snapshot} numero={number} format={format}
-                          emitidoEn={current?.emitidoEn} />
+                          emitidoEn={current?.emitidoEn} signatureImage={signatureImage} />
                       </PDFViewer>
                     </div>
                   </div>
