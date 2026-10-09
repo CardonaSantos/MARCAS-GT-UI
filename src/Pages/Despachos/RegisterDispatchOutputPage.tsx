@@ -86,10 +86,7 @@ export default function RegisterDispatchOutputPage() {
         (item) => item.id === line.detalleId,
       );
       const quantity = Number(line.cantidad);
-      if (
-        source &&
-        quantity > source.despacho.pendienteDespachar
-      ) {
+      if (source && quantity > source.despacho.pendienteDespachar) {
         invalid = true;
         form.setError(
           ("detalles." + index + ".cantidad") as Path<DispatchOutputFormValues>,
@@ -112,8 +109,13 @@ export default function RegisterDispatchOutputPage() {
 
     navigate(detailUrl, {
       replace: true,
-      state: { from: listFrom,
-        justDispatchedOperationId: result.result.status === "APLICADA" ? result.result.operationId : null },
+      state: {
+        from: listFrom,
+        justDispatchedOperationId:
+          result.result.status === "APLICADA"
+            ? result.result.operationId
+            : null,
+      },
     });
   };
 
@@ -147,8 +149,8 @@ export default function RegisterDispatchOutputPage() {
 
                 <AppAlert
                   tone="warning"
-                  title="Esta acción mueve inventario real"
-                  description="La salida aplica la reserva, reduce stock real y reservado, crea SALIDA_DESPACHO y sincroniza cantidadDespachada del Pedido."
+                  title="Esta acción moverá stock real y reservado"
+                  description=""
                 />
 
                 <AppCard title="Salida" size="sm">
@@ -221,8 +223,7 @@ export default function RegisterDispatchOutputPage() {
                     loadingText="Registrando salida..."
                     disableWhenInvalid
                     disabled={
-                      !query.data.acciones.puedeDespachar ||
-                      blockedByFailure
+                      !query.data.acciones.puedeDespachar || blockedByFailure
                     }
                   >
                     Registrar salida

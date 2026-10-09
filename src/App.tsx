@@ -520,7 +520,7 @@ function App() {
             <Route
               path="/marcas-gt/pedidos/:id/cancelar"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR"]}>
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA"]}>
                   <CancelOrderPage />
                 </ProtectedRouteRoles>
               }

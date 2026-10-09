@@ -48,15 +48,15 @@ export default function CreatePaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const preselectedCustomerId =
-    Number(searchParams.get("clienteId")) || 0;
-  const preselectedOrderId =
-    Number(searchParams.get("pedidoId")) || null;
+  const preselectedCustomerId = Number(searchParams.get("clienteId")) || 0;
+  const preselectedOrderId = Number(searchParams.get("pedidoId")) || null;
   const backTo = getReturnRoute(location.state, "/marcas-gt/pagos");
   const customers = useCustomerSelectables();
   const banks = usePaymentBanks();
   const mutation = useRegisterPayment();
-  const [pending, setPending] = useState<RegisterPaymentFormValues | null>(null);
+  const [pending, setPending] = useState<RegisterPaymentFormValues | null>(
+    null,
+  );
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [key, setKey] = useState("");
 
@@ -170,8 +170,8 @@ export default function CreatePaymentPage() {
 
         <AppAlert
           tone="info"
-          title="Registro no equivale a aplicación"
-          description="Registrar un pago no disminuye todavía una Cuenta por Cobrar. Primero debe verificarse y después aplicarse a la CxC correspondiente."
+          title="Registrar un pago para su posterior verificación."
+          description=""
         />
 
         <AppForm form={form} onSubmit={requestConfirmation}>
@@ -301,12 +301,25 @@ export default function CreatePaymentPage() {
         >
           {pending ? (
             <div className="grid gap-2 text-sm sm:grid-cols-2">
-              <p><strong>Cliente:</strong> {selectedCustomer?.nombreCompleto ?? "#" + pending.clienteId}</p>
-              <p><strong>Pedido:</strong> {selectedOrder?.numero ?? "Sin pedido"}</p>
-              <p><strong>Método:</strong> {PAYMENT_METHOD_LABELS[pending.metodo]}</p>
-              <p><strong>Monto:</strong> {formatMoney(pending.monto)}</p>
-              <p><strong>Banco:</strong> {selectedBank?.nombre ?? "No aplica"}</p>
-              <p><strong>Referencia:</strong> {pending.referencia || "—"}</p>
+              <p>
+                <strong>Cliente:</strong>{" "}
+                {selectedCustomer?.nombreCompleto ?? "#" + pending.clienteId}
+              </p>
+              <p>
+                <strong>Pedido:</strong> {selectedOrder?.numero ?? "Sin pedido"}
+              </p>
+              <p>
+                <strong>Método:</strong> {PAYMENT_METHOD_LABELS[pending.metodo]}
+              </p>
+              <p>
+                <strong>Monto:</strong> {formatMoney(pending.monto)}
+              </p>
+              <p>
+                <strong>Banco:</strong> {selectedBank?.nombre ?? "No aplica"}
+              </p>
+              <p>
+                <strong>Referencia:</strong> {pending.referencia || "—"}
+              </p>
             </div>
           ) : null}
         </AppConfirmDialog>
