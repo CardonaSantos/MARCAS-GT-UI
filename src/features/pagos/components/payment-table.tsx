@@ -122,7 +122,7 @@ export function PaymentTable(props: Props) {
             {formatMoney(payment.montoDisponible)}
             <span className="ml-2 text-xs text-[hsl(var(--app-muted-foreground))]">
               {payment.estado === "VERIFICADO"
-                ? direct ? "Anticipo" : "CxC"
+                ? direct ? (payment.pedido?.condicionPago === "PREPAGO" ? "Anticipo" : "Vinculado") : "CxC"
                 : "Sin verificar"}
             </span>
           </span>
