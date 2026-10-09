@@ -10,6 +10,8 @@ on:
       - "src/features/common/catalogs/catalog.queries.ts"
       - "scripts/check-user-directory.mjs"
       - ".github/workflows/user-directory.yml"
+  pull_request:
+    branches: [update-requerimientos]
   workflow_dispatch:
 permissions:
   contents: read
