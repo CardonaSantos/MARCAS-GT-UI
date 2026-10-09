@@ -1,6 +1,7 @@
 import {
   CheckCircle2,
   PackageCheck,
+  Printer,
   Pencil,
   Play,
   Truck,
@@ -10,6 +11,7 @@ import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
+import { dispatchReceiptPath } from "@/features/comprobantes/common/receipt.helpers";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import { getReturnRoute } from "@/features/common/navigation/route-state";
 import { useUrlTabState } from "@/features/common/navigation/use-url-tab-state";
@@ -33,6 +35,7 @@ import { DispatchLinesTable } from "@/features/despachos/components/dispatch-lin
 import { DispatchLogisticsPanel } from "@/features/despachos/components/dispatch-logistics-panel";
 import { DispatchOperationsTable } from "@/features/despachos/components/dispatch-operations-table";
 import { AppBadge } from "@/ui/components/app/primitives/app-badge";
+import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppConfirmDialog } from "@/ui/components/app/primitives/app-confirm-dialog";
 import { AppContainer } from "@/ui/components/app/primitives/app-container";
@@ -64,6 +67,9 @@ export default function DispatchDetailPage() {
   });
 
   const dispatch = query.data;
+  const recentReceiptId = (location.state as { justDispatchedOperationId?: number } | null)?.justDispatchedOperationId;
+  const latestAppliedOutput = (operationsQuery.data?.data ?? []).find((op) =>
+    op.tipo === "SALIDA_DESPACHO" && op.estado === "APLICADA");
   const operations = operationsQuery.data?.data ?? [];
   const failedTypes = new Set(
     operations
@@ -109,6 +115,7 @@ export default function DispatchDetailPage() {
               error={operationsQuery.error}
               onRetryQuery={() => void operationsQuery.refetch()}
               canOperate={canOperate}
+              canPrintReceipt={canOperate}
               retryingOperationId={retryingId}
               onRetryOperation={async (operationId) => {
                 setRetryingId(operationId);
@@ -172,6 +179,13 @@ export default function DispatchDetailPage() {
           actions={
             dispatch ? (
               <>
+                {canOperate && latestAppliedOutput ? (
+                  <AppButton asChild variant="secondary" size="sm">
+                    <Link to={dispatchReceiptPath(id, latestAppliedOutput.id)} state={{ from: currentUrl }}>
+                      <Printer className="h-4 w-4" /> Comprobante de salida
+                    </Link>
+                  </AppButton>
+                ) : null}
                 {canOperate && dispatch.acciones.puedeEditar ? (
                   <AppButton asChild variant="secondary" size="sm">
                     <Link
@@ -271,6 +285,15 @@ export default function DispatchDetailPage() {
           }
         />
 
+        {canOperate && recentReceiptId ? (
+          <AppAlert tone="success" title="Salida registrada correctamente"
+            description="Puedes revisar y emitir el comprobante de esta salida sin buscar la operación."
+            action={<AppButton asChild variant="secondary" size="sm">
+              <Link to={dispatchReceiptPath(id, recentReceiptId)} state={{ from: currentUrl }}>
+                <Printer className="h-4 w-4" /> Ver comprobante de esta salida
+              </Link>
+            </AppButton>} />
+        ) : null}
         <AppDataState
           isLoading={query.isLoading}
           isFetching={query.isFetching}
