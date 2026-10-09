@@ -172,6 +172,9 @@ export const marcasEndpoints = {
       reviewReference: (id: number, referenceId: number) =>
         `/creditos/solicitudes/${id}/referencias/${referenceId}/revisar`,
       documents: (id: number) => `/creditos/solicitudes/${id}/documentos`,
+      documentUpload: (id: number) => `/creditos/solicitudes/${id}/documentos/archivo`,
+      documentFile: (id: number, documentId: number) =>
+        `/creditos/solicitudes/${id}/documentos/${documentId}/archivo`,
       reviewDocument: (id: number, documentId: number) =>
         `/creditos/solicitudes/${id}/documentos/${documentId}/revisar`,
       reviewRequirement: (id: number, requirementId: number) =>
