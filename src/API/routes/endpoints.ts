@@ -62,6 +62,8 @@ export const marcasEndpoints = {
     workflowStart: "/date/jornada",
     workflowFinish: (id: number) => `/date/jornada/${id}/finalizar`,
     workflowCancel: (id: number) => `/date/jornada/${id}/cancelar`,
+    history: "/date/historial",
+    historyDetail: (id: number) => `/date/historial/${id}`,
   },
 
   notifications: {

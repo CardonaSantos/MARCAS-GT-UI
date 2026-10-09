@@ -40,6 +40,7 @@ import { ProtectedRouteAdmin } from "./components/Auth/ProtectedRouteAdmin";
 import MySales from "./Pages/EmployePages/MySales";
 import RegistroVisita from "./Pages/RegistroVisita";
 import VisitasTable from "./Pages/Dates/VisitasTable";
+import VisitaHistorialDetalle from "./Pages/Dates/VisitaHistorialDetalle";
 import CustomerSales from "./Pages/CustomerSales/CustomerSales";
 import { MarcasLayout } from "./ui/components/Layout/layout-marcas";
 import VentaPdfPage from "./components/PDF/VentasPDF/VentaPdfPage";
@@ -1328,6 +1329,14 @@ function App() {
               element={
                 <ProtectedRouteAdmin>
                   <VisitasTable />
+                </ProtectedRouteAdmin>
+              }
+            />
+            <Route
+              path="/marcas-gt/historial-visitas/:id"
+              element={
+                <ProtectedRouteAdmin>
+                  <VisitaHistorialDetalle />
                 </ProtectedRouteAdmin>
               }
             />
