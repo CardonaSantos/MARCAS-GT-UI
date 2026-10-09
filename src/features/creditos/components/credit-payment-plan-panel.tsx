@@ -151,6 +151,8 @@ export function CreditPaymentPlanPanel({
   const existingPlan = credit.planPago;
   const editable = credit.acciones.puedeGestionarPlan;
   const active = existingPlan?.estado === "ACTIVO";
+  const awaitingDelivery = existingPlan?.estado === "BORRADOR" &&
+    credit.pedido.estado !== "ENTREGADO";
 
   const [frequency, setFrequency] =
     useState<CreditPaymentPlanFrequency>("MENSUAL");
@@ -718,6 +720,15 @@ export function CreditPaymentPlanPanel({
               </AppBadge>
             </div>
 
+            {awaitingDelivery ? (
+              <div className="rounded-md border border-[hsl(var(--app-border))] p-3 text-sm">
+                <p className="font-medium">Cuotas listas para activarse</p>
+                <p className="mt-1 text-[hsl(var(--app-muted-foreground))]">
+                  El sistema creará las cuentas por cobrar automáticamente al completar la entrega del pedido.
+                  No tienes que activar el plan manualmente.
+                </p>
+              </div>
+            ) : null}
             <div className="flex flex-wrap gap-2">
               {editable ? (
                 <AppButton
@@ -730,7 +741,8 @@ export function CreditPaymentPlanPanel({
                   Revisar y guardar borrador
                 </AppButton>
               ) : null}
-              {existingPlan && credit.acciones.puedeActivarPlan ? (
+              {existingPlan && credit.acciones.puedeActivarPlan &&
+                credit.pedido.estado === "ENTREGADO" ? (
                 <AppButton
                   variant="primary"
                   size="sm"
