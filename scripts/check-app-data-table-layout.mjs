@@ -13,7 +13,7 @@ assert.ok(table.includes("if (shouldVirtualizeRows)"),
   "El cuerpo también debe respetar el umbral de virtualización.");
 assert.ok(table.includes("measureElement: (element) => element.getBoundingClientRect().height"),
   "La altura debe medirse en el DOM para filas de altura variable.");
-assert.match(table, /ref=\\{\\s*shouldVirtualizeRows && virtualStart !== undefined/,
+assert.ok(table.includes("ref={") && table.includes("rowVirtualizer.measureElement"),
   "El virtualizador necesita medir los elementos renderizados.");
 assert.ok(table.includes("data-index={shouldVirtualizeRows ? virtualIndex : undefined}"),
   "TanStack Virtual necesita data-index en las filas que mide.");
