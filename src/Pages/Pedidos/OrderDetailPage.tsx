@@ -75,7 +75,7 @@ export default function OrderDetailPage() {
     order?.solicitudesCredito[0] ??
     null;
   const canStartCredit =
-    canWrite &&
+    (role === "ADMIN" || role === "VENDEDOR") &&
     order?.condicionPago === "CREDITO" &&
     order.estado === "PENDIENTE_VALIDACION" &&
     !linkedCredit;
