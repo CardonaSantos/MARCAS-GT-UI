@@ -1,7 +1,8 @@
-import { Camera, CheckCircle2, MapPin, PackageCheck, Play, ReceiptText } from "lucide-react";
+import { Camera, CheckCircle2, MapPin, PackageCheck, Play, Printer, ReceiptText } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
+import { DELIVERY_TERMINAL_STATES, deliveryReceiptPath } from "@/features/comprobantes/common/receipt.helpers";
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import { getReturnRoute } from "@/features/common/navigation/route-state";
 import { useUrlTabState } from "@/features/common/navigation/use-url-tab-state";
@@ -18,6 +19,7 @@ import { DeliveryEvidencePanel } from "@/features/entregas/components/delivery-e
 import { DeliveryLinesTable } from "@/features/entregas/components/delivery-lines-table";
 import { DeliveryTrackingPanel } from "@/features/entregas/components/delivery-tracking-panel";
 import { AppBadge } from "@/ui/components/app/primitives/app-badge";
+import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppContainer } from "@/ui/components/app/primitives/app-container";
 import { AppDataState } from "@/ui/components/app/primitives/app-data-state";
@@ -33,6 +35,9 @@ export default function DeliveryDetailPage() {
   const delivery = query.data;
   const backTo = getReturnRoute(location.state, "/marcas-gt/entregas");
   const currentUrl = location.pathname + location.search;
+  const canPrint = (role === "ADMIN" || role === "BODEGA" || role === "REPARTIDOR") &&
+    Boolean(delivery && DELIVERY_TERMINAL_STATES.has(delivery.estado) && delivery.tiempos.finalizadaEn);
+  const justFinalized = Boolean((location.state as { justFinalized?: boolean } | null)?.justFinalized);
   const canBill =
     (role === "ADMIN" || role === "CONTABILIDAD") &&
     Boolean(
@@ -176,6 +181,13 @@ export default function DeliveryDetailPage() {
                     </Link>
                   </AppButton>
                 ) : null}
+                {canPrint ? (
+                  <AppButton asChild variant="secondary" size="sm">
+                    <Link to={deliveryReceiptPath(id)} state={{ from: currentUrl }}>
+                      <Printer className="h-4 w-4" /> Imprimir comprobante
+                    </Link>
+                  </AppButton>
+                ) : null}
                 {canBill ? (
                   <AppButton asChild variant="secondary" size="sm">
                     <Link
@@ -203,6 +215,15 @@ export default function DeliveryDetailPage() {
           }
         />
 
+        {canPrint && justFinalized ? (
+          <AppAlert tone="success" title="Entrega finalizada correctamente"
+            description="La constancia está disponible para revisión y emisión."
+            action={<AppButton asChild variant="secondary" size="sm">
+              <Link to={deliveryReceiptPath(id)} state={{ from: currentUrl }}>
+                <Printer className="h-4 w-4" /> Ver comprobante de entrega
+              </Link>
+            </AppButton>} />
+        ) : null}
         <AppDataState
           isLoading={query.isLoading}
           isFetching={query.isFetching}
