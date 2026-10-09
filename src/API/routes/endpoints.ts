@@ -239,6 +239,11 @@ export const marcasEndpoints = {
     detail: (id: number) => `/entregas/${id}`,
     events: (id: number) => `/entregas/${id}/eventos`,
     evidences: (id: number) => `/entregas/${id}/evidencias`,
+    evidenceUpload: (id: number) => `/entregas/${id}/evidencias/archivo`,
+    evidenceFile: (id: number, evidenceId: number) =>
+      `/entregas/${id}/evidencias/${evidenceId}/archivo`,
+    evidenceImage: (id: number, evidenceId: number) =>
+      `/entregas/${id}/evidencias/${evidenceId}/imagen`,
     evidence: (id: number, evidenceId: number) =>
       `/entregas/${id}/evidencias/${evidenceId}`,
     start: (id: number) => `/entregas/${id}/iniciar`,

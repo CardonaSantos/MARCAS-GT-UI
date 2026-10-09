@@ -1,4 +1,4 @@
-import { Camera, CheckCircle2, MapPin, PackageCheck, Play, Printer, ReceiptText } from "lucide-react";
+import { Camera, CheckCircle2, MapPin, PackageCheck, Printer, ReceiptText } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
@@ -138,25 +138,16 @@ export default function DeliveryDetailPage() {
           actions={
             delivery ? (
               <>
-                {delivery.acciones.puedeIniciar ? (
-                  <AppButton asChild variant="primary" size="sm">
-                    <Link
-                      to={"/marcas-gt/entregas/" + id + "/iniciar"}
-                      state={{ from: currentUrl, listFrom: backTo }}
-                    >
-                      <Play className="h-4 w-4" />
-                      Iniciar atención
-                    </Link>
-                  </AppButton>
-                ) : null}
                 {delivery.acciones.puedeEditarResultado ? (
-                  <AppButton asChild variant="secondary" size="sm">
+                  <AppButton asChild variant={delivery.estado === "PENDIENTE" ? "primary" : "secondary"} size="sm">
                     <Link
                       to={"/marcas-gt/entregas/" + id + "/resultado"}
                       state={{ from: currentUrl, listFrom: backTo }}
                     >
                       <PackageCheck className="h-4 w-4" />
-                      Registrar resultado
+                      {delivery.estado === "PENDIENTE"
+                        ? "Atender y registrar resultado"
+                        : "Editar resultado"}
                     </Link>
                   </AppButton>
                 ) : null}

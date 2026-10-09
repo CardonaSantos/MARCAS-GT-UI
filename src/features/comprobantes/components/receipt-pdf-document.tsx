@@ -15,6 +15,7 @@ interface Props {
   numero: string;
   format: ReceiptFormat;
   emitidoEn?: string | null;
+  signatureImage?: string | null;
 }
 
 const ink = "#1e293b";
@@ -121,13 +122,14 @@ function ProductTable({ snapshot }: { snapshot: ReceiptPreview["snapshot"] }) {
   );
 }
 
-function A4Receipt({ snapshot, numero, emitidoEn }: Omit<Props, "format">) {
+function A4Receipt({ snapshot, numero, emitidoEn, signatureImage }: Omit<Props, "format">) {
   const despacho = isDispatchSnapshot(snapshot) ? snapshot : null;
   const entrega = isDeliverySnapshot(snapshot) ? snapshot : null;
   const referencia = despacho?.documento.numeroPedido ?? entrega?.documento.numeroPedido ?? "—";
   const fechaOperacion = despacho?.fechas.salidaConfirmadaEn ?? entrega?.fechas.finalizadaEn ?? null;
-  const signature = entrega?.evidencias.find((e) => e.tipo === "FIRMA" &&
+  const legacySignature = entrega?.evidencias.find((e) => e.tipo === "FIRMA" &&
     /^https:\/\/res\.cloudinary\.com\//i.test(e.url)) ?? null;
+  const signatureSource = signatureImage ?? legacySignature?.url ?? null;
   return (
     <Page size="A4" style={styles.page}>
       <View style={styles.header} wrap={false}>
@@ -196,9 +198,9 @@ function A4Receipt({ snapshot, numero, emitidoEn }: Omit<Props, "format">) {
           {entrega.motivoNoEntrega ? (
             <Text>Motivo de no entrega: {entrega.motivoNoEntrega} · {entrega.detalleNoEntrega ?? ""}</Text>
           ) : null}
-          {signature ? <View style={{ marginTop: 7 }}>
+          {signatureSource ? <View style={{ marginTop: 7 }}>
             <Text style={styles.label}>Firma registrada</Text>
-            <Image src={signature.url} style={styles.signatureImage} />
+            <Image src={signatureSource} style={styles.signatureImage} />
           </View> : (
             <View style={styles.signature}><Text style={styles.label}>
               {entrega.evidencias.some((x) => x.tipo === "FIRMA")
@@ -275,7 +277,7 @@ function ThermalReceipt({ snapshot, numero, emitidoEn }: Omit<Props, "format">) 
   );
 }
 
-export function ReceiptPdfDocument({ snapshot, numero, format, emitidoEn }: Props) {
+export function ReceiptPdfDocument({ snapshot, numero, format, emitidoEn, signatureImage }: Props) {
   return (
     <Document
       title={receiptTitle(isDispatchSnapshot(snapshot) ? "SALIDA_DESPACHO" : "ENTREGA", snapshot) + " " + numero}
@@ -283,7 +285,7 @@ export function ReceiptPdfDocument({ snapshot, numero, format, emitidoEn }: Prop
       subject="Comprobante operativo no fiscal"
     >
       {format === "A4"
-        ? <A4Receipt snapshot={snapshot} numero={numero} emitidoEn={emitidoEn} />
+        ? <A4Receipt snapshot={snapshot} numero={numero} emitidoEn={emitidoEn} signatureImage={signatureImage} />
         : <ThermalReceipt snapshot={snapshot} numero={numero} emitidoEn={emitidoEn} />}
     </Document>
   );
