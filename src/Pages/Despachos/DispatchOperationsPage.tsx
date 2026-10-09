@@ -97,6 +97,7 @@ export default function DispatchOperationsPage() {
           error={query.error}
           onRetryQuery={() => void query.refetch()}
           canOperate={canOperate}
+          canPrintReceipt={canOperate}
           retryingOperationId={retryingId}
           onRetryOperation={async (operationId) => {
             setRetryingId(operationId);

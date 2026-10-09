@@ -105,14 +105,15 @@ export default function RegisterDispatchOutputPage() {
     });
     if (invalid) return;
 
-    await mutation.mutateAsync({
+    const result = await mutation.mutateAsync({
       id,
       payload: toRegisterOutputPayload(values, key),
     });
 
     navigate(detailUrl, {
       replace: true,
-      state: { from: listFrom },
+      state: { from: listFrom,
+        justDispatchedOperationId: result.result.status === "APLICADA" ? result.result.operationId : null },
     });
   };
 

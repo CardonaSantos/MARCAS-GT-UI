@@ -105,7 +105,7 @@ export default function DispatchesPage() {
           />
         )}
 
-        <DispatchTable
+        <DispatchTable canPrintReceipt={canOperate}
           data={listQuery.data?.data ?? []}
           isLoading={listQuery.isLoading}
           isFetching={listQuery.isFetching}

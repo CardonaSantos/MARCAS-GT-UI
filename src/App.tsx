@@ -114,6 +114,7 @@ import CreditPortfolioDetailPage from "./Pages/Creditos/CreditPortfolioDetailPag
 import DispatchesPage from "./Pages/Despachos/DispatchesPage";
 import CreateDispatchPage from "./Pages/Despachos/CreateDispatchPage";
 import DispatchDetailPage from "./Pages/Despachos/DispatchDetailPage";
+import OperationalReceiptPage from "./Pages/Comprobantes/OperationalReceiptPage";
 import EditDispatchPage from "./Pages/Despachos/EditDispatchPage";
 import StartDispatchPreparationPage from "./Pages/Despachos/StartDispatchPreparationPage";
 import UpdateDispatchPreparationPage from "./Pages/Despachos/UpdateDispatchPreparationPage";
@@ -719,6 +720,14 @@ function App() {
               }
             />
             <Route
+              path="/marcas-gt/despachos/:id/comprobante/:operacionId"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA"]}>
+                  <OperationalReceiptPage kind="SALIDA_DESPACHO" />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
               path="/marcas-gt/despachos/:id"
               element={
                 <ProtectedRouteRoles
@@ -961,6 +970,14 @@ function App() {
               element={
                 <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "CONTABILIDAD"]}>
                   <DeliveryOperationalReportPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/entregas/:id/comprobante"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "BODEGA", "REPARTIDOR"]}>
+                  <OperationalReceiptPage kind="ENTREGA" />
                 </ProtectedRouteRoles>
               }
             />
