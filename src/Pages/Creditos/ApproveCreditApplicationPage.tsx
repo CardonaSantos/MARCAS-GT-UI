@@ -273,7 +273,7 @@ export default function ApproveCreditApplicationPage() {
                   title="Aprobar crédito y programar cuotas"
                   description={"Se autorizará el crédito y se prepararán " + installmentCount +
                     " cuota(s). Las cuentas por cobrar nacerán al confirmarse la entrega."}
-                  preset="approve"
+                  preset="success"
                   confirmText="Aprobar y programar"
                   loadingText="Autorizando..."
                   isLoading={mutation.isPending}
