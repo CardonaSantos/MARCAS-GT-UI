@@ -10,7 +10,7 @@ import { createIdempotencyKey } from "@/features/common/utils/idempotency";
 import { useIssueReceipt, useRecordReceiptAction } from "@/features/comprobantes/api/receipt.mutations";
 import { useReceiptPreview } from "@/features/comprobantes/api/receipt.queries";
 import type { ReceiptFormat, ReceiptKind } from "@/features/comprobantes/api/receipt.types";
-import { cleanFilePart, isDeliverySnapshot, receiptTitle } from "@/features/comprobantes/common/receipt.helpers";
+import { cleanFilePart, receiptTitle } from "@/features/comprobantes/common/receipt.helpers";
 import { ReceiptDataSummary } from "@/features/comprobantes/components/receipt-data-summary";
 import { ReceiptPdfDocument } from "@/features/comprobantes/components/receipt-pdf-document";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
