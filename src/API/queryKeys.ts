@@ -28,6 +28,7 @@ export const marcasQueryKeys = {
   proveedores: createQueryKeys("proveedores"),
   usuarios: createQueryKeys("usuarios"),
   clientes: createQueryKeys("clientes"),
+  prospectos: createQueryKeys("prospectos"),
   visitas: createQueryKeys("visitas"),
   inventario: createQueryKeys("inventario"),
   requisiciones: createQueryKeys("requisiciones"),

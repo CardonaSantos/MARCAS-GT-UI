@@ -33,6 +33,12 @@ export const marcasEndpoints = {
     deleteOne: (id: number) => `/provider/delete-provider/${id}`,
   },
 
+  prospects: {
+    workflowOpen: "/prospecto/jornada/abierto",
+    workflowStart: "/prospecto/jornada",
+    workflowFinish: (id: number) => `/prospecto/jornada/${id}/finalizar`,
+    workflowCancel: (id: number) => `/prospecto/jornada/${id}/cancelar`,
+  },
   customers: {
     root: "/customers",
     simple: "/customers/customer-simple",
