@@ -7,7 +7,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useStore } from "@/Context/ContextSucursal";
 import {
@@ -153,6 +153,13 @@ export function CreditPaymentPlanPanel({
   const active = existingPlan?.estado === "ACTIVO";
   const awaitingDelivery = existingPlan?.estado === "BORRADOR" &&
     credit.pedido.estado !== "ENTREGADO";
+  const advanceRequired = Number(credit.montos.anticipoRequerido) > 0;
+  const verified = Number(credit.montos.pagadoVerificado);
+  const advanceMissing = Math.max(0, Number(credit.montos.anticipoRequerido) - verified);
+  const pendingAdvance = credit.pagos.find((payment) => payment.estado === "PENDIENTE");
+  const advancePaymentUrl = "/marcas-gt/pagos/nuevo?clienteId=" + credit.cliente.id +
+    "&pedidoId=" + credit.pedido.id + "&monto=" + advanceMissing.toFixed(2) +
+    "&concepto=anticipo";
 
   const [frequency, setFrequency] =
     useState<CreditPaymentPlanFrequency>("MENSUAL");
@@ -593,6 +600,32 @@ export function CreditPaymentPlanPanel({
         }
       />
 
+      {advanceRequired ? (
+        <AppCard title="Anticipo requerido antes de la entrega" icon={<Banknote />} size="sm">
+          <div className="grid gap-3 text-sm sm:grid-cols-3">
+            <div><p className="text-[hsl(var(--app-muted-foreground))]">Anticipo autorizado</p><p className="mt-1 font-semibold tabular-nums">{formatMoney(credit.montos.anticipoRequerido)}</p></div>
+            <div><p className="text-[hsl(var(--app-muted-foreground))]">Pagos verificados</p><p className="mt-1 font-semibold tabular-nums">{formatMoney(credit.montos.pagadoVerificado)}</p></div>
+            <div><p className="text-[hsl(var(--app-muted-foreground))]">Saldo financiado en cuotas</p><p className="mt-1 font-semibold tabular-nums">{formatMoney(credit.montos.financiado)}</p></div>
+          </div>
+          <p className="mt-3 text-sm text-[hsl(var(--app-muted-foreground))]">El anticipo debe quedar cobrado, verificado y aplicado en Pagos. No se permitirá entregar el pedido ni activar cuotas antes de completar este paso.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {pendingAdvance ? (
+              <AppButton asChild variant="primary" size="sm">
+                <Link to={"/marcas-gt/pagos/" + pendingAdvance.id} state={{ from: location.pathname + location.search }}>Revisar pago pendiente</Link>
+              </AppButton>
+            ) : null}
+            {!pendingAdvance && advanceMissing > 0 && canRegister ? (
+              <AppButton asChild variant="primary" size="sm">
+                <Link to={advancePaymentUrl} state={{ from: location.pathname + location.search }}>Registrar anticipo</Link>
+              </AppButton>
+            ) : null}
+            <AppButton asChild variant="secondary" size="sm">
+              <Link to={"/marcas-gt/pedidos/" + credit.pedido.id + "?tab=operacion"} state={{ from: location.pathname + location.search }}>Ver pagos del pedido</Link>
+            </AppButton>
+          </div>
+        </AppCard>
+      ) : null}
+
       {editable ? (
         <AppCard title="Configuración" size="sm">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -724,8 +757,9 @@ export function CreditPaymentPlanPanel({
               <div className="rounded-md border border-[hsl(var(--app-border))] p-3 text-sm">
                 <p className="font-medium">Cuotas listas para activarse</p>
                 <p className="mt-1 text-[hsl(var(--app-muted-foreground))]">
-                  El sistema creará las cuentas por cobrar automáticamente al completar la entrega del pedido.
-                  No tienes que activar el plan manualmente.
+                  {advanceRequired
+                    ? "El sistema creará las cuotas automáticamente después de completar la entrega, siempre que el anticipo esté verificado y aplicado. No se requiere activación manual."
+                    : "El sistema creará las cuentas por cobrar automáticamente al completar la entrega del pedido. No tienes que activar el plan manualmente."}
                 </p>
               </div>
             ) : null}

@@ -334,7 +334,7 @@ export default function OrderDetailPage() {
                       }}
                     >
                       <Banknote className="h-4 w-4" />
-                      {mixed && linkedCredit?.estado === "APROBADA" ? "Registrar anticipo" : "Registrar pago"
+                      {mixed && linkedCredit?.estado === "APROBADA" ? "Registrar anticipo" : "Registrar pago"}
                     </Link>
                   </AppButton>
                 ) : null}
