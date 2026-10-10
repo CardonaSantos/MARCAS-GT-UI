@@ -1,0 +1,34 @@
+name: Pedidos UI - Rol BODEGA
+on:
+  push:
+    branches: [feat-bodega-pedidos-20261009]
+    paths:
+      - "src/Pages/Pedidos/**"
+      - "src/features/pedidos/**"
+      - "src/App.tsx"
+      - "scripts/check-bodega-order-access.mjs"
+      - ".github/workflows/pedidos-rol-bodega.yml"
+  pull_request:
+    branches: [update-requerimientos]
+    paths:
+      - "src/Pages/Pedidos/**"
+      - "src/features/pedidos/**"
+      - "src/App.tsx"
+      - "scripts/check-bodega-order-access.mjs"
+      - ".github/workflows/pedidos-rol-bodega.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/check-bodega-order-access.mjs
+      - run: npm run build

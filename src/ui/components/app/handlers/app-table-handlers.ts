@@ -22,6 +22,8 @@ export interface UseAppTableHandlersOptions {
   initialColumnVisibility?: VisibilityState;
   initialColumnPinning?: ColumnPinningState;
   initialDensity?: AppDataTableDensity;
+  initialSearch?: string;
+  initialServerSearch?: string;
   resetPageOnSearch?: boolean;
 }
 
@@ -37,6 +39,8 @@ export function useAppTableHandlers(options: UseAppTableHandlersOptions = {}) {
       right: ["__actions"],
     },
     initialDensity = "xs",
+    initialSearch = "",
+    initialServerSearch = initialSearch,
     resetPageOnSearch = true,
   } = options;
 
@@ -58,8 +62,9 @@ export function useAppTableHandlers(options: UseAppTableHandlersOptions = {}) {
   const [density, setDensity] =
     React.useState<AppDataTableDensity>(initialDensity);
 
-  const [search, setSearch] = React.useState("");
-  const [serverSearch, setServerSearch] = React.useState("");
+  const [search, setSearch] = React.useState(initialSearch);
+  const [serverSearch, setServerSearch] =
+    React.useState(initialServerSearch);
 
   const selectedCount = React.useMemo(
     () => getSelectionCount(rowSelection),
@@ -86,8 +91,8 @@ export function useAppTableHandlers(options: UseAppTableHandlersOptions = {}) {
     setColumnVisibility(initialColumnVisibility);
     setColumnPinning(initialColumnPinning);
     setDensity(initialDensity);
-    setSearch("");
-    setServerSearch("");
+    setSearch(initialSearch);
+    setServerSearch(initialServerSearch);
   }, [
     initialColumnPinning,
     initialColumnVisibility,
@@ -95,6 +100,8 @@ export function useAppTableHandlers(options: UseAppTableHandlersOptions = {}) {
     initialPageIndex,
     initialPageSize,
     initialRowSelection,
+    initialSearch,
+    initialServerSearch,
     initialSorting,
   ]);
 

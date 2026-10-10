@@ -123,7 +123,7 @@ function formatOutputDate(
 
   return bounded.format(resolveOutputFormat(outputFormat));
 }
-
+// inicio de comiteo
 function buildDateMeta(
   inputValue: string,
   outputFormat: AppDateOutputFormat = "YYYY-MM-DD",

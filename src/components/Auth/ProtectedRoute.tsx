@@ -1,42 +1,52 @@
 import { Navigate } from "react-router-dom";
-import { ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+
 import { useStore } from "@/Context/ContextSucursal";
-import gif from "@/assets/images/loading.gif";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-function LoadingScreen() {
-  return (
-    <div className="flex flex-col justify-center items-center h-screen gap-2">
-      <img src={gif} alt="Cargando..." className="w-16 h-16 object-contain" />
-      <p className="text-lg font-semibold text-gray-600">Cargando...</p>
-    </div>
-  );
+interface ProtectedRouteRolesProps extends ProtectedRouteProps {
+  roles: readonly string[];
+  fallback?: string;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  // 1) ¿Está autenticado?
-  const isAuth = Boolean(localStorage.getItem("authToken"));
-  if (!isAuth) {
+  const authToken = useStore((state) => state.authToken);
+
+  if (!authToken) {
     return <Navigate to="/marcas-gt/login" replace />;
   }
 
-  // 2) Si está auth, esperamos a que el rol esté definido
-  const rolUser = useStore((state) => state.userRol);
-  const [loadingRol, setLoadingRol] = useState(true);
+  return <>{children}</>;
+}
 
-  useEffect(() => {
-    if (rolUser !== undefined) {
-      setLoadingRol(false);
-    }
-  }, [rolUser]);
+export function ProtectedRouteRoles({
+  children,
+  roles,
+  fallback,
+}: ProtectedRouteRolesProps) {
+  const authToken = useStore((state) => state.authToken);
+  const userRol = useStore((state) => state.userRol);
 
-  if (loadingRol) {
-    return <LoadingScreen />;
+  if (!authToken) {
+    return <Navigate to="/marcas-gt/login" replace />;
   }
 
-  // 3) Ya está autenticado y tenemos rol cargado, devolvemos los children
+  if (!userRol || !roles.includes(userRol)) {
+    return (
+      <Navigate
+        to={
+          fallback ??
+          (userRol === "ADMIN"
+            ? "/marcas-gt/dashboard"
+            : "/marcas-gt/dashboard-empleado")
+        }
+        replace
+      />
+    );
+  }
+
   return <>{children}</>;
 }

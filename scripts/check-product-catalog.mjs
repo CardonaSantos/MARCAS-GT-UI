@@ -1,0 +1,68 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const read = (path) => readFileSync(path, "utf8");
+const p = "src/features/productos/";
+const page = read("src/Pages/ViewProducts.tsx");
+const endpoints = read("src/API/routes/endpoints.ts");
+const schema = read(p + "schemas/product.schemas.ts");
+const types = read(p + "api/catalog.types.ts");
+const queries = read(p + "api/catalog.queries.ts");
+const mutations = read(p + "api/product.mutations.ts");
+const state = read(p + "common/use-product-catalog-state.ts");
+const filters = read(p + "components/product-catalog-filters.tsx");
+const table = read(p + "components/product-catalog-table.tsx");
+const detail = read(p + "components/product-catalog-detail-dialog.tsx");
+const edit = read(p + "components/product-catalog-edit-dialog.tsx");
+const mapper = read(p + "common/catalog.mappers.ts");
+
+assert.ok(endpoints.includes('catalog: "/product/catalogo"'));
+assert.ok(endpoints.includes('catalogDetail: (id: number) => `/product/catalogo/${id}`'));
+assert.ok(endpoints.includes('inventoryCatalog: "/product/get-product-to-inventary"'), "Legacy endpoint must stay for other consumers.");
+assert.ok(queries.includes("API.useQuery<ProductCatalogPage>"));
+assert.ok(queries.includes("API.useQuery<CatalogProductDetail>"));
+assert.ok(queries.includes("marcasQueryKeys.productos.list(filters)"));
+assert.ok(queries.includes("marcasQueryKeys.productos.detail(id ?? 0)"));
+assert.ok(queries.includes("params: { ...filters }"));
+assert.ok(types.includes('fuente: "STOCK_BODEGA"'));
+assert.ok(types.includes('fuente: "STOCK_LEGACY"'));
+assert.ok(types.includes("CatalogMovement"));
+assert.ok(types.includes("ingresosRecientes"));
+assert.ok(types.includes("perfilFiscal"));
+for (const param of ["page", "limit", "search", "categoriaId", "bodegaId",
+  "conExistencia", "precioMin", "precioMax", "sortBy", "sortDir"]) {
+  assert.ok(state.includes(param + ":"), "Missing URL / server filter " + param);
+}
+assert.ok(state.includes("useSearchParams"));
+assert.ok(filters.includes("AppSingleSelect"));
+assert.ok(filters.includes("AppSearchInput"));
+assert.ok(filters.includes("Precio desde"));
+assert.ok(filters.includes("Precio hasta"));
+assert.ok(filters.includes("validMoney"));
+assert.ok(table.includes("AppDataTable"));
+assert.ok(table.includes('paginationMode="server"'));
+assert.ok(table.includes("manualSorting"));
+assert.ok(table.includes('responsiveMode="cards"'));
+assert.ok(table.includes("inventario.totales.disponible"));
+assert.ok(!table.includes("stock?.cantidad"));
+assert.ok(detail.includes("ingresosRecientes"));
+assert.ok(detail.includes("movimientosRecientes"));
+assert.ok(detail.includes("inventario.bodegas"));
+assert.ok(detail.includes("stockLegacy"));
+assert.ok(edit.includes("ProductFormFields"));
+assert.ok(edit.includes("ProductImageUploader"));
+assert.ok(edit.includes("AppFormSubmit"));
+assert.ok(edit.includes("AppConfirmDialog"));
+assert.ok(edit.includes("getCloudinaryPublicId"));
+assert.ok(schema.includes("createProductSchema"));
+assert.ok(mapper.includes("categoriasIds: [...values.categoriaIds]"),
+  "PATCH server uses categoriasIds (plural), distinct from POST.");
+for (const method of ['method: "PATCH"', 'method: "DELETE"']) assert.ok(mutations.includes(method));
+assert.ok(mutations.includes("marcasQueryKeys.productos.all"));
+assert.ok(page.includes('title="Catálogo de productos"'));
+assert.ok(page.includes("ProductCatalogTable"));
+assert.ok(page.includes("ProductCatalogDetailDialog"));
+assert.ok(page.includes("ProductCatalogEditDialog"));
+assert.ok(!page.includes("axios"));
+assert.ok(!page.includes("/product/get-product-to-inventary"));
+assert.ok(!page.includes("StockPage"));
+console.log("Catálogo de productos: API V2, paginación, filtros, stock oficial, edición e imágenes verificados.");

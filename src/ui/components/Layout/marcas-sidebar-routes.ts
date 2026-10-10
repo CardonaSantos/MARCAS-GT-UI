@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowRightLeft,
   BarChart3,
   Box,
   Boxes,
@@ -13,12 +14,18 @@ import {
   FileClock,
   FileSpreadsheet,
   Home,
+  Landmark,
   MapPin,
   MapPinned,
+  PackageCheck,
   PackagePlus,
+  PencilLine,
   PieChart,
   ShoppingBag,
   ShoppingCart,
+  RotateCcw,
+  ReceiptText,
+  Settings2,
   Star,
   Tags,
   Truck,
@@ -33,13 +40,18 @@ export type MarcasRoute = {
   icon: LucideIcon;
   label: string;
   href?: string;
+  activePaths?: string[];
+  exactPaths?: string[];
   submenu?: MarcasRoute[];
 };
 
+// Navegación administrativa organizada por flujo operativo; los permisos
+// siguen definidos en las rutas protegidas y en el servidor.
+// No cambiar los href: otras pantallas enlazan a estas mismas rutas.
 const adminRoutes: MarcasRoute[] = [
   {
     icon: Home,
-    label: "Dashboard",
+    label: "Inicio",
     submenu: [
       {
         icon: Home,
@@ -56,27 +68,12 @@ const adminRoutes: MarcasRoute[] = [
         label: "Informes y reportes",
         href: "/marcas-gt/reportes",
       },
-      {
-        icon: Wallet,
-        label: "Balance de cuentas",
-        href: "/marcas-gt/saldos",
-      },
     ],
   },
   {
-    icon: ShoppingBag,
-    label: "Ventas y clientes",
+    icon: Users,
+    label: "Clientes y prospectos",
     submenu: [
-      {
-        icon: ShoppingBag,
-        label: "Nueva venta",
-        href: "/marcas-gt/hacer-ventas",
-      },
-      {
-        icon: ClipboardList,
-        label: "Historial de ventas",
-        href: "/marcas-gt/ventas",
-      },
       {
         icon: Users,
         label: "Directorio de clientes",
@@ -88,25 +85,14 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/crear-cliente",
       },
       {
-        icon: CreditCard,
-        label: "Gestión de créditos",
-        href: "/marcas-gt/creditos",
+        icon: UserPlus2,
+        label: "Nuevo prospecto",
+        href: "/marcas-gt/prospecto",
       },
-    ],
-  },
-  {
-    icon: MapPin,
-    label: "Prospectos y visitas",
-    submenu: [
       {
         icon: Calendar,
-        label: "Registro de prospectos",
+        label: "Historial de prospectos",
         href: "/marcas-gt/historial-prospectos",
-      },
-      {
-        icon: MapPin,
-        label: "Registro de visitas",
-        href: "/marcas-gt/historial-visitas",
       },
       {
         icon: CalendarPlus,
@@ -114,41 +100,61 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/visita",
       },
       {
-        icon: UserPlus2,
-        label: "Nuevo prospecto",
-        href: "/marcas-gt/prospecto",
+        icon: MapPin,
+        label: "Historial de visitas",
+        href: "/marcas-gt/historial-visitas",
       },
     ],
   },
   {
-    icon: Users,
-    label: "Empleados",
+    icon: ShoppingBag,
+    label: "Ventas y pedidos",
     submenu: [
       {
-        icon: UserCog,
-        label: "Administración de usuarios",
-        href: "/marcas-gt/usuarios",
+        icon: ShoppingCart,
+        label: "Pedidos",
+        href: "/marcas-gt/pedidos",
       },
       {
-        icon: MapPinned,
-        label: "Ubicación de empleados",
-        href: "/marcas-gt/empleados",
+        icon: ShoppingBag,
+        label: "Nueva venta",
+        href: "/marcas-gt/hacer-ventas",
       },
       {
-        icon: FileClock,
-        label: "Control de asistencia",
-        href: "/marcas-gt/historial-empleados-check",
-      },
-      {
-        icon: Clock,
-        label: "Registro de jornada",
-        href: "/marcas-gt/registrar-entrada-salida",
+        icon: ClipboardList,
+        label: "Historial de ventas",
+        href: "/marcas-gt/ventas",
       },
     ],
   },
   {
-    icon: Boxes,
-    label: "Inventario",
+    icon: CreditCard,
+    label: "Créditos",
+    submenu: [
+      {
+        icon: CreditCard,
+        label: "Solicitudes de crédito",
+        href: "/marcas-gt/creditos",
+        exactPaths: ["/marcas-gt/creditos"],
+        activePaths: ["/marcas-gt/creditos/solicitudes"],
+      },
+      {
+        icon: Landmark,
+        label: "Cartera de crédito",
+        href: "/marcas-gt/creditos/cartera",
+        activePaths: ["/marcas-gt/creditos/cartera"],
+      },
+      {
+        icon: Settings2,
+        label: "Políticas de crédito",
+        href: "/marcas-gt/creditos/politicas",
+        activePaths: ["/marcas-gt/creditos/politicas"],
+      },
+    ],
+  },
+  {
+    icon: Tags,
+    label: "Productos y proveedores",
     submenu: [
       {
         icon: Boxes,
@@ -166,19 +172,188 @@ const adminRoutes: MarcasRoute[] = [
         href: "/marcas-gt/crear-categoria",
       },
       {
-        icon: BarChart3,
-        label: "Control de inventario",
-        href: "/marcas-gt/asignar-stock",
-      },
-      {
         icon: Truck,
         label: "Directorio de proveedores",
         href: "/marcas-gt/proveedor",
+      },
+    ],
+  },
+  {
+    icon: Boxes,
+    label: "Inventario y bodegas",
+    submenu: [
+      {
+        icon: Building2,
+        label: "Bodegas",
+        href: "/marcas-gt/bodegas",
+      },
+      {
+        icon: BarChart3,
+        label: "Existencias",
+        href: "/marcas-gt/inventario",
+        exactPaths: ["/marcas-gt/inventario"],
+        activePaths: ["/marcas-gt/inventario/stocks", "/marcas-gt/inventario/productos"],
+      },
+      {
+        icon: Boxes,
+        label: "Disponibilidad de stock",
+        href: "/marcas-gt/inventario/disponibilidad",
+      },
+      {
+        icon: ClipboardList,
+        label: "Reservas",
+        href: "/marcas-gt/inventario/reservas",
+      },
+      {
+        icon: FileClock,
+        label: "Movimientos de inventario",
+        href: "/marcas-gt/inventario/movimientos",
+      },
+    ],
+  },
+  {
+    icon: ArrowRightLeft,
+    label: "Operaciones de bodega",
+    submenu: [
+      {
+        icon: ClipboardList,
+        label: "Requisiciones",
+        href: "/marcas-gt/requisiciones",
+        activePaths: ["/marcas-gt/requisiciones"],
+      },
+      {
+        icon: ArrowRightLeft,
+        label: "Transferencias",
+        href: "/marcas-gt/transferencias",
+        activePaths: ["/marcas-gt/transferencias"],
+      },
+      {
+        icon: PackagePlus,
+        label: "Registrar entrada",
+        href: "/marcas-gt/inventario/entradas/nueva",
+      },
+      {
+        icon: PencilLine,
+        label: "Ajustar inventario",
+        href: "/marcas-gt/inventario/ajustes/nuevo",
+      },
+      {
+        icon: RotateCcw,
+        label: "Registrar devolución",
+        href: "/marcas-gt/inventario/devoluciones/nueva",
+      },
+    ],
+  },
+  {
+    icon: PackageCheck,
+    label: "Despachos y entregas",
+    submenu: [
+      {
+        icon: Truck,
+        label: "Despachos",
+        href: "/marcas-gt/despachos",
+      },
+      {
+        icon: Truck,
+        label: "Envíos",
+        href: "/marcas-gt/transporte/envios",
+      },
+      {
+        icon: PackageCheck,
+        label: "Entregas",
+        href: "/marcas-gt/entregas",
       },
       {
         icon: Box,
         label: "Registro de entregas",
         href: "/marcas-gt/registro-entregas",
+      },
+    ],
+  },
+  {
+    icon: Truck,
+    label: "Transporte y flota",
+    submenu: [
+      {
+        icon: Users,
+        label: "Transportistas",
+        href: "/marcas-gt/transporte/transportistas",
+      },
+      {
+        icon: UserCog,
+        label: "Conductores",
+        href: "/marcas-gt/transporte/conductores",
+      },
+      {
+        icon: Truck,
+        label: "Vehículos",
+        href: "/marcas-gt/transporte/vehiculos",
+      },
+    ],
+  },
+  {
+    icon: ReceiptText,
+    label: "Finanzas y cobros",
+    submenu: [
+      {
+        icon: ReceiptText,
+        label: "Facturación",
+        href: "/marcas-gt/facturacion/facturas",
+      },
+      {
+        icon: Landmark,
+        label: "Cuentas por cobrar",
+        href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+      {
+        icon: Wallet,
+        label: "Pagos",
+        href: "/marcas-gt/pagos",
+        exactPaths: ["/marcas-gt/pagos"],
+        activePaths: ["/marcas-gt/pagos/registrar", "/marcas-gt/pagos/historial"],
+      },
+      {
+        icon: Building2,
+        label: "Bancos",
+        href: "/marcas-gt/pagos/bancos",
+      },
+      {
+        icon: Wallet,
+        label: "Balance de cuentas",
+        href: "/marcas-gt/saldos",
+      },
+      {
+        icon: Settings2,
+        label: "Configuración fiscal",
+        href: "/marcas-gt/facturacion/configuracion-fiscal",
+      },
+    ],
+  },
+  {
+    icon: UserCog,
+    label: "Personal y seguimiento",
+    submenu: [
+      {
+        icon: UserCog,
+        label: "Administración de usuarios",
+        href: "/marcas-gt/usuarios",
+      },
+      {
+        icon: MapPinned,
+        label: "Monitoreo GPS",
+        href: "/marcas-gt/tracking",
+        exactPaths: ["/marcas-gt/tracking"],
+      },
+      {
+        icon: FileClock,
+        label: "Auditoría de jornadas",
+        href: "/marcas-gt/tracking/historial",
+        activePaths: ["/marcas-gt/tracking/historial", "/marcas-gt/tracking/jornadas"],
+      },
+      {
+        icon: Clock,
+        label: "Registro de jornada",
+        href: "/marcas-gt/registrar-entrada-salida",
       },
     ],
   },
@@ -207,9 +382,74 @@ const sellerRoutes: MarcasRoute[] = [
     href: "/marcas-gt/hacer-ventas",
   },
   {
+    icon: ShoppingCart,
+    label: "Pedidos",
+    href: "/marcas-gt/pedidos",
+  },
+  {
+    icon: Truck,
+    label: "Despachos",
+    href: "/marcas-gt/despachos",
+  },
+  {
+    icon: Truck,
+    label: "Envíos",
+    href: "/marcas-gt/transporte/envios",
+  },
+  {
+    icon: PackageCheck,
+    label: "Entregas",
+    href: "/marcas-gt/entregas",
+  },
+  {
+    icon: ReceiptText,
+    label: "Finanzas",
+    submenu: [
+      {
+        icon: ReceiptText,
+        label: "Facturas",
+        href: "/marcas-gt/facturacion/facturas",
+      },
+      {
+        icon: Landmark,
+        label: "Cuentas por cobrar",
+        href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+      {
+        icon: Wallet,
+        label: "Pagos",
+        href: "/marcas-gt/pagos",
+      },
+    ],
+  },
+  {
+    icon: CreditCard,
+    label: "Solicitudes de crédito",
+    href: "/marcas-gt/creditos",
+    exactPaths: ["/marcas-gt/creditos"],
+        activePaths: ["/marcas-gt/creditos/solicitudes"],
+  },
+  {
+    icon: Landmark,
+    label: "Cartera de crédito",
+    href: "/marcas-gt/creditos/cartera",
+    activePaths: ["/marcas-gt/creditos/cartera"],
+  },
+  {
+    icon: Settings2,
+    label: "Políticas de crédito",
+    href: "/marcas-gt/creditos/politicas",
+    activePaths: ["/marcas-gt/creditos/politicas"],
+  },
+  {
     icon: Users,
     label: "Gestión de clientes",
     href: "/marcas-gt/clientes",
+  },
+  {
+    icon: Boxes,
+    label: "Disponibilidad de productos",
+    href: "/marcas-gt/inventario/disponibilidad",
   },
   {
     icon: CheckSquare,
@@ -233,6 +473,291 @@ const sellerRoutes: MarcasRoute[] = [
   },
 ];
 
+const warehouseRoutes: MarcasRoute[] = [
+  {
+    icon: Home,
+    label: "Inicio",
+    href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: ShoppingCart,
+    label: "Pedidos",
+    href: "/marcas-gt/pedidos",
+  },
+  {
+    icon: CreditCard,
+    label: "Solicitudes de crédito",
+    href: "/marcas-gt/creditos",
+    exactPaths: ["/marcas-gt/creditos"],
+    activePaths: ["/marcas-gt/creditos/solicitudes"],
+  },
+  {
+    icon: Boxes,
+    label: "Operación de bodega",
+    submenu: [
+      {
+        icon: Building2,
+        label: "Bodegas",
+        href: "/marcas-gt/bodegas",
+      },
+      {
+        icon: BarChart3,
+        label: "Existencias",
+        href: "/marcas-gt/inventario",
+      },
+      {
+        icon: ClipboardList,
+        label: "Requisiciones",
+        href: "/marcas-gt/requisiciones",
+        activePaths: ["/marcas-gt/requisiciones"],
+      },
+      {
+        icon: ArrowRightLeft,
+        label: "Transferencias",
+        href: "/marcas-gt/transferencias",
+        activePaths: ["/marcas-gt/transferencias"],
+      },
+      {
+        icon: Boxes,
+        label: "Consultar disponibilidad",
+        href: "/marcas-gt/inventario/disponibilidad",
+      },
+      {
+        icon: FileClock,
+        label: "Movimientos",
+        href: "/marcas-gt/inventario/movimientos",
+      },
+      {
+        icon: ClipboardList,
+        label: "Reservas",
+        href: "/marcas-gt/inventario/reservas",
+      },
+      {
+        icon: Truck,
+        label: "Despachos",
+        href: "/marcas-gt/despachos",
+      },
+      {
+        icon: PackagePlus,
+        label: "Registrar entrada",
+        href: "/marcas-gt/inventario/entradas/nueva",
+      },
+      {
+        icon: PencilLine,
+        label: "Ajustar inventario",
+        href: "/marcas-gt/inventario/ajustes/nuevo",
+      },
+      {
+        icon: RotateCcw,
+        label: "Registrar devolución",
+        href: "/marcas-gt/inventario/devoluciones/nueva",
+      },
+    ],
+  },
+  {
+    icon: Truck,
+    label: "Logística",
+    submenu: [
+      {
+        icon: Truck,
+        label: "Envíos",
+        href: "/marcas-gt/transporte/envios",
+      },
+      {
+        icon: PackageCheck,
+        label: "Entregas",
+        href: "/marcas-gt/entregas",
+      },
+      {
+        icon: Users,
+        label: "Transportistas",
+        href: "/marcas-gt/transporte/transportistas",
+      },
+      {
+        icon: Truck,
+        label: "Vehículos",
+        href: "/marcas-gt/transporte/vehiculos",
+      },
+      {
+        icon: UserCog,
+        label: "Conductores",
+        href: "/marcas-gt/transporte/conductores",
+      },
+    ],
+  },
+];
+
+const accountingRoutes: MarcasRoute[] = [
+  {
+    icon: Home,
+    label: "Inicio",
+    href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: ShoppingCart,
+    label: "Pedidos",
+    href: "/marcas-gt/pedidos",
+  },
+  {
+    icon: CreditCard,
+    label: "Créditos",
+    submenu: [
+      {
+        icon: ClipboardList,
+        label: "Solicitudes de crédito",
+        href: "/marcas-gt/creditos",
+        exactPaths: ["/marcas-gt/creditos"],
+        activePaths: ["/marcas-gt/creditos/solicitudes"],
+      },
+      {
+        icon: Landmark,
+        label: "Cartera de crédito",
+        href: "/marcas-gt/creditos/cartera",
+        activePaths: ["/marcas-gt/creditos/cartera"],
+      },
+      {
+        icon: Settings2,
+        label: "Políticas de crédito",
+        href: "/marcas-gt/creditos/politicas",
+        activePaths: ["/marcas-gt/creditos/politicas"],
+      },
+    ],
+  },
+  {
+    icon: Boxes,
+    label: "Inventario",
+    submenu: [
+      {
+        icon: Building2,
+        label: "Bodegas",
+        href: "/marcas-gt/bodegas",
+      },
+      {
+        icon: BarChart3,
+        label: "Existencias",
+        href: "/marcas-gt/inventario",
+      },
+      {
+        icon: ClipboardList,
+        label: "Requisiciones",
+        href: "/marcas-gt/requisiciones",
+        activePaths: ["/marcas-gt/requisiciones"],
+      },
+      {
+        icon: ArrowRightLeft,
+        label: "Transferencias",
+        href: "/marcas-gt/transferencias",
+        activePaths: ["/marcas-gt/transferencias"],
+      },
+      {
+        icon: Boxes,
+        label: "Consultar disponibilidad",
+        href: "/marcas-gt/inventario/disponibilidad",
+      },
+      {
+        icon: FileClock,
+        label: "Movimientos",
+        href: "/marcas-gt/inventario/movimientos",
+      },
+      {
+        icon: Truck,
+        label: "Despachos",
+        href: "/marcas-gt/despachos",
+      },
+    ],
+  },
+  {
+    icon: Truck,
+    label: "Logística",
+    submenu: [
+      {
+        icon: Truck,
+        label: "Envíos",
+        href: "/marcas-gt/transporte/envios",
+      },
+      {
+        icon: PackageCheck,
+        label: "Entregas",
+        href: "/marcas-gt/entregas",
+      },
+      {
+        icon: Users,
+        label: "Transportistas",
+        href: "/marcas-gt/transporte/transportistas",
+      },
+      {
+        icon: Truck,
+        label: "Vehículos",
+        href: "/marcas-gt/transporte/vehiculos",
+      },
+      {
+        icon: UserCog,
+        label: "Conductores",
+        href: "/marcas-gt/transporte/conductores",
+      },
+    ],
+  },
+  {
+    icon: ReceiptText,
+    label: "Finanzas",
+    submenu: [
+      {
+        icon: ReceiptText,
+        label: "Facturación",
+        href: "/marcas-gt/facturacion/facturas",
+      },
+      {
+        icon: Landmark,
+        label: "Cuentas por cobrar",
+        href: "/marcas-gt/facturacion/cuentas-por-cobrar",
+      },
+      {
+        icon: Wallet,
+        label: "Pagos",
+        href: "/marcas-gt/pagos",
+      },
+      {
+        icon: Building2,
+        label: "Bancos",
+        href: "/marcas-gt/pagos/bancos",
+      },
+      {
+        icon: Settings2,
+        label: "Configuración fiscal",
+        href: "/marcas-gt/facturacion/configuracion-fiscal",
+      },
+    ],
+  },
+];
+
+const deliveryRoutes: MarcasRoute[] = [
+  {
+    icon: Home,
+    label: "Inicio",
+    href: "/marcas-gt/dashboard-empleado",
+  },
+  {
+    icon: Truck,
+    label: "Mis envíos",
+    href: "/marcas-gt/transporte/envios",
+  },
+  {
+    icon: PackageCheck,
+    label: "Mis entregas",
+    href: "/marcas-gt/entregas",
+  },
+  {
+    icon: CheckSquare,
+    label: "Registro de entrada/salida",
+    href: "/marcas-gt/registrar-entrada-salida",
+  },
+];
+
 export function getMarcasRoutesByRole(role?: string | null) {
-  return role === "ADMIN" ? adminRoutes : sellerRoutes;
+  if (role === "ADMIN") return adminRoutes;
+  if (role === "BODEGA") return warehouseRoutes;
+  if (role === "CONTABILIDAD") return accountingRoutes;
+  if (role === "REPARTIDOR") return deliveryRoutes;
+
+  return sellerRoutes;
 }
