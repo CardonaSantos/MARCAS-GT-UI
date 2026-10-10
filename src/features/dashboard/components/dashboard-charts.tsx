@@ -116,7 +116,7 @@ export function AgingChart({ section, loading, error, retry }: ChartCommon<{ ran
 export function DispatchChart({ section, loading, error, retry }: ChartCommon<{ estado: string; cantidad: number }[]>) {
   const rows = section?.status === "OK" ? section.data.filter(r => r.cantidad > 0) : [];
   const data: ChartData<"doughnut"> = {
-    labels: rows.map(r => r.estado.replaceAll("_", " ")),
+    labels: rows.map(r => r.estado.replace(/_/g, " ")),
     datasets: [{ data: rows.map(r => r.cantidad), backgroundColor: rows.map((_, i) => palette[i % palette.length]),
       borderWidth: 2, borderColor: "hsl(var(--app-card-bg))", hoverOffset: 5 }],
   };
@@ -136,7 +136,7 @@ export function DispatchChart({ section, loading, error, retry }: ChartCommon<{ 
         {rows.map((r, i) => <div key={r.estado} className="flex items-center justify-between gap-2 text-xs">
           <span className="flex min-w-0 items-center gap-2">
             <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: palette[i % palette.length] }} />
-            <span className="truncate">{r.estado.replaceAll("_", " ")}</span>
+            <span className="truncate">{r.estado.replace(/_/g, " ")}</span>
           </span>
           <strong className="tabular-nums">{r.cantidad}</strong>
         </div>)}

@@ -56,7 +56,7 @@ export function DashboardAttention({ source }: { source: Source }) {
         section={data?.sections.incidenciasTransporte} href="/marcas-gt/transporte/envios" {...base}>
         {v => <div className="space-y-3"><strong className="text-xl tabular-nums">{v.total}</strong>
           {v.items.length ? <div className="space-y-2">{v.items.slice(0, 3).map(item =>
-            <DashboardRecord key={item.id} title={item.tipo.replaceAll("_", " ")}
+            <DashboardRecord key={item.id} title={item.tipo.replace(/_/g, " ")}
               detail={"Envío #" + item.envioId + " · " + dateGt(item.reportadaEn)}
               badge={item.severidad} href={"/marcas-gt/transporte/envios/" + item.envioId} />)}</div>
             : <p className={"text-xs " + mutedText}>Sin incidencias abiertas.</p>}</div>}
@@ -65,7 +65,7 @@ export function DashboardAttention({ source }: { source: Source }) {
         section={data?.sections.despachosFallidos} href="/marcas-gt/despachos/operaciones" {...base}>
         {v => <div className="space-y-3"><strong className="text-xl tabular-nums">{v.total}</strong>
           {v.items.length ? <div className="space-y-2">{v.items.slice(0, 3).map(item =>
-            <DashboardRecord key={item.id} title={item.tipo.replaceAll("_", " ")}
+            <DashboardRecord key={item.id} title={item.tipo.replace(/_/g, " ")}
               detail={"Despacho #" + item.ordenDespachoId + " · " + item.intentos + " intento(s)"}
               href={"/marcas-gt/despachos/" + item.ordenDespachoId} />)}</div>
             : <p className={"text-xs " + mutedText}>Sin operaciones fallidas.</p>}</div>}

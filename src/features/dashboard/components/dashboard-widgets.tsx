@@ -114,7 +114,7 @@ export function DashboardRecord({
     </span>
     <span className="flex shrink-0 items-center gap-2">
       {amount && <span className="text-xs font-medium tabular-nums">{amount}</span>}
-      {badge && <span className={"max-w-28 truncate rounded-md bg-[hsl(var(--app-muted-bg))] px-2 py-1 text-[11px] " + mutedText}>{badge.replaceAll("_", " ")}</span>}
+      {badge && <span className={"max-w-28 truncate rounded-md bg-[hsl(var(--app-muted-bg))] px-2 py-1 text-[11px] " + mutedText}>{badge.replace(/_/g, " ")}</span>}
       <ArrowUpRight className={"h-4 w-4 " + mutedText} />
     </span>
   </Link>;

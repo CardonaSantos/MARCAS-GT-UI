@@ -49,7 +49,7 @@ export default function AdminDashboardPage() {
   const queries = [summary, alerts, agenda, graphs, activity, live];
   const anyFetching = queries.some(q => q.isFetching);
   const anyUnavailable = queries.some(q => q.isError || q.data?.partial);
-  const latest = queries.map(q => q.data?.generatedAt).filter((x): x is string => !!x).sort().at(-1);
+  const latest = queries.map(q => q.data?.generatedAt).filter((x): x is string => !!x).sort().slice(-1)[0];
   const retryAll = () => { queries.forEach(q => { void q.refetch(); }); };
   const choosePeriod = (period: string) => {
     setValidationMessage(null);
