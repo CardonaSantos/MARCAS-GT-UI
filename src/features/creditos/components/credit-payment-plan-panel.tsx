@@ -152,12 +152,20 @@ export function CreditPaymentPlanPanel({
   const editable = credit.acciones.puedeGestionarPlan;
   const active = existingPlan?.estado === "ACTIVO";
   const advanceRequired = Number(credit.montos.anticipoRequerido) > 0;
-  const advanceMissing = Number(credit.anticipo?.saldoPendiente ?? credit.montos.anticipoRequerido);
-  const advanceReady = !advanceRequired ||
+  const advanceMissing = Number(
+    credit.anticipo?.saldoPendiente ?? credit.montos.anticipoRequerido,
+  );
+  const advanceReady =
+    !advanceRequired ||
     (credit.anticipo?.estado === "PAGADA" && advanceMissing === 0);
   const pendingAdvanceId = credit.anticipo?.pagoPendienteId ?? null;
-  const advancePaymentUrl = "/marcas-gt/pagos/nuevo?clienteId=" + credit.cliente.id +
-    "&pedidoId=" + credit.pedido.id + "&monto=" + advanceMissing.toFixed(2) +
+  const advancePaymentUrl =
+    "/marcas-gt/pagos/nuevo?clienteId=" +
+    credit.cliente.id +
+    "&pedidoId=" +
+    credit.pedido.id +
+    "&monto=" +
+    advanceMissing.toFixed(2) +
     "&concepto=anticipo";
 
   const [frequency, setFrequency] =
@@ -206,14 +214,17 @@ export function CreditPaymentPlanPanel({
     }
   }, [availablePayments, selectedPaymentId]);
 
-  const planHasChanges = !!existingPlan && (
-    existingPlan.frecuencia !== frequency ||
-    existingPlan.cuotas.length !== installments.length ||
-    existingPlan.cuotas.some((cuota, index) =>
-      toDateInput(cuota.fechaVencimiento) !== installments[index]?.fechaVencimiento ||
-      moneyToCents(cuota.montoProgramado) !== moneyToCents(installments[index]?.montoProgramado ?? "")
-    )
-  );
+  const planHasChanges =
+    !!existingPlan &&
+    (existingPlan.frecuencia !== frequency ||
+      existingPlan.cuotas.length !== installments.length ||
+      existingPlan.cuotas.some(
+        (cuota, index) =>
+          toDateInput(cuota.fechaVencimiento) !==
+            installments[index]?.fechaVencimiento ||
+          moneyToCents(cuota.montoProgramado) !==
+            moneyToCents(installments[index]?.montoProgramado ?? ""),
+      ));
 
   const draftTotal = installments.reduce(
     (total, installment) =>
@@ -241,8 +252,7 @@ export function CreditPaymentPlanPanel({
       !installments.length ||
       !totalMatches ||
       installments.some(
-        (item) =>
-          !item.fechaVencimiento || Number(item.montoProgramado) <= 0,
+        (item) => !item.fechaVencimiento || Number(item.montoProgramado) <= 0,
       )
     ) {
       return;
@@ -289,8 +299,13 @@ export function CreditPaymentPlanPanel({
   };
 
   const requestActivate = () => {
-    if (!existingPlan || !credit.acciones.puedeActivarPlan ||
-        !advanceReady || planHasChanges) return;
+    if (
+      !existingPlan ||
+      !credit.acciones.puedeActivarPlan ||
+      !advanceReady ||
+      planHasChanges
+    )
+      return;
     setActivateKey(createIdempotencyKey("credit-plan-activate"));
     setActivateOpen(true);
   };
@@ -308,7 +323,9 @@ export function CreditPaymentPlanPanel({
   };
 
   const requestApply = (
-    installment: NonNullable<CreditPortfolioDetail["planPago"]>["cuotas"][number],
+    installment: NonNullable<
+      CreditPortfolioDetail["planPago"]
+    >["cuotas"][number],
   ) => {
     const payment = availablePayments.find(
       (item) => item.id === selectedPaymentId,
@@ -335,7 +352,9 @@ export function CreditPaymentPlanPanel({
   };
 
   const goRegisterPayment = (
-    installment: NonNullable<CreditPortfolioDetail["planPago"]>["cuotas"][number],
+    installment: NonNullable<
+      CreditPortfolioDetail["planPago"]
+    >["cuotas"][number],
   ) => {
     const next = new URLSearchParams(location.search);
     next.set("tab", "pagos");
@@ -369,13 +388,27 @@ export function CreditPaymentPlanPanel({
     return (
       <div className="space-y-4">
         <AppAlert
-          tone={existingPlan.cuotas.every((cuota) => Number(cuota.saldoPendiente) === 0) ? "success" : "info"}
-          title={existingPlan.cuotas.every((cuota) => Number(cuota.saldoPendiente) === 0)
-            ? "Plan liquidado"
-            : "Plan activo"}
-          description={existingPlan.cuotas.every((cuota) => Number(cuota.saldoPendiente) === 0)
-            ? "Todas las cuotas están pagadas y las cuentas por cobrar tienen saldo cero. El despacho y la entrega siguen su proceso por separado."
-            : "Cada cuota tiene su Cuenta por Cobrar. Puedes registrar, verificar y aplicar pagos sin esperar la entrega del pedido."}
+          tone={
+            existingPlan.cuotas.every(
+              (cuota) => Number(cuota.saldoPendiente) === 0,
+            )
+              ? "success"
+              : "info"
+          }
+          title={
+            existingPlan.cuotas.every(
+              (cuota) => Number(cuota.saldoPendiente) === 0,
+            )
+              ? "Plan liquidado"
+              : "Plan activo"
+          }
+          description={
+            existingPlan.cuotas.every(
+              (cuota) => Number(cuota.saldoPendiente) === 0,
+            )
+              ? "Todas las cuotas están pagadas y las cuentas por cobrar tienen saldo cero. El despacho y la entrega siguen su proceso por separado."
+              : "Cada cuota tiene su Cuenta por Cobrar. Puedes registrar, verificar y aplicar pagos sin esperar la entrega del pedido."
+          }
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -385,9 +418,7 @@ export function CreditPaymentPlanPanel({
             </p>
           </AppCard>
           <AppCard title="Cuotas" icon={<CalendarClock />} size="sm">
-            <p className="text-xl font-semibold">
-              {existingPlan.numeroCuotas}
-            </p>
+            <p className="text-xl font-semibold">{existingPlan.numeroCuotas}</p>
           </AppCard>
           <AppCard title="Frecuencia" size="sm">
             <p className="text-sm font-semibold">
@@ -489,7 +520,10 @@ export function CreditPaymentPlanPanel({
                     Estado
                   </p>
                   <div className="mt-1">
-                    <AppBadge tone={toneForAccount(installment.estado)} size="xs">
+                    <AppBadge
+                      tone={toneForAccount(installment.estado)}
+                      size="xs"
+                    >
                       {installment.estado}
                     </AppBadge>
                   </div>
@@ -615,50 +649,113 @@ export function CreditPaymentPlanPanel({
       />
 
       {advanceRequired ? (
-        <AppCard title="Anticipo para activar las cuotas" icon={<Banknote />} size="sm">
+        <AppCard
+          title="Anticipo para activar las cuotas"
+          icon={<Banknote />}
+          size="sm"
+        >
           <div className="grid gap-3 text-sm sm:grid-cols-3">
-            <div><p className="text-[hsl(var(--app-muted-foreground))]">Anticipo autorizado</p><p className="mt-1 font-semibold tabular-nums">{formatMoney(credit.montos.anticipoRequerido)}</p></div>
-            <div><p className="text-[hsl(var(--app-muted-foreground))]">Anticipo aplicado a CxC</p><p className="mt-1 font-semibold tabular-nums">{formatMoney(credit.montos.anticipoAplicado)}</p></div>
-            <div><p className="text-[hsl(var(--app-muted-foreground))]">Saldo financiado en cuotas</p><p className="mt-1 font-semibold tabular-nums">{formatMoney(credit.montos.financiado)}</p></div>
+            <div>
+              <p className="text-[hsl(var(--app-muted-foreground))]">
+                Anticipo autorizado
+              </p>
+              <p className="mt-1 font-semibold tabular-nums">
+                {formatMoney(credit.montos.anticipoRequerido)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[hsl(var(--app-muted-foreground))]">
+                Anticipo aplicado a CxC
+              </p>
+              <p className="mt-1 font-semibold tabular-nums">
+                {formatMoney(credit.montos.anticipoAplicado)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[hsl(var(--app-muted-foreground))]">
+                Saldo financiado en cuotas
+              </p>
+              <p className="mt-1 font-semibold tabular-nums">
+                {formatMoney(credit.montos.financiado)}
+              </p>
+            </div>
           </div>
-          <p className="mt-3 text-sm text-[hsl(var(--app-muted-foreground))]">{advanceReady
-            ? "Anticipo liquidado. El administrador ya puede activar el plan de cuotas."
-            : "Registra un único anticipo, verifícalo y aplícalo antes de activar. No es necesario entregar el pedido para comenzar a cobrar cuotas."}</p>
+          <p className="mt-3 text-sm text-[hsl(var(--app-muted-foreground))]">
+            {advanceReady
+              ? "Anticipo liquidado. El administrador ya puede activar el plan de cuotas."
+              : "Registra un único anticipo, verifícalo y aplícalo antes de activar. No es necesario entregar el pedido para comenzar a cobrar cuotas."}
+          </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {pendingAdvanceId ? (
               <AppButton asChild variant="primary" size="sm">
-                <Link to={"/marcas-gt/pagos/" + pendingAdvanceId} state={{ from: location.pathname + location.search }}>Revisar pago pendiente</Link>
+                <Link
+                  to={"/marcas-gt/pagos/" + pendingAdvanceId}
+                  state={{ from: location.pathname + location.search }}
+                >
+                  Revisar pago pendiente
+                </Link>
               </AppButton>
             ) : null}
-            {!pendingAdvanceId && !advanceReady && advanceMissing > 0 && canRegister ? (
+            {!pendingAdvanceId &&
+            !advanceReady &&
+            advanceMissing > 0 &&
+            canRegister ? (
               <AppButton asChild variant="primary" size="sm">
-                <Link to={advancePaymentUrl} state={{ from: location.pathname + location.search }}>Registrar anticipo</Link>
+                <Link
+                  to={advancePaymentUrl}
+                  state={{ from: location.pathname + location.search }}
+                >
+                  Registrar anticipo
+                </Link>
               </AppButton>
             ) : null}
             <AppButton asChild variant="secondary" size="sm">
-              <Link to={"/marcas-gt/pedidos/" + credit.pedido.id + "?tab=operacion"} state={{ from: location.pathname + location.search }}>Ver pagos del pedido</Link>
+              <Link
+                to={"/marcas-gt/pedidos/" + credit.pedido.id + "?tab=operacion"}
+                state={{ from: location.pathname + location.search }}
+              >
+                Ver pagos del pedido
+              </Link>
             </AppButton>
           </div>
         </AppCard>
       ) : null}
 
-      {existingPlan?.estado === "BORRADOR" && credit.acciones.puedeActivarPlan ? (
-        <AppCard title="Activar cuotas y cuentas por cobrar" icon={<CheckCircle2 />} size="sm">
+      {existingPlan?.estado === "BORRADOR" &&
+      credit.acciones.puedeActivarPlan ? (
+        <AppCard
+          title="Activar cuotas y cuentas por cobrar"
+          icon={<CheckCircle2 />}
+          size="sm"
+        >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-sm font-medium">
-                {advanceReady ? "Plan listo para activar" : "Falta verificar y aplicar el anticipo"}
+                {advanceReady
+                  ? "Plan listo para activar"
+                  : "Falta verificar y aplicar el anticipo"}
               </p>
               <p className="mt-1 text-sm text-[hsl(var(--app-muted-foreground))]">
                 {planHasChanges
                   ? "Tienes cambios sin guardar. Guarda el borrador antes de activarlo."
-                  : "Se crearán " + existingPlan.numeroCuotas + " CxC por " +
-                      formatMoney(existingPlan.montoProgramado) + ". El cobro puede iniciar de inmediato y el plan ya no se podrá editar."}
+                  : "Se crearán " +
+                    existingPlan.numeroCuotas +
+                    " CxC por " +
+                    formatMoney(existingPlan.montoProgramado) +
+                    ". El cobro puede iniciar de inmediato y el plan ya no se podrá editar."}
               </p>
             </div>
-            <AppButton variant="primary" size="sm" leftIcon={<CheckCircle2 />}
-              disabled={!advanceReady || planHasChanges || activateMutation.isPending}
-              onClick={requestActivate}>Activar cuotas ahora</AppButton>
+            <AppButton
+              variant="primary"
+              size="sm"
+              leftIcon={<CheckCircle2 />}
+              disabled={
+                !advanceReady || planHasChanges || activateMutation.isPending
+              }
+              onClick={requestActivate}
+            >
+              Activar cuotas ahora
+            </AppButton>
           </div>
         </AppCard>
       ) : null}
@@ -738,9 +835,7 @@ export function CreditPaymentPlanPanel({
                 key={index}
                 className="grid items-center gap-2 rounded-md border border-[hsl(var(--app-border))] p-2 sm:grid-cols-[70px_1fr_1fr]"
               >
-                <span className="text-sm font-semibold">
-                  #{index + 1}
-                </span>
+                <span className="text-sm font-semibold">#{index + 1}</span>
                 <AppInput
                   type="date"
                   value={installment.fechaVencimiento}
@@ -815,7 +910,9 @@ export function CreditPaymentPlanPanel({
           }
         }}
         preset="send"
-        title={existingPlan ? "Confirmar cambios del plan" : "Crear plan en borrador"}
+        title={
+          existingPlan ? "Confirmar cambios del plan" : "Crear plan en borrador"
+        }
         description="Revisa el número de cuotas, fechas y monto total. Guardar el borrador todavía no genera deuda ni CxC."
         confirmText={existingPlan ? "Guardar cambios" : "Crear borrador"}
         loadingText="Guardando..."
@@ -833,8 +930,7 @@ export function CreditPaymentPlanPanel({
               <strong>Cuotas:</strong> {saveReview.installments.length}
             </p>
             <p>
-              <strong>Total programado:</strong>{" "}
-              {formatMoney(saveReview.total)}
+              <strong>Total programado:</strong> {formatMoney(saveReview.total)}
             </p>
             <p>
               <strong>Primera cuota:</strong>{" "}
@@ -848,7 +944,9 @@ export function CreditPaymentPlanPanel({
 
       <AppConfirmDialog
         open={activateOpen}
-        onOpenChange={(next) => { if (!activateMutation.isPending) setActivateOpen(next); }}
+        onOpenChange={(next) => {
+          if (!activateMutation.isPending) setActivateOpen(next);
+        }}
         preset="warning"
         title="Activar plan de pagos"
         description="Se creará inmediatamente una Cuenta por Cobrar por cada cuota, aunque el pedido todavía no esté entregado. Los vencimientos programados comenzarán a contar desde sus fechas; los anteriores a hoy se considerarán vencidos. La operación no se puede deshacer editando el borrador."
@@ -864,6 +962,7 @@ export function CreditPaymentPlanPanel({
             <p>
               <strong>Crédito:</strong> {credit.numero}
             </p>
+            {/* comiteo */}
             <p>
               <strong>Cuotas:</strong> {existingPlan.numeroCuotas}
             </p>
