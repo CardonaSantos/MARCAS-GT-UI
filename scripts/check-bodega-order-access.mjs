@@ -18,16 +18,16 @@ for (const path of [
   assert.match(routes.slice(at, at + 190), /roles=\{\["ADMIN", "VENDEDOR", "BODEGA"\]\}/,
     "BODEGA debe tener acceso a " + path);
 }
-assert.ok(list.includes('["ADMIN", "VENDEDOR", "BODEGA"].includes(role ?? "")'),
+assert.match(list, /const canWrite = role === "ADMIN" \|\| role === "VENDEDOR" \|\| role === "BODEGA";/,
   "La lista debe ofrecer crear y editar pedidos a BODEGA");
-assert.ok(detail.includes('["ADMIN", "VENDEDOR", "BODEGA"].includes(role ?? "")'),
+assert.match(detail, /const canWrite = role === "ADMIN" \|\| role === "VENDEDOR" \|\| role === "BODEGA";/,
   "El detalle debe ofrecer acciones comerciales a BODEGA");
 assert.ok(detail.includes('role === "ADMIN" && order.acciones.puedeConfirmar'),
   "Solo ADMIN puede ver la confirmacion");
-assert.ok(detail.includes('(role === "ADMIN" || role === "VENDEDOR") &&'),
-  "Tramitar credito sigue limitado a comercial y ADMIN");
+assert.match(detail, /const canStartCredit\s*=\s*canWrite &&\s*isCredit &&/,
+  "BODEGA, VENDEDOR y ADMIN deben poder tramitar crédito puro o mixto");
 assert.ok(sellers.includes('["ADMIN", "VENDEDOR", "BODEGA"].includes(user.rol)'),
   "El selector debe permitir al responsable BODEGA creado por backend");
 assert.ok(edit.includes("query.data?.acciones.puedeEditar"),
   "La edicion debe respetar restricciones de estado del dominio");
-console.log("Permisos UI Pedidos BODEGA: rutas, acciones, credito y estado OK.");
+console.log("Permisos UI Pedidos BODEGA: rutas, acciones, credito puro/mixto y estado OK.");
