@@ -16,6 +16,7 @@ import { FeaturePageHeader } from "@/features/common/components/feature-page-hea
 import { getReturnRoute } from "@/features/common/navigation/route-state";
 import { formatMoney } from "@/features/common/formatters/value.formatters";
 import { createIdempotencyKey } from "@/features/common/utils/idempotency";
+import { moneyCents } from "@/features/creditos/common/credit-advance.utils";
 import { useOrders } from "@/features/pedidos/api/order.queries";
 import { useRegisterPayment } from "@/features/pagos/api/payment.mutations";
 import { usePaymentBanks } from "@/features/pagos/api/payment.queries";
@@ -50,6 +51,9 @@ export default function CreatePaymentPage() {
   const [searchParams] = useSearchParams();
   const preselectedCustomerId = Number(searchParams.get("clienteId")) || 0;
   const preselectedOrderId = Number(searchParams.get("pedidoId")) || null;
+  const requestedAmount = searchParams.get("monto") ?? "";
+  const preselectedAmount = (moneyCents(requestedAmount) ?? 0) > 0 ? requestedAmount : "";
+  const isAdvancePayment = searchParams.get("concepto") === "anticipo" && preselectedOrderId !== null;
   const backTo = getReturnRoute(location.state, "/marcas-gt/pagos");
   const customers = useCustomerSelectables();
   const banks = usePaymentBanks();
@@ -68,7 +72,7 @@ export default function CreatePaymentPage() {
       bancoId: null,
       metodo: "EFECTIVO",
       moneda: "GTQ",
-      monto: "",
+      monto: preselectedAmount,
       referencia: "",
       fechaPago: "",
       observaciones: "",
@@ -163,15 +167,19 @@ export default function CreatePaymentPage() {
       <AppStack gap="lg">
         <FeaturePageHeader
           title="Registrar pago"
-          description="Registra el dinero recibido. El pago quedará PENDIENTE hasta que ADMIN o CONTABILIDAD lo verifique."
+          description={isAdvancePayment
+            ? "Registra el anticipo del pedido mixto. No se considerará cobrado hasta que ADMIN o CONTABILIDAD verifiquen el pago."
+            : "Registra el dinero recibido. El pago quedará PENDIENTE hasta que ADMIN o CONTABILIDAD lo verifique."}
           backTo={backTo}
           backLabel="Volver a pagos"
         />
 
         <AppAlert
           tone="info"
-          title="Registrar un pago para su posterior verificación."
-          description=""
+          title={isAdvancePayment ? "Anticipo del pedido" : "Registro de pago"}
+          description={isAdvancePayment
+            ? "Confirma cliente, pedido e importe. La verificación aplicará el pago al anticipo; las cuotas financiadas se activan después de entregar el pedido."
+            : "El registro de un pago no equivale a su verificación."}
         />
 
         <AppForm form={form} onSubmit={requestConfirmation}>
@@ -292,7 +300,9 @@ export default function CreatePaymentPage() {
           onOpenChange={setConfirmOpen}
           preset="send"
           title="Confirmar registro del pago"
-          description="Revisa los datos antes de crear el pago. Después quedará pendiente de verificación."
+          description={isAdvancePayment
+            ? "Se registrará el anticipo del pedido. Se mantendrá pendiente hasta que se verifique."
+            : "Revisa los datos antes de crear el pago. Después quedará pendiente de verificación."}
           confirmText="Registrar pago"
           loadingText="Registrando..."
           onConfirm={confirm}

@@ -45,6 +45,8 @@ export default function EditCreditApplicationPage() {
       pedidoId: null,
       politicaId: null,
       montoSolicitado: "0.00",
+      condicionPago: "CREDITO",
+      anticipoPropuesto: "0.00",
       plazoDias: "30",
       motivo: "",
     },

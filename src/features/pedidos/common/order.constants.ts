@@ -30,6 +30,7 @@ export const ORDER_PAYMENT_CONDITIONS: readonly OrderPaymentCondition[] = [
   "PREPAGO",
   "CONTRAENTREGA",
   "CREDITO",
+  "MIXTO",
 ];
 
 export const ORDER_SORT_FIELDS: readonly OrderSortField[] = [
@@ -96,7 +97,7 @@ export const ORDER_PAYMENT_CONDITION_LABELS: Record<
   PREPAGO: "Prepago",
   CONTRAENTREGA: "Contraentrega",
   CREDITO: "Crédito",
-  MIXTO: "Mixto",
+  MIXTO: "Crédito con anticipo",
 };
 
 export const ORDER_EVENT_LABELS: Record<OrderEventType, string> = {

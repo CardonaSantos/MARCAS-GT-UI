@@ -101,13 +101,17 @@ export function useCreditPortfolioDetail(id: number) {
   });
 }
 
-export function useCreditOrderOptions(search = "") {
+export function useCreditOrderOptions(
+  search = "",
+  condition: "CREDITO" | "MIXTO" = "CREDITO",
+) {
   const normalized = search.trim();
 
   return API.useQuery<OrderPageResponse>({
     queryKey: marcasQueryKeys.pedidos.custom(
       "credit-application-options",
       normalized,
+      condition,
     ),
     endpoint: marcasEndpoints.pedidos.root,
     params: {
@@ -115,7 +119,7 @@ export function useCreditOrderOptions(search = "") {
       limit: 100,
       search: normalized || undefined,
       estado: "PENDIENTE_VALIDACION",
-      condicionPago: "CREDITO",
+      condicionPago: condition,
       soloAbiertos: true,
       sortBy: "creadoEn",
       sortDir: "desc",

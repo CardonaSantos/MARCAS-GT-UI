@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { formatMoney } from "@/features/common/formatters/value.formatters";
+import { financedCreditAmount, validCreditAdvance } from "../common/credit-advance.utils";
 import { useOrder } from "@/features/pedidos/api/order.queries";
 import {
   AppFormInput,
@@ -26,20 +27,22 @@ export function CreditApplicationFormFields({
   const form = useFormContext<CreditApplicationFormValues>();
   const pedidoId = useWatch({ control: form.control, name: "pedidoId" });
   const politicaId = useWatch({ control: form.control, name: "politicaId" });
+  const anticipo = useWatch({ control: form.control, name: "anticipoPropuesto" });
 
   const [searchInput, setSearchInput] = useState("");
   const [serverSearch, setServerSearch] = useState("");
 
-  const ordersQuery = useCreditOrderOptions(serverSearch);
+  const ordersQuery = useCreditOrderOptions(serverSearch, "CREDITO");
+  const mixedOrdersQuery = useCreditOrderOptions(serverSearch, "MIXTO");
   const orderQuery = useOrder(pedidoId ?? 0);
   const policyQuery = useCreditPolicy(politicaId ?? 0);
 
   const orderOptions = useMemo(() => {
-    const rows = [...(ordersQuery.data?.data ?? [])];
+    const rows = [...(ordersQuery.data?.data ?? []), ...(mixedOrdersQuery.data?.data ?? [])];
 
     if (
       orderQuery.data &&
-      orderQuery.data.condicionPago === "CREDITO" &&
+      ["CREDITO", "MIXTO"].includes(orderQuery.data.condicionPago) &&
       !rows.some((order) => order.id === orderQuery.data?.id)
     ) {
       rows.unshift(orderQuery.data);
@@ -54,11 +57,18 @@ export function CreditApplicationFormFields({
         " · " +
         formatMoney(order.total),
     }));
-  }, [orderQuery.data, ordersQuery.data]);
+  }, [orderQuery.data, ordersQuery.data, mixedOrdersQuery.data]);
 
   useEffect(() => {
     const order = orderQuery.data;
-    if (!order || order.condicionPago !== "CREDITO") return;
+    if (!order || !["CREDITO", "MIXTO"].includes(order.condicionPago)) return;
+
+    form.setValue("condicionPago", order.condicionPago as "CREDITO" | "MIXTO", {
+      shouldValidate: true,
+    });
+    if (order.condicionPago === "CREDITO" && form.getValues("anticipoPropuesto") !== "0.00") {
+      form.setValue("anticipoPropuesto", "0.00", { shouldValidate: true });
+    }
 
     const amount = Number(order.total).toFixed(2);
 
@@ -71,8 +81,15 @@ export function CreditApplicationFormFields({
 
   const invalidOrder =
     orderQuery.data &&
-    (orderQuery.data.condicionPago !== "CREDITO" ||
+    (!["CREDITO", "MIXTO"].includes(orderQuery.data.condicionPago) ||
       orderQuery.data.estado !== "PENDIENTE_VALIDACION");
+  const mixed = orderQuery.data?.condicionPago === "MIXTO";
+  const validAdvance = orderQuery.data
+    ? validCreditAdvance(mixed ? "MIXTO" : "CREDITO", anticipo, orderQuery.data.total)
+    : false;
+  const financed = orderQuery.data
+    ? financedCreditAmount(orderQuery.data.total, anticipo)
+    : null;
 
   return (
     <AppStack gap="md">
@@ -91,10 +108,10 @@ export function CreditApplicationFormFields({
             name="pedidoId"
             label="Pedido"
             options={orderOptions}
-            isLoading={ordersQuery.isLoading || orderQuery.isLoading}
+            isLoading={ordersQuery.isLoading || mixedOrdersQuery.isLoading || orderQuery.isLoading}
             isDisabled={lockOrder}
             placeholder="Seleccionar pedido a crédito"
-            noOptionsText="No hay pedidos CREDITO pendientes de validación"
+            noOptionsText="No hay pedidos a crédito pendientes de validación"
             required
           />
 
@@ -139,7 +156,7 @@ export function CreditApplicationFormFields({
             <AppAlert
               tone="danger"
               title="Pedido no elegible"
-              description="Esta interfaz sólo tramita pedidos CREDITO en estado PENDIENTE_VALIDACION."
+              description="Selecciona un pedido CREDITO o MIXTO pendiente de validación."
             />
           ) : null}
         </AppStack>
@@ -165,6 +182,17 @@ export function CreditApplicationFormFields({
             required
           />
 
+          <AppFormInput<CreditApplicationFormValues>
+            name="anticipoPropuesto"
+            label={mixed ? "Anticipo propuesto (Q)" : "Anticipo (no aplica)"}
+            type="number"
+            min={0}
+            step="0.01"
+            inputMode="decimal"
+            readOnly={!mixed}
+            required
+          />
+
           <CreditPolicyFormSelect<CreditApplicationFormValues>
             name="politicaId"
             label="Política de crédito"
@@ -173,6 +201,17 @@ export function CreditApplicationFormFields({
             isClearable
           />
         </AppGrid>
+
+        {orderQuery.data ? (
+          <div className="mt-4 rounded-lg border border-[hsl(var(--app-border))] p-3" role="status" aria-live="polite">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Total pedido</p><p className="font-semibold tabular-nums">{formatMoney(orderQuery.data.total)}</p></div>
+              <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Anticipo</p><p className="font-semibold tabular-nums">{formatMoney(anticipo || 0)}</p></div>
+              <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Saldo a financiar</p><p className="font-semibold tabular-nums">{financed == null ? "—" : formatMoney(financed)}</p></div>
+            </div>
+            {mixed && !validAdvance ? <p className="mt-2 text-sm text-red-500">El anticipo debe ser mayor que Q0.00 y menor que el total del pedido.</p> : null}
+          </div>
+        ) : null}
 
         {policyQuery.data ? (
           <div className="mt-4 rounded-md border border-[hsl(var(--app-border))] p-3">

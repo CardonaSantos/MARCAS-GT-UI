@@ -18,6 +18,7 @@ import { AppCard } from "@/ui/components/app/primitives/app-card";
 import { AppGrid } from "@/ui/components/app/primitives/app-grid";
 
 import type { CreditPortfolioDetail } from "../api/credit.types";
+import { moneyCents } from "../common/credit-advance.utils";
 
 function Value({
   label,
@@ -42,6 +43,13 @@ export function CreditPortfolioDetailSummary({
   currentUrl: string;
 }) {
   const hasReceivables = credit.cuentasPorCobrar.length > 0;
+  const requiresAdvance = (moneyCents(credit.montos.anticipoRequerido) ?? 0) > 0;
+  const advancePending = credit.pagos.find((payment) => payment.estado === "PENDIENTE");
+  const verifiedCents = moneyCents(credit.montos.pagadoVerificado) ?? 0;
+  const missingAdvance = Math.max(0, (moneyCents(credit.montos.anticipoRequerido) ?? 0) - verifiedCents);
+  const paymentPath = "/marcas-gt/pagos/nuevo?clienteId=" + credit.cliente.id +
+    "&pedidoId=" + credit.pedido.id + "&monto=" + (missingAdvance / 100).toFixed(2) +
+    "&concepto=anticipo";
 
   return (
     <div className="space-y-4">
@@ -51,6 +59,38 @@ export function CreditPortfolioDetailSummary({
           title="Crédito sin plan de pagos"
           description="Todavía no existe una programación de cuotas. El saldo no se considera liquidado: aún no se han generado las Cuentas por Cobrar."
         />
+      ) : null}
+
+      {requiresAdvance ? (
+        <AppCard title="Anticipo del pedido" icon={<Banknote />} size="sm">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Value label="Anticipo requerido">{formatMoney(credit.montos.anticipoRequerido)}</Value>
+            <Value label="Pagos verificados del pedido">{formatMoney(credit.montos.pagadoVerificado)}</Value>
+            <Value label="Plan de cuotas">{credit.planPago?.estado === "ACTIVO" ? "Activo" : "Pendiente de activación"}</Value>
+          </div>
+          <p className="mt-3 text-sm text-[hsl(var(--app-muted-foreground))]">
+            El anticipo debe cobrarse, verificarse y aplicarse antes de entregar. Los importes de las cuotas corresponden sólo al saldo financiado.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {advancePending ? (
+              <AppButton asChild variant="secondary" size="sm">
+                <Link to={"/marcas-gt/pagos/" + advancePending.id} state={{ from: currentUrl }}>
+                  Revisar pago pendiente
+                </Link>
+              </AppButton>
+            ) : null}
+            {!advancePending && missingAdvance > 0 && credit.planPago?.estado !== "ACTIVO" ? (
+              <AppButton asChild variant="primary" size="sm">
+                <Link to={paymentPath} state={{ from: currentUrl }}>Registrar anticipo</Link>
+              </AppButton>
+            ) : null}
+            <AppButton asChild variant="secondary" size="sm">
+              <Link to={"/marcas-gt/pedidos/" + credit.pedido.id + "?tab=operacion"} state={{ from: currentUrl }}>
+                Consultar pagos del pedido
+              </Link>
+            </AppButton>
+          </div>
+        </AppCard>
       ) : null}
 
       <AppGrid cols={{ base: 1, sm: 2, xl: 4 }} gap="sm">

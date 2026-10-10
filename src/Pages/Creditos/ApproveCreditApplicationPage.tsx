@@ -14,6 +14,7 @@ import { useIdempotencyKey } from "@/features/common/utils/idempotency";
 import { useApproveCreditWithSchedule } from "@/features/creditos/api/credit.mutations";
 import { useCreditApplication } from "@/features/creditos/api/credit.queries";
 import { toApproveCreditPayload } from "@/features/creditos/common/credit.mappers";
+import { financedCreditAmount, moneyCents, validCreditAdvance } from "@/features/creditos/common/credit-advance.utils";
 import {
   creditApprovalSchema,
   type CreditApprovalFormValues,
@@ -80,10 +81,19 @@ export default function ApproveCreditApplicationPage() {
     form.reset({
       montoAutorizado: Number(query.data.montos.solicitado).toFixed(2),
       plazoAutorizadoDias: String(query.data.plazos.solicitadoDias),
-      anticipoRequerido: "0.00",
+      anticipoRequerido: query.data.origen.pedido.condicionPago === "MIXTO"
+        ? query.data.montos.anticipoPropuesto : "0.00",
       observaciones: "",
     });
   }, [form, query.data]);
+
+  const isMixed = query.data?.origen.pedido.condicionPago === "MIXTO";
+  const authorized = form.watch("montoAutorizado");
+  const advance = form.watch("anticipoRequerido");
+  const validAdvance = validCreditAdvance(isMixed ? "MIXTO" : "CREDITO", advance, authorized);
+  const financed = financedCreditAmount(authorized, advance);
+  const validFinancedSchedule = validSchedule && validAdvance &&
+    (moneyCents(financed ?? "") ?? 0) >= installmentCount;
 
   const readiness = query.data
     ? {
@@ -102,13 +112,13 @@ export default function ApproveCreditApplicationPage() {
     readiness.documentos === 0;
 
   const onSubmit = async (_values: CreditApprovalFormValues) => {
-    if (!query.data?.acciones.puedeAprobar || !ready || !validSchedule || !dueDate) return;
+    if (!query.data?.acciones.puedeAprobar || !ready || !validFinancedSchedule || !dueDate) return;
     setConfirmOpen(true);
   };
 
   const confirmApproval = async () => {
     const values = form.getValues();
-    if (!validSchedule || !dueDate) return;
+    if (!validFinancedSchedule || !dueDate) return;
     const result = await mutation.mutateAsync({
       id,
       payload: {
@@ -165,10 +175,12 @@ export default function ApproveCreditApplicationPage() {
 
                 <AppCard
                   title="Resolución"
-                  description="En crédito puro, el monto autorizado debe coincidir con el monto solicitado y el total vigente del Pedido."
+                  description={isMixed
+                    ? "En crédito con anticipo se autoriza el total del pedido. El anticipo se descontará del saldo a financiar."
+                    : "En crédito puro se financia el total del pedido, sin anticipo."}
                   size="sm"
                 >
-                  <AppGrid cols={{ base: 1, md: 2 }} gap="md">
+                  <AppGrid cols={{ base: 1, md: 2, lg: 3 }} gap="md">
                     <AppFormInput<CreditApprovalFormValues>
                       name="montoAutorizado"
                       label="Monto autorizado"
@@ -188,8 +200,12 @@ export default function ApproveCreditApplicationPage() {
 
                     <AppFormInput<CreditApprovalFormValues>
                       name="anticipoRequerido"
-                      label="Anticipo requerido"
-                      readOnly
+                      label={isMixed ? "Anticipo requerido (Q)" : "Anticipo (no aplica)"}
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      inputMode="decimal"
+                      readOnly={!isMixed}
                       required
                     />
                   </AppGrid>
@@ -210,15 +226,27 @@ export default function ApproveCreditApplicationPage() {
                       description={
                         "Total vigente: " +
                         formatMoney(query.data.origen.pedido.total) +
-                        ". Anticipo: Q0.00."
+                        ". Anticipo: " + formatMoney(advance || 0) +
+                        ". Saldo financiado: " + (financed == null ? "—" : formatMoney(financed)) + "."
                       }
                     />
                   </div>
+                  {isMixed ? (
+                    <div className="mt-3">
+                      <AppAlert tone={validAdvance ? "info" : "warning"}
+                        title={validAdvance ? "Anticipo y financiación separados" : "Revisa el anticipo"}
+                        description={validAdvance
+                          ? "El anticipo se cobra desde Pagos; debe verificarse y aplicarse antes de entregar el pedido y activar las cuotas."
+                          : "Ingresa un anticipo mayor que Q0.00 y menor que el monto autorizado."} />
+                    </div>
+                  ) : null}
                 </AppCard>
 
                 <AppCard
                   title="Programar cuotas"
-                  description="Se guardará un calendario en borrador al aprobar. Las CxC se activarán automáticamente cuando el pedido esté entregado."
+                  description={isMixed
+                    ? "El calendario quedará en borrador hasta que el pedido se entregue y el anticipo esté cobrado, verificado y aplicado."
+                    : "Se guardará un calendario en borrador. Las cuotas se activarán automáticamente cuando el pedido esté entregado."}
                   size="sm"
                 >
                   <AppGrid cols={{ base: 1, md: 3 }} gap="md">
@@ -262,6 +290,9 @@ export default function ApproveCreditApplicationPage() {
                       />
                     </div>
                   </AppGrid>
+                  {!validFinancedSchedule && validAdvance && (moneyCents(financed ?? "") ?? 0) < installmentCount ? (
+                    <p className="mt-2 text-sm text-red-500" role="alert">El saldo financiado no alcanza para generar cuotas positivas.</p>
+                  ) : null}
                   <p className="mt-3 text-xs text-[hsl(var(--app-muted-foreground))]">
                     La suma se distribuye sin perder centavos. La última cuota absorbe el redondeo.
                   </p>
@@ -271,8 +302,12 @@ export default function ApproveCreditApplicationPage() {
                   open={confirmOpen}
                   onOpenChange={setConfirmOpen}
                   title="Aprobar crédito y programar cuotas"
-                  description={"Se autorizará el crédito y se prepararán " + installmentCount +
-                    " cuota(s). Las cuentas por cobrar nacerán al confirmarse la entrega."}
+                  description={"Se autorizarán " + formatMoney(authorized) +
+                    " con anticipo de " + formatMoney(advance || 0) +
+                    " y saldo financiado de " + (financed ? formatMoney(financed) : "—") +
+                    " en " + installmentCount + " cuota(s). " +
+                    (isMixed ? "El anticipo debe quedar verificado y aplicado antes de la entrega." :
+                      "Las cuotas se activarán al completar la entrega.")}
                   preset="success"
                   confirmText="Aprobar y programar"
                   loadingText="Autorizando..."
@@ -291,7 +326,7 @@ export default function ApproveCreditApplicationPage() {
                     leftIcon={<CheckCircle2 />}
                     loadingText="Aprobando..."
                     disableWhenInvalid
-                    disabled={!ready || !validSchedule || mutation.isPending}
+                    disabled={!ready || !validFinancedSchedule || mutation.isPending}
                     className="w-full sm:w-auto"
                   >
                     Aprobar y programar cuotas

@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, ShieldCheck } from "lucide-react";
+import { formatMoney } from "@/features/common/formatters/value.formatters";
+import { financedCreditAmount, normalizeCreditAdvance, validCreditAdvance } from "@/features/creditos/common/credit-advance.utils";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -13,7 +15,7 @@ import { useCreateOrder } from "@/features/pedidos/api/order.mutations";
 import { useRequestCreditFromOrder } from "@/features/creditos/api/credit.mutations";
 import { CreditPolicySelect } from "@/features/creditos/components/credit-selects";
 import { toCreateOrderPayload } from "@/features/pedidos/common/order.mappers";
-import { validateOrderDraftDiscounts } from "@/features/pedidos/common/order-form.utils";
+import { orderDraftTotals, validateOrderDraftDiscounts } from "@/features/pedidos/common/order-form.utils";
 import { OrderFormFields } from "@/features/pedidos/components/order-form-fields";
 import {
   orderFormSchema,
@@ -38,6 +40,7 @@ export default function CreateOrderPage() {
   const mutation = useCreateOrder();
   const creditRequest = useRequestCreditFromOrder();
   const [term, setTerm] = useState("30");
+  const [advance, setAdvance] = useState("");
   const [policyId, setPolicyId] = useState<number | null>(null);
 
   const form = useForm<OrderFormValues>({
@@ -61,6 +64,11 @@ export default function CreateOrderPage() {
   });
 
   const condition = form.watch("condicionPago");
+  const details = form.watch("detalles");
+  const isCredit = condition === "CREDITO" || condition === "MIXTO";
+  const estimatedTotal = orderDraftTotals(details, productsQuery.data ?? []).total;
+  const validAdvance = condition !== "MIXTO" || validCreditAdvance("MIXTO", advance, estimatedTotal.toFixed(2));
+  const estimatedFinanced = financedCreditAmount(estimatedTotal.toFixed(2), advance);
   const termNumber = Number(term);
   const validTerm = Number.isInteger(termNumber) && termNumber >= 1 && termNumber <= 3650;
 
@@ -80,16 +88,22 @@ export default function CreateOrderPage() {
       return;
     }
 
-    if (values.condicionPago === "CREDITO" && !validTerm) {
+    if (isCredit && !validTerm) {
       toast.error("Indica un plazo válido entre 1 y 3650 días.");
       return;
     }
+    if (values.condicionPago === "MIXTO" && !validAdvance) {
+      toast.error("El anticipo debe ser mayor que Q0.00 y menor que el total estimado del pedido.");
+      return;
+    }
     const created = await mutation.mutateAsync(toCreateOrderPayload(values));
-    if (values.condicionPago === "CREDITO") {
+    if (isCredit) {
       try {
         await creditRequest.mutateAsync({
           pedidoId: created.id,
-          payload: { plazoDias: termNumber, politicaId: policyId },
+          payload: { plazoDias: termNumber, politicaId: policyId,
+            anticipoPropuesto: values.condicionPago === "MIXTO"
+              ? normalizeCreditAdvance(advance) : "0.00", },
         });
       } catch {
         // El pedido ya existe. En su detalle puede recuperarse la solicitud
@@ -117,10 +131,10 @@ export default function CreateOrderPage() {
           <AppStack gap="md">
             <OrderFormFields />
 
-            {condition === "CREDITO" ? (
+            {isCredit ? (
               <AppCard
-                title="Solicitud de crédito"
-                description="Al guardar el pedido se enviará su solicitud directamente al administrador."
+                title={condition === "MIXTO" ? "Crédito con anticipo" : "Solicitud de crédito"}
+                description="Al guardar el pedido se enviará la solicitud al administrador para su evaluación."
                 size="sm"
               >
                 <AppGrid cols={{ base: 1, md: 2 }} gap="md">
@@ -139,6 +153,15 @@ export default function CreateOrderPage() {
                       aria-invalid={!validTerm}
                     />
                   </div>
+                  {condition === "MIXTO" ? (
+                    <div className="min-w-0">
+                      <label htmlFor="order-credit-advance" className="mb-2 block text-xs font-medium">Anticipo propuesto (Q) *</label>
+                      <AppInput id="order-credit-advance" type="number" min={0.01} step="0.01" inputMode="decimal"
+                        value={advance} onChange={(event) => setAdvance(event.target.value)}
+                        aria-invalid={!validAdvance} aria-describedby="order-credit-advance-help" required />
+                      <p id="order-credit-advance-help" className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">Mayor que Q0.00 y menor que el total del pedido.</p>
+                    </div>
+                  ) : null}
                   <div className="min-w-0">
                     <label className="mb-2 block text-xs font-medium">Política de crédito (opcional)</label>
                     <CreditPolicySelect
@@ -150,11 +173,20 @@ export default function CreateOrderPage() {
                     />
                   </div>
                 </AppGrid>
+                {condition === "MIXTO" ? (
+                  <div className="mt-4 grid gap-3 rounded-lg border border-[hsl(var(--app-border))] p-3 sm:grid-cols-3" role="status" aria-live="polite">
+                    <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Total estimado</p><p className="font-semibold tabular-nums">{formatMoney(estimatedTotal)}</p></div>
+                    <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Anticipo</p><p className="font-semibold tabular-nums">{advance && Number.isFinite(Number(advance)) ? formatMoney(advance) : "—"}</p></div>
+                    <div><p className="text-xs text-[hsl(var(--app-muted-foreground))]">Por financiar</p><p className="font-semibold tabular-nums">{validAdvance && estimatedFinanced ? formatMoney(estimatedFinanced) : "—"}</p></div>
+                  </div>
+                ) : null}
                 <div className="mt-4">
                   <AppAlert
                     tone="info"
                     title="La aprobación es exclusiva de ADMIN"
-                    description="El bodeguero registra el pedido y solicita el crédito en una sola acción. No se autoriza ni se genera deuda hasta aprobar y entregar."
+                    description={condition === "MIXTO"
+                      ? "El anticipo se cobra y verifica por Pagos. No se entregará el pedido ni se activarán cuotas hasta que el anticipo esté aplicado; el saldo se financia al entregar."
+                      : "El pedido se solicita sin autorizar crédito ni generar cuotas. El ADMIN revisará las condiciones."}
                   />
                 </div>
               </AppCard>
@@ -166,13 +198,13 @@ export default function CreateOrderPage() {
               </AppButton>
 
               <AppFormSubmit<OrderFormValues>
-                leftIcon={condition === "CREDITO" ? <ShieldCheck /> : <Save />}
-                loadingText={condition === "CREDITO" ? "Creando y solicitando..." : "Creando..."}
+                leftIcon={isCredit ? <ShieldCheck /> : <Save />}
+                loadingText={isCredit ? "Creando y solicitando..." : "Creando..."}
                 disableWhenInvalid
-                disabled={mutation.isPending || creditRequest.isPending || (condition === "CREDITO" && !validTerm)}
+                disabled={mutation.isPending || creditRequest.isPending || (isCredit && (!validTerm || !validAdvance))}
                 className="w-full sm:w-auto"
               >
-                {condition === "CREDITO" ? "Crear y solicitar crédito" : "Crear pedido"}
+                {isCredit ? "Crear y solicitar crédito" : "Crear pedido"}
               </AppFormSubmit>
             </div>
           </AppStack>

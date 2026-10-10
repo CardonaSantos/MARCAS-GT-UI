@@ -21,6 +21,8 @@ import {
 import { useOrder } from "@/features/pedidos/api/order.queries";
 import { useRequestCreditFromOrder } from "@/features/creditos/api/credit.mutations";
 import { CreditPolicySelect } from "@/features/creditos/components/credit-selects";
+import { financedCreditAmount, normalizeCreditAdvance, validCreditAdvance } from "@/features/creditos/common/credit-advance.utils";
+import { formatMoney } from "@/features/common/formatters/value.formatters";
 import { AppInput } from "@/ui/components/app/primitives/app-input";
 import {
   ORDER_DETAIL_TABS,
@@ -59,6 +61,7 @@ export default function OrderDetailPage() {
   const confirmOrder = useConfirmOrder();
   const creditRequest = useRequestCreditFromOrder();
   const [creditTerm, setCreditTerm] = useState("30");
+  const [creditAdvance, setCreditAdvance] = useState("");
   const [creditPolicy, setCreditPolicy] = useState<number | null>(null);
 
   const tabState = useUrlTabState<OrderDetailTab>({
@@ -79,9 +82,13 @@ export default function OrderDetailPage() {
       (application) => !["RECHAZADA", "CANCELADA"].includes(application.estado),
     ) ??
     null;
+  const mixed = order?.condicionPago === "MIXTO";
+  const isCredit = order?.condicionPago === "CREDITO" || mixed;
+  const validAdvance = !mixed || (order != null && validCreditAdvance("MIXTO", creditAdvance, order.total));
+  const estimatedFinanced = order ? financedCreditAmount(order.total, creditAdvance) : null;
   const canStartCredit =
     canWrite &&
-    order?.condicionPago === "CREDITO" &&
+    isCredit &&
     ["BORRADOR", "PENDIENTE_VALIDACION"].includes(order.estado) &&
     !linkedCredit;
 
@@ -171,7 +178,7 @@ export default function OrderDetailPage() {
                   </AppButton>
                 ) : null}
 
-                {order.acciones.puedeSolicitarValidacion && canWrite && order.condicionPago !== "CREDITO" ? (
+                {order.acciones.puedeSolicitarValidacion && canWrite && !isCredit ? (
                   <AppConfirmDialog
                     title="Solicitar validación"
                     description="El pedido dejará de ser editable y pasará a revisión. Debe contener al menos un producto."
@@ -219,7 +226,7 @@ export default function OrderDetailPage() {
                 ) : null}
 
                 {canReadCredit &&
-                order.condicionPago === "CREDITO" &&
+                isCredit &&
                 linkedCredit ? (
                   <AppButton asChild variant="secondary" size="sm">
                     <Link
@@ -238,12 +245,14 @@ export default function OrderDetailPage() {
                 {canStartCredit ? (
                   <AppConfirmDialog
                     title="Solicitar autorización de crédito"
-                    description="El pedido pasará a validación y se generará automáticamente una solicitud para ADMIN."
+                    description={mixed
+                      ? "Se enviará el pedido y el anticipo propuesto a ADMIN. El pago se registrará y verificará por separado."
+                      : "El pedido pasará a validación y se generará automáticamente una solicitud para ADMIN."}
                     preset="send"
                     confirmText="Enviar solicitud"
                     loadingText="Solicitando..."
                     confirmDisabled={!Number.isInteger(Number(creditTerm)) ||
-                      Number(creditTerm) < 1 || Number(creditTerm) > 3650}
+                      Number(creditTerm) < 1 || Number(creditTerm) > 3650 || !validAdvance}
                     isLoading={creditRequest.isPending}
                     trigger={
                       <AppButton variant="primary" size="sm" leftIcon={<WalletCards />}>
@@ -256,6 +265,7 @@ export default function OrderDetailPage() {
                         payload: {
                           plazoDias: Number(creditTerm),
                           politicaId: creditPolicy,
+                          anticipoPropuesto: mixed ? normalizeCreditAdvance(creditAdvance) : "0.00",
                         },
                       });
                       await query.refetch();
@@ -276,6 +286,15 @@ export default function OrderDetailPage() {
                           inputMode="numeric"
                         />
                       </div>
+                      {mixed ? (
+                        <div className="min-w-0">
+                          <label htmlFor="order-credit-advance" className="mb-2 block text-xs font-medium">Anticipo propuesto (Q) *</label>
+                          <AppInput id="order-credit-advance" type="number" min={0.01} step="0.01" inputMode="decimal"
+                            value={creditAdvance} onChange={(event) => setCreditAdvance(event.target.value)}
+                            aria-invalid={!validAdvance} aria-describedby="detail-advance-help" required />
+                          <p id="detail-advance-help" className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">Entre Q0.01 y menos de {formatMoney(order.total)}.</p>
+                        </div>
+                      ) : null}
                       <div className="min-w-0">
                         <label className="mb-2 block text-xs font-medium">
                           Política (opcional)
@@ -289,6 +308,13 @@ export default function OrderDetailPage() {
                         />
                       </div>
                     </div>
+                    {mixed ? (
+                      <div className="mt-3 rounded-lg border border-[hsl(var(--app-border))] p-3 text-sm" role="status" aria-live="polite">
+                        <p>Total del pedido: <strong>{formatMoney(order.total)}</strong></p>
+                        <p>Anticipo propuesto: <strong>{creditAdvance ? formatMoney(creditAdvance) : "—"}</strong></p>
+                        <p>Por financiar: <strong>{validAdvance && estimatedFinanced ? formatMoney(estimatedFinanced) : "—"}</strong></p>
+                      </div>
+                    ) : null}
                   </AppConfirmDialog>
                 ) : null}
 
@@ -299,7 +325,8 @@ export default function OrderDetailPage() {
                         "/marcas-gt/pagos/nuevo?clienteId=" +
                         order.cliente.id +
                         "&pedidoId=" +
-                        id
+                        id +
+                        (mixed && linkedCredit?.estado === "APROBADA" ? "&concepto=anticipo" : "")
                       }
                       state={{
                         from: currentUrl,
@@ -307,7 +334,7 @@ export default function OrderDetailPage() {
                       }}
                     >
                       <Banknote className="h-4 w-4" />
-                      Registrar pago
+                      {mixed && linkedCredit?.estado === "APROBADA" ? "Registrar anticipo" : "Registrar pago"
                     </Link>
                   </AppButton>
                 ) : null}

@@ -1,3 +1,4 @@
+import { normalizeCreditAdvance } from "./credit-advance.utils";
 import type {
   AddCreditDocumentPayload,
   AddCreditReferencePayload,
@@ -50,6 +51,7 @@ export function toCreateCreditApplicationPayload(
     politicaId: values.politicaId,
     montoSolicitado: Number(values.montoSolicitado).toFixed(2),
     plazoDias: Number(values.plazoDias),
+    anticipoPropuesto: normalizeCreditAdvance(values.anticipoPropuesto),
     motivo: nullableText(values.motivo),
   };
 }
@@ -61,6 +63,7 @@ export function toUpdateCreditApplicationPayload(
     politicaId: values.politicaId,
     montoSolicitado: Number(values.montoSolicitado).toFixed(2),
     plazoDias: Number(values.plazoDias),
+    anticipoPropuesto: normalizeCreditAdvance(values.anticipoPropuesto),
     motivo: nullableText(values.motivo),
   };
 }
@@ -72,6 +75,8 @@ export function toCreditApplicationFormValues(
     pedidoId: credit.origen.pedido.id,
     politicaId: credit.politica?.id ?? null,
     montoSolicitado: Number(credit.montos.solicitado).toFixed(2),
+    condicionPago: credit.origen.pedido.condicionPago,
+    anticipoPropuesto: credit.montos.anticipoPropuesto,
     plazoDias: String(credit.plazos.solicitadoDias),
     motivo: credit.motivo ?? "",
   };
@@ -84,7 +89,7 @@ export function toApproveCreditPayload(
   return {
     montoAutorizado: Number(values.montoAutorizado).toFixed(2),
     plazoAutorizadoDias: Number(values.plazoAutorizadoDias),
-    anticipoRequerido: "0.00",
+    anticipoRequerido: normalizeCreditAdvance(values.anticipoRequerido),
     observaciones: nullableText(values.observaciones),
     claveIdempotencia,
   };

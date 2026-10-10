@@ -102,7 +102,7 @@ export interface CreditOriginOrder {
   id: number;
   numero: string;
   estado: string;
-  condicionPago: "CREDITO";
+  condicionPago: "CREDITO" | "MIXTO";
   estadoPago: string;
   total: string;
   creadoEn: string;
@@ -403,7 +403,7 @@ export interface CreditPortfolioItem {
     id: number;
     numero: string;
     estado: string;
-    condicionPago: "CREDITO";
+    condicionPago: "CREDITO" | "MIXTO";
     total: string;
   };
   cliente: CreditCustomer;
@@ -440,7 +440,7 @@ export interface CreditListFilters {
   politicaId?: number;
   tipoDecision?: CreditDecisionType;
   integracionEstado?: CreditIntegrationState;
-  condicionPago: "CREDITO";
+  condicionPago?: "CREDITO" | "MIXTO";
   fechaDesde?: string;
   fechaHasta?: string;
   soloPendientes?: boolean;
@@ -488,6 +488,7 @@ export interface CreditPortfolioFilters {
 
 export interface RequestCreditFromOrderPayload {
   plazoDias: number;
+  anticipoPropuesto?: string;
   politicaId?: number | null;
   motivo?: string | null;
 }
@@ -505,6 +506,7 @@ export interface CreateCreditApplicationPayload {
   politicaId?: number | null;
   montoSolicitado: string;
   plazoDias: number;
+  anticipoPropuesto?: string;
   motivo?: string | null;
 }
 
@@ -512,6 +514,7 @@ export interface UpdateCreditApplicationPayload {
   politicaId?: number | null;
   montoSolicitado?: string;
   plazoDias?: number;
+  anticipoPropuesto?: string;
   motivo?: string | null;
 }
 
@@ -562,7 +565,7 @@ export interface ReviewCreditRequirementPayload {
 export interface ApproveCreditPayload {
   montoAutorizado: string;
   plazoAutorizadoDias: number;
-  anticipoRequerido: "0.00";
+  anticipoRequerido: string;
   observaciones?: string | null;
   claveIdempotencia: string;
 }

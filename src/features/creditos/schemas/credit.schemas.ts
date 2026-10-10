@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { validCreditAdvance } from "../common/credit-advance.utils";
 
 import {
   CREDIT_DOCUMENT_TYPES,
@@ -56,6 +57,8 @@ export const creditApplicationFormSchema = z
     pedidoId: nullableSelectId,
     politicaId: nullableSelectId,
     montoSolicitado: moneyText,
+    condicionPago: z.enum(["CREDITO", "MIXTO"]),
+    anticipoPropuesto: moneyText,
     plazoDias: positiveIntegerText,
     motivo: optionalText(1000),
   })
@@ -66,6 +69,12 @@ export const creditApplicationFormSchema = z
       "Selecciona un pedido.",
       ctx,
     );
+    if (!validCreditAdvance(values.condicionPago, values.anticipoPropuesto, values.montoSolicitado)) {
+      ctx.addIssue({ code: "custom", path: ["anticipoPropuesto"],
+        message: values.condicionPago === "MIXTO"
+          ? "El anticipo debe ser mayor que Q0.00 y menor que el total del pedido."
+          : "El crédito puro no admite anticipo." });
+    }
   });
 
 export const creditReasonSchema = z.object({
@@ -79,7 +88,7 @@ export const creditReasonSchema = z.object({
 export const creditApprovalSchema = z.object({
   montoAutorizado: moneyText,
   plazoAutorizadoDias: positiveIntegerText,
-  anticipoRequerido: z.literal("0.00"),
+  anticipoRequerido: moneyText,
   observaciones: optionalText(1000),
 });
 

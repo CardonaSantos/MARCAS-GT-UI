@@ -285,7 +285,6 @@ export function useCreditListState() {
       politicaId: filters.state.politicaId ?? undefined,
       tipoDecision: filters.state.tipoDecision ?? undefined,
       integracionEstado: filters.state.integracionEstado ?? undefined,
-      condicionPago: "CREDITO",
       fechaDesde: filters.state.fechaDesde || undefined,
       fechaHasta: filters.state.fechaHasta || undefined,
       soloPendientes: filters.state.soloPendientes ?? undefined,
