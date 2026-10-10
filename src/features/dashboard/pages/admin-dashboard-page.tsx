@@ -10,6 +10,7 @@ import { countGt, dashboardDates, dateGt, moneyGt } from "../common/dashboard.ut
 import { DashboardBlock, DashboardInfoLine, DashboardMetric, mutedText } from "../components/dashboard-widgets";
 import { AgingChart, CashChart, DispatchChart, OrdersChart } from "../components/dashboard-charts";
 import { DashboardActivity, DashboardAgenda, DashboardAttention, DashboardLive } from "../components/dashboard-operations";
+import { DashboardDiscountApprovals } from "../components/dashboard-discount-approvals";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 
 const shortcuts = [
@@ -155,6 +156,7 @@ export default function AdminDashboardPage() {
     </section>
 
     <DashboardAttention source={source(alerts)} />
+    <DashboardDiscountApprovals />
 
     <section className="space-y-3" aria-labelledby="dashboard-finance-title">
       <div><p className={"text-[11px] font-semibold uppercase tracking-[.16em] " + mutedText}>Análisis histórico</p>

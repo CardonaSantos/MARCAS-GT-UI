@@ -1,5 +1,10 @@
 export const marcasEndpoints = {
   dashboard: {
+    legacyDiscounts: {
+      list: "/discount/solicitudes-descuento",
+      approve: "/location/create-discount-from-request",
+      reject: "/location/delete-discount-regist",
+    },
     admin: {
       resumen: "/dashboard/admin/resumen",
       alertas: "/dashboard/admin/alertas",
