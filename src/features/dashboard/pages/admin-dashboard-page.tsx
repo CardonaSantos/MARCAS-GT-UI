@@ -11,7 +11,6 @@ import { DashboardBlock, DashboardInfoLine, DashboardMetric, mutedText } from ".
 import { AgingChart, CashChart, DispatchChart, OrdersChart } from "../components/dashboard-charts";
 import { DashboardActivity, DashboardAgenda, DashboardAttention, DashboardLive } from "../components/dashboard-operations";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
-import { AppCard } from "@/ui/components/app/primitives/app-card";
 
 const shortcuts = [
   { label: "Nuevo pedido", href: "/marcas-gt/pedidos/nuevo", icon: ClipboardCheck },
