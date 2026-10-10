@@ -40,9 +40,12 @@ export const timeGt = (iso?: string | null) => {
 };
 
 export function dateInGuatemala(value = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", {
+  // formatToParts evita depender del orden de fecha que implementa cada navegador/ICU.
+  const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Guatemala", year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(value);
+  }).formatToParts(value);
+  const get = (type: string) => parts.find(part => part.type === type)?.value ?? "";
+  return get("year") + "-" + get("month") + "-" + get("day");
 }
 
 export function dashboardDates(days: number) {
