@@ -41,4 +41,5 @@ export const marcasQueryKeys = {
   facturacion: createQueryKeys("facturacion"),
   pagos: createQueryKeys("pagos"),
   tracking: createQueryKeys("tracking"),
+  dashboard: createQueryKeys("dashboard"),
 } as const;

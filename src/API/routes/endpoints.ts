@@ -1,4 +1,14 @@
 export const marcasEndpoints = {
+  dashboard: {
+    admin: {
+      resumen: "/dashboard/admin/resumen",
+      alertas: "/dashboard/admin/alertas",
+      agenda: "/dashboard/admin/agenda",
+      graficos: "/dashboard/admin/graficos",
+      actividad: "/dashboard/admin/actividad",
+      live: "/dashboard/admin/live",
+    },
+  },
   auth: {
     login: "/auth/login",
   },
