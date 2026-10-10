@@ -107,8 +107,8 @@ export default function AdminDashboardPage() {
           {[["7", "7 días"], ["30", "30 días"], ["90", "90 días"], ["personalizado", "Personalizado"]].map(([key, label]) =>
             <button key={key} type="button" onClick={() => choosePeriod(key)} aria-pressed={activeRange === key}
               className={"rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors " +
-                (activeRange === key ? "border-[hsl(var(--app-primary))] bg-[hsl(var(--app-muted-bg))]" :
-                  "border-[hsl(var(--app-border))] hover:bg-[hsl(var(--app-muted-bg))]")}>{label}</button>)}
+                (activeRange === key ? "border-[hsl(var(--app-primary))] bg-[hsl(var(--app-muted))]" :
+                  "border-[hsl(var(--app-border))] hover:bg-[hsl(var(--app-muted))]")}>{label}</button>)}
         </div>
       </div>
       {activeRange === "personalizado" && <div className="flex flex-wrap items-end gap-2 border-t border-[hsl(var(--app-border))] pt-3">
@@ -148,7 +148,7 @@ export default function AdminDashboardPage() {
       <p className={"text-[11px] font-semibold uppercase tracking-[.16em] " + mutedText}>Accesos rápidos</p>
       <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {shortcuts.map(shortcut => <Link key={shortcut.href} to={shortcut.href}
-          className="group flex min-w-0 items-center justify-between gap-2 rounded-xl border border-[hsl(var(--app-border))] bg-[hsl(var(--app-card-bg))] px-3 py-3 text-sm font-medium transition-colors hover:bg-[hsl(var(--app-muted-bg))]">
+          className="group flex min-w-0 items-center justify-between gap-2 rounded-xl border border-[hsl(var(--app-border))] bg-[hsl(var(--app-card-bg))] px-3 py-3 text-sm font-medium transition-colors hover:bg-[hsl(var(--app-muted))]">
           <span className="flex min-w-0 items-center gap-2"><shortcut.icon className="h-4 w-4 shrink-0 text-[hsl(var(--app-muted-foreground))]" />
             <span className="truncate">{shortcut.label}</span></span><ArrowRight className="h-3.5 w-3.5 shrink-0 opacity-40 group-hover:opacity-100" />
         </Link>)}

@@ -63,7 +63,7 @@ export function DashboardDiscountApprovals() {
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">
               {request.cliente?.nombre ?? "Cliente #" + request.id}
-              <span className="ml-2 inline-flex rounded-md bg-[hsl(var(--app-muted-bg))] px-2 py-0.5 text-xs font-medium">
+              <span className="ml-2 inline-flex rounded-md bg-[hsl(var(--app-muted))] px-2 py-0.5 text-xs font-medium">
                 {request.porcentaje}%
               </span>
             </p>

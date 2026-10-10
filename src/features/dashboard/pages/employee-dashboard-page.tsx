@@ -42,7 +42,7 @@ export default function EmployeeDashboardPage() {
           {quickLinks.map(item => <AppCard key={item.href} className="h-full" size="sm">
             <Link to={item.href!} className="group flex min-h-20 min-w-0 items-center justify-between gap-3 rounded-lg outline-offset-2">
               <span className="flex min-w-0 items-center gap-3">
-                <span className="rounded-lg bg-[hsl(var(--app-muted-bg))] p-2.5">
+                <span className="rounded-lg bg-[hsl(var(--app-muted))] p-2.5">
                   <item.icon className="h-5 w-5 shrink-0" />
                 </span>
                 <span className="min-w-0">

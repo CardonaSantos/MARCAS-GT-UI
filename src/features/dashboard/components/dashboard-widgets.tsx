@@ -30,12 +30,12 @@ export function DashboardMetric<T>({
     <AppCard className={"h-full min-w-0 " + (emphasized ? "border-[hsl(var(--app-primary))]/30" : "")} size="sm">
       <div className="flex items-start justify-between gap-2">
         <p className={"min-w-0 text-xs font-medium " + mutedText}>{label}</p>
-        <span className="rounded-lg bg-[hsl(var(--app-muted-bg))] p-2 text-[hsl(var(--app-foreground))]">
+        <span className="rounded-lg bg-[hsl(var(--app-muted))] p-2 text-[hsl(var(--app-foreground))]">
           <Icon className="h-4 w-4" aria-hidden />
         </span>
       </div>
       <div className="mt-3 min-h-11">
-        {loading && !section ? <div className="h-9 w-28 animate-pulse rounded bg-[hsl(var(--app-muted-bg))]" /> :
+        {loading && !section ? <div className="h-9 w-28 animate-pulse rounded bg-[hsl(var(--app-muted))]" /> :
           unavailable || !ready ? (
             <button type="button" onClick={retry} className={"flex items-center gap-1 text-xs underline underline-offset-2 " + mutedText}>
               <AlertCircle className="h-4 w-4" /> No disponible · Reintentar
@@ -65,7 +65,7 @@ export function DashboardBlock<T>({
     <AppCard size="sm" className={"min-w-0 h-full " + (className ?? "")}>
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[hsl(var(--app-border))] pb-3">
         <div className="flex min-w-0 items-start gap-2.5">
-          {Icon && <span className="rounded-lg bg-[hsl(var(--app-muted-bg))] p-2"><Icon className="h-4 w-4" aria-hidden /></span>}
+          {Icon && <span className="rounded-lg bg-[hsl(var(--app-muted))] p-2"><Icon className="h-4 w-4" aria-hidden /></span>}
           <div className="min-w-0">
             <h2 className="text-sm font-semibold">{title}</h2>
             {description && <p className={"mt-1 text-xs leading-relaxed " + mutedText}>{description}</p>}
@@ -101,20 +101,20 @@ export function DashboardInfoLine({
       {value}{href && <ArrowUpRight className={"h-3.5 w-3.5 " + mutedText} />}
     </span>
   </div>;
-  return href ? <Link to={href} className="block rounded-md px-1 transition-colors hover:bg-[hsl(var(--app-muted-bg))]">{content}</Link> : content;
+  return href ? <Link to={href} className="block rounded-md px-1 transition-colors hover:bg-[hsl(var(--app-muted))]">{content}</Link> : content;
 }
 
 export function DashboardRecord({
   title, detail, amount, href, badge,
 }: { title: string; detail?: string; amount?: string; href: string; badge?: string }) {
-  return <Link to={href} className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-[hsl(var(--app-border))] px-3 py-2.5 transition-colors hover:bg-[hsl(var(--app-muted-bg))]">
+  return <Link to={href} className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-[hsl(var(--app-border))] px-3 py-2.5 transition-colors hover:bg-[hsl(var(--app-muted))]">
     <span className="min-w-0">
       <span className="block truncate text-sm font-medium">{title}</span>
       {detail && <span className={"mt-0.5 block truncate text-xs " + mutedText}>{detail}</span>}
     </span>
     <span className="flex shrink-0 items-center gap-2">
       {amount && <span className="text-xs font-medium tabular-nums">{amount}</span>}
-      {badge && <span className={"max-w-28 truncate rounded-md bg-[hsl(var(--app-muted-bg))] px-2 py-1 text-[11px] " + mutedText}>{badge.replace(/_/g, " ")}</span>}
+      {badge && <span className={"max-w-28 truncate rounded-md bg-[hsl(var(--app-muted))] px-2 py-1 text-[11px] " + mutedText}>{badge.replace(/_/g, " ")}</span>}
       <ArrowUpRight className={"h-4 w-4 " + mutedText} />
     </span>
   </Link>;

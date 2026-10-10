@@ -80,7 +80,7 @@ export function OrdersChart({ section, loading, error, retry, from, to }: Graphi
           <button key={item} type="button" onClick={() => setMode(item)}
             aria-pressed={mode === item}
             className={"rounded-md border px-3 py-1.5 text-xs transition-colors " +
-              (mode === item ? "border-[hsl(var(--app-primary))] bg-[hsl(var(--app-muted-bg))] font-semibold" : "border-[hsl(var(--app-border))] " + mutedText)}>
+              (mode === item ? "border-[hsl(var(--app-primary))] bg-[hsl(var(--app-muted))] font-semibold" : "border-[hsl(var(--app-border))] " + mutedText)}>
             {item === "cantidad" ? "Cantidad" : "Valor (Q)"}
           </button>)}
       </div>
