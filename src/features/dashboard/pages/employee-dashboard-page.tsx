@@ -39,7 +39,7 @@ export default function EmployeeDashboardPage() {
       <h2 id="quick-actions" className="text-base font-semibold">Tus rutas operativas</h2>
       {quickLinks.length ? (
         <nav aria-label="Accesos de trabajo" className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {quickLinks.map(item => <AppCard key={item.href} className="h-full" size="sm">
+          {quickLinks.map(item => <AppCard key={item.href} className="h-full p-2 sm:p-3" size="sm">
             <Link to={item.href!} className="group flex min-h-20 min-w-0 items-center justify-between gap-3 rounded-lg outline-offset-2">
               <span className="flex min-w-0 items-center gap-3">
                 <span className="rounded-lg bg-[hsl(var(--app-muted))] p-2.5">
@@ -54,7 +54,7 @@ export default function EmployeeDashboardPage() {
             </Link>
           </AppCard>)}
         </nav>
-      ) : <AppCard size="sm">
+      ) : <AppCard size="sm" className="p-2 sm:p-3">
         <p className="text-sm">No hay rutas disponibles para este rol. Contacta al administrador.</p>
       </AppCard>}
     </section>

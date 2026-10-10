@@ -27,7 +27,7 @@ export function DashboardMetric<T>({
   const ready = section?.status === "OK" ? section.data : null;
   const unavailable = (!loading && (!section || section.status === "UNAVAILABLE")) || error;
   return (
-    <AppCard className={"h-full min-w-0 " + (emphasized ? "border-[hsl(var(--app-primary))]/30" : "")} size="sm">
+    <AppCard className={"h-full min-w-0 p-2 sm:p-3 " + (emphasized ? "border-[hsl(var(--app-primary))]/30" : "")} size="sm">
       <div className="flex items-start justify-between gap-2">
         <p className={"min-w-0 text-xs font-medium " + mutedText}>{label}</p>
         <span className="rounded-lg bg-[hsl(var(--app-muted))] p-2 text-[hsl(var(--app-foreground))]">
@@ -62,7 +62,7 @@ export function DashboardBlock<T>({
   const ready = section?.status === "OK" ? section.data : null;
   const unavailable = error || (!loading && (!section || section.status === "UNAVAILABLE"));
   return (
-    <AppCard size="sm" className={"min-w-0 h-full " + (className ?? "")}>
+    <AppCard size="sm" className={"min-w-0 h-full p-2 sm:p-3 " + (className ?? "")}>
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[hsl(var(--app-border))] pb-3">
         <div className="flex min-w-0 items-start gap-2.5">
           {Icon && <span className="rounded-lg bg-[hsl(var(--app-muted))] p-2"><Icon className="h-4 w-4" aria-hidden /></span>}

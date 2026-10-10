@@ -72,7 +72,7 @@ export default function AdminDashboardPage() {
   const source = (query: typeof summary) => ({
     data: query.data, isLoading: query.isLoading, isError: query.isError, retry: () => { void query.refetch(); },
   });
-  return <main className="mx-auto w-full min-w-0 max-w-[1600px] space-y-6 px-3 py-5 sm:px-5 lg:space-y-8 lg:px-7 lg:py-7 2xl:px-10">
+  return <main className="w-full min-w-0 space-y-6 px-1 py-4 sm:px-2 sm:py-5 lg:space-y-8 lg:px-3 lg:py-6 2xl:px-4">
     <header className="relative overflow-hidden rounded-2xl border border-[hsl(var(--app-border))] bg-[hsl(var(--app-card-bg))] px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
       <div aria-hidden className="pointer-events-none absolute -right-24 -top-28 h-64 w-64 rounded-full bg-[hsl(var(--chart-1))] opacity-[.065] blur-3xl" />
       <div className="relative flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
