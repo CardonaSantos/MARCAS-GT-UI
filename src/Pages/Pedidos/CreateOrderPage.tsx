@@ -185,7 +185,7 @@ export default function CreateOrderPage() {
                     tone="info"
                     title="La aprobación es exclusiva de ADMIN"
                     description={condition === "MIXTO"
-                      ? "El anticipo se cobra y verifica por Pagos. No se entregará el pedido ni se activarán cuotas hasta que el anticipo esté aplicado; el saldo se financia al entregar."
+                      ? "El anticipo se registra y verifica en Pagos. Una vez aplicado, ADMIN o CONTABILIDAD podrá activar las cuotas financiadas sin esperar la entrega."
                       : "El pedido se solicita sin autorizar crédito ni generar cuotas. El ADMIN revisará las condiciones."}
                   />
                 </div>

@@ -326,7 +326,7 @@ export default function OrderDetailPage() {
                         order.cliente.id +
                         "&pedidoId=" +
                         id +
-                        (mixed && linkedCredit?.estado === "APROBADA" ? "&concepto=anticipo" : "")
+                        ""
                       }
                       state={{
                         from: currentUrl,
@@ -334,7 +334,7 @@ export default function OrderDetailPage() {
                       }}
                     >
                       <Banknote className="h-4 w-4" />
-                      {mixed && linkedCredit?.estado === "APROBADA" ? "Registrar anticipo" : "Registrar pago"}
+                      Registrar pago
                     </Link>
                   </AppButton>
                 ) : null}

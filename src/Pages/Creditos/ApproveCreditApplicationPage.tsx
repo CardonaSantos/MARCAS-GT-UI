@@ -245,8 +245,8 @@ export default function ApproveCreditApplicationPage() {
                 <AppCard
                   title="Programar cuotas"
                   description={isMixed
-                    ? "El calendario quedará en borrador hasta que el pedido se entregue y el anticipo esté cobrado, verificado y aplicado."
-                    : "Se guardará un calendario en borrador. Las cuotas se activarán automáticamente cuando el pedido esté entregado."}
+                    ? "El calendario quedará en borrador hasta que ADMIN o CONTABILIDAD active las cuotas. Antes debe estar verificado y aplicado el anticipo."
+                    : "Se guardará el calendario en borrador. ADMIN o CONTABILIDAD podrá activarlo sin esperar la entrega."}
                   size="sm"
                 >
                   <AppGrid cols={{ base: 1, md: 3 }} gap="md">
@@ -307,7 +307,7 @@ export default function ApproveCreditApplicationPage() {
                     " y saldo financiado de " + (financed ? formatMoney(financed) : "—") +
                     " en " + installmentCount + " cuota(s). " +
                     (isMixed ? "El anticipo debe quedar verificado y aplicado antes de la entrega." :
-                      "Las cuotas se activarán al completar la entrega.")}
+                      "Las cuotas se crearán cuando ADMIN o CONTABILIDAD active el plan.")}
                   preset="success"
                   confirmText="Aprobar y programar"
                   loadingText="Autorizando..."

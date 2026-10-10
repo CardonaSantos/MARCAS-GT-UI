@@ -44,9 +44,9 @@ export function CreditPortfolioDetailSummary({
 }) {
   const hasReceivables = credit.cuentasPorCobrar.length > 0;
   const requiresAdvance = (moneyCents(credit.montos.anticipoRequerido) ?? 0) > 0;
-  const advancePending = credit.pagos.find((payment) => payment.estado === "PENDIENTE");
-  const verifiedCents = moneyCents(credit.montos.pagadoVerificado) ?? 0;
-  const missingAdvance = Math.max(0, (moneyCents(credit.montos.anticipoRequerido) ?? 0) - verifiedCents);
+  const advancePendingId = credit.anticipo?.pagoPendienteId ?? null;
+  const missingAdvance = moneyCents(credit.anticipo?.saldoPendiente ?? credit.montos.anticipoRequerido) ?? 0;
+  const advancePaid = credit.anticipo?.estado === "PAGADA" && missingAdvance === 0;
   const paymentPath = "/marcas-gt/pagos/nuevo?clienteId=" + credit.cliente.id +
     "&pedidoId=" + credit.pedido.id + "&monto=" + (missingAdvance / 100).toFixed(2) +
     "&concepto=anticipo";
@@ -65,23 +65,30 @@ export function CreditPortfolioDetailSummary({
         <AppCard title="Anticipo del pedido" icon={<Banknote />} size="sm">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Value label="Anticipo requerido">{formatMoney(credit.montos.anticipoRequerido)}</Value>
-            <Value label="Pagos verificados del pedido">{formatMoney(credit.montos.pagadoVerificado)}</Value>
+            <Value label="Anticipo aplicado">{formatMoney(credit.montos.anticipoAplicado)}</Value>
             <Value label="Plan de cuotas">{credit.planPago?.estado === "ACTIVO" ? "Activo" : "Pendiente de activación"}</Value>
           </div>
           <p className="mt-3 text-sm text-[hsl(var(--app-muted-foreground))]">
-            El anticipo debe cobrarse, verificarse y aplicarse antes de entregar. Los importes de las cuotas corresponden sólo al saldo financiado.
+            {advancePaid
+              ? "Anticipo liquidado. Ya puedes activar manualmente el plan desde la pestaña Plan de pagos, sin esperar la entrega."
+              : "El anticipo debe verificarse y aplicarse antes de activar las cuotas. Solo se admite un anticipo activo por pedido."}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {advancePending ? (
+            {advancePendingId ? (
               <AppButton asChild variant="secondary" size="sm">
-                <Link to={"/marcas-gt/pagos/" + advancePending.id} state={{ from: currentUrl }}>
+                <Link to={"/marcas-gt/pagos/" + advancePendingId} state={{ from: currentUrl }}>
                   Revisar pago pendiente
                 </Link>
               </AppButton>
             ) : null}
-            {!advancePending && missingAdvance > 0 && credit.planPago?.estado !== "ACTIVO" ? (
+            {!advancePendingId && !advancePaid && missingAdvance > 0 && credit.planPago?.estado !== "ACTIVO" ? (
               <AppButton asChild variant="primary" size="sm">
                 <Link to={paymentPath} state={{ from: currentUrl }}>Registrar anticipo</Link>
+              </AppButton>
+            ) : null}
+            {advancePaid && credit.planPago?.estado === "BORRADOR" ? (
+              <AppButton asChild variant="primary" size="sm">
+                <Link to={currentUrl.split("?")[0] + "?tab=plan"}>Activar cuotas</Link>
               </AppButton>
             ) : null}
             <AppButton asChild variant="secondary" size="sm">
@@ -112,12 +119,12 @@ export function CreditPortfolioDetailSummary({
           </p>
         </AppCard>
 
-        <AppCard title="Pagado aplicado" icon={<Landmark />} size="sm">
+        <AppCard title="Abonado a cuotas" icon={<Landmark />} size="sm">
           <p className="text-2xl font-semibold tabular-nums">
             {formatMoney(credit.montos.pagadoAplicado)}
           </p>
           <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-            Aplicado realmente a la deuda
+            Cobros aplicados a cuentas de cuotas (no incluye anticipo)
           </p>
         </AppCard>
 
@@ -128,7 +135,7 @@ export function CreditPortfolioDetailSummary({
               : "—"}
           </p>
           <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-            {hasReceivables ? "Saldo de CxC activas" : "Sin CxC generada"}
+            {hasReceivables ? "Saldo de cuotas activadas" : "Activa el plan para crear CxC de cuotas"}
           </p>
         </AppCard>
       </AppGrid>

@@ -634,7 +634,14 @@ export interface CreditPortfolioDetail {
     financiado: string;
     pagadoVerificado: string;
     pagadoAplicado: string;
+    anticipoAplicado: string;
     saldoPendiente: string | null;
+  };
+  anticipo: null | {
+    estado: string;
+    montoOriginal: string;
+    saldoPendiente: string;
+    pagoPendienteId: number | null;
   };
   plazoAutorizadoDias: number;
   aprobadoEn: string | null;

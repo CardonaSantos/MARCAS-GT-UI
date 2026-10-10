@@ -154,7 +154,7 @@ export default function CreatePaymentPage() {
   const confirm = async () => {
     if (!pending) return;
     const payment = await mutation.mutateAsync(
-      toRegisterPaymentPayload(pending, key),
+      toRegisterPaymentPayload(pending, key, isAdvancePayment ? "ANTICIPO" : undefined),
     );
     navigate("/marcas-gt/pagos/" + payment.id, {
       replace: true,
@@ -178,7 +178,7 @@ export default function CreatePaymentPage() {
           tone="info"
           title={isAdvancePayment ? "Anticipo del pedido" : "Registro de pago"}
           description={isAdvancePayment
-            ? "Confirma cliente, pedido e importe. La verificación aplicará el pago al anticipo; las cuotas financiadas se activan después de entregar el pedido."
+            ? "Confirma cliente, pedido e importe. La verificación aplicará el anticipo. Después, ADMIN o CONTABILIDAD podrá activar las cuotas sin esperar la entrega."
             : "El registro de un pago no equivale a su verificación."}
         />
 
@@ -222,7 +222,8 @@ export default function CreatePaymentPage() {
                 />
                 <AppFormInput<RegisterPaymentFormValues>
                   name="monto"
-                  label="Monto"
+                  label={isAdvancePayment ? "Anticipo autorizado (Q)" : "Monto"}
+                  readOnly={isAdvancePayment && !!preselectedAmount}
                   type="number"
                   min={0.01}
                   step="0.01"

@@ -17,6 +17,7 @@ function optionalText(value?: string | null) {
 export function toRegisterPaymentPayload(
   values: RegisterPaymentFormValues,
   key: string,
+  concepto?: "ANTICIPO" | "CUOTA",
 ): RegisterPaymentPayload {
   const fechaPago = optionalText(values.fechaPago);
 
@@ -26,6 +27,7 @@ export function toRegisterPaymentPayload(
     moneda: values.moneda.trim().toUpperCase(),
     monto: Number(values.monto).toFixed(2),
     claveIdempotencia: key,
+    ...(concepto ? { concepto } : {}),
     ...(values.pedidoId ? { pedidoId: values.pedidoId } : {}),
     ...(values.bancoId ? { bancoId: values.bancoId } : {}),
     ...(optionalText(values.referencia)

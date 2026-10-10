@@ -295,6 +295,7 @@ export interface RegisterPaymentPayload {
   clienteId: number;
   pedidoId?: number;
   bancoId?: number;
+  concepto?: "ANTICIPO" | "CUOTA";
   metodo: PaymentMethod;
   moneda?: string;
   monto: string;

@@ -61,6 +61,13 @@ export function CreditPortfolioPayments({
   const [searchParams, setSearchParams] = useSearchParams();
   const role = useStore((state) => state.userRol);
   const canVerify = role === "ADMIN" || role === "CONTABILIDAD";
+  const draftMixed = credit.pedido.condicionPago === "MIXTO" &&
+    credit.planPago?.estado !== "ACTIVO";
+  const advanceAlreadyLinked = draftMixed &&
+    (!!credit.anticipo?.pagoPendienteId ||
+      credit.anticipo?.estado === "PAGADA" ||
+      Number(credit.montos.anticipoAplicado) > 0);
+  const canRegisterNewPayment = !advanceAlreadyLinked;
   const banks = usePaymentBanks();
   const registerMutation = useRegisterPayment();
   const verifyMutation = useVerifyPayment();
@@ -86,7 +93,7 @@ export function CreditPortfolioPayments({
   const requestedInstallment = searchParams.get("cuota");
 
   useEffect(() => {
-    if (!requestedAmount || Number(requestedAmount) <= 0) return;
+    if (!requestedAmount || Number(requestedAmount) <= 0 || !canRegisterNewPayment) return;
 
     setShowRegister(true);
     setDraft((current) => ({
@@ -101,7 +108,7 @@ export function CreditPortfolioPayments({
             credit.numero
           : "Cobro relacionado con " + credit.numero),
     }));
-  }, [credit.numero, requestedAmount, requestedInstallment]);
+  }, [credit.numero, requestedAmount, requestedInstallment, canRegisterNewPayment]);
 
   const bankRequired = BANK_REQUIRED_METHODS.includes(draft.metodo);
   const selectedBank = (banks.data ?? []).find(
@@ -110,6 +117,8 @@ export function CreditPortfolioPayments({
 
   const canReviewRegistration =
     Number(draft.monto) > 0 &&
+    canRegisterNewPayment &&
+    (!draftMixed || Number(draft.monto) === Number(credit.anticipo?.montoOriginal)) &&
     (!bankRequired ||
       (draft.bancoId != null && draft.referencia.trim().length > 0));
 
@@ -141,6 +150,7 @@ export function CreditPortfolioPayments({
       metodo: registerReview.metodo,
       moneda: credit.pedido.moneda,
       monto: Number(registerReview.monto).toFixed(2),
+      concepto: draftMixed ? "ANTICIPO" : "CUOTA",
       ...(registerReview.bancoId
         ? { bancoId: registerReview.bancoId }
         : {}),
@@ -280,18 +290,26 @@ export function CreditPortfolioPayments({
         </AppCard>
       </div>
 
-      <div className="flex justify-end">
-        <AppButton
-          variant="primary"
-          size="sm"
-          leftIcon={<Plus />}
-          onClick={() => setShowRegister((current) => !current)}
-        >
-          {showRegister ? "Ocultar registro" : "Registrar pago"}
-        </AppButton>
+      <div className="flex flex-wrap justify-end gap-2">
+        {advanceAlreadyLinked ? (
+          <AppAlert tone="info" title="Anticipo ya vinculado"
+            description="No se puede registrar otro anticipo. Verifica el pago pendiente o activa el plan para cobrar cuotas." />
+        ) : (
+          <AppButton variant="primary" size="sm" leftIcon={<Plus />}
+            onClick={() => {
+              if (!showRegister && draftMixed) {
+                setDraft((current) => ({
+                  ...current, monto: credit.anticipo?.montoOriginal ?? credit.montos.anticipoRequerido,
+                }));
+              }
+              setShowRegister((current) => !current);
+            }}>
+            {showRegister ? "Ocultar registro" : draftMixed ? "Registrar anticipo" : "Registrar pago"}
+          </AppButton>
+        )}
       </div>
 
-      {showRegister ? (
+      {showRegister && canRegisterNewPayment ? (
         <AppCard
           title={
             requestedInstallment
@@ -325,11 +343,12 @@ export function CreditPortfolioPayments({
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium">Monto</label>
+              <label className="mb-1 block text-xs font-medium">{draftMixed ? "Anticipo autorizado" : "Monto"}</label>
               <AppInput
                 type="number"
                 min={0.01}
                 step="0.01"
+                readOnly={draftMixed}
                 value={draft.monto}
                 onChange={(event) =>
                   setDraft((current) => ({
