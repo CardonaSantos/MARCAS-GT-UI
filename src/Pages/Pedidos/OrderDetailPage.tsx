@@ -249,6 +249,7 @@ export default function OrderDetailPage() {
                       ? "Se enviará el pedido y el anticipo propuesto a ADMIN. El pago se registrará y verificará por separado."
                       : "El pedido pasará a validación y se generará automáticamente una solicitud para ADMIN."}
                     preset="send"
+                    maxWidth="lg"
                     confirmText="Enviar solicitud"
                     loadingText="Solicitando..."
                     confirmDisabled={!Number.isInteger(Number(creditTerm)) ||
@@ -295,16 +296,20 @@ export default function OrderDetailPage() {
                           <p id="detail-advance-help" className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">Entre Q0.01 y menos de {formatMoney(order.total)}.</p>
                         </div>
                       ) : null}
-                      <div className="min-w-0">
-                        <label className="mb-2 block text-xs font-medium">
-                          Política (opcional)
+                      <div className="min-w-0 sm:col-span-2">
+                        <label htmlFor="request-credit-policy" className="mb-2 block text-xs font-medium">
+                          Política de crédito (opcional)
                         </label>
                         <CreditPolicySelect
+                          inputId="request-credit-policy"
                           value={creditPolicy}
                           onChange={setCreditPolicy}
                           placeholder="Sin política específica"
                           activeOnly
                           isClearable
+                          portalToBody={false}
+                          menuPlacement="auto"
+                          maxMenuHeight={160}
                         />
                       </div>
                     </div>

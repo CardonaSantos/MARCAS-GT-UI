@@ -70,7 +70,9 @@ export function CreditPortfolioDetailSummary({
           </div>
           <p className="mt-3 text-sm text-[hsl(var(--app-muted-foreground))]">
             {advancePaid
-              ? "Anticipo liquidado. Ya puedes activar manualmente el plan desde la pestaña Plan de pagos, sin esperar la entrega."
+              ? credit.planPago?.estado === "ACTIVO"
+                ? "Anticipo liquidado y plan activo. El saldo del anticipo no forma parte de las cuotas; consulta sus cobros en Plan de pagos."
+                : "Anticipo liquidado. Puedes activar el plan de cuotas ahora, sin esperar la entrega."
               : "El anticipo debe verificarse y aplicarse antes de activar las cuotas. Solo se admite un anticipo activo por pedido."}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -110,12 +112,12 @@ export function CreditPortfolioDetailSummary({
           </p>
         </AppCard>
 
-        <AppCard title="Pagado verificado" icon={<Banknote />} size="sm">
+        <AppCard title="Total recibido verificado" icon={<Banknote />} size="sm">
           <p className="text-2xl font-semibold tabular-nums">
             {formatMoney(credit.montos.pagadoVerificado)}
           </p>
           <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-            Dinero reconocido en pagos
+            Incluye anticipo y pagos de cuotas, sin duplicarlos
           </p>
         </AppCard>
 

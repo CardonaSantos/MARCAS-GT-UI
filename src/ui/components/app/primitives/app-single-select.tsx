@@ -408,14 +408,10 @@ function AppSingleSelectInner<
 
   const resolvedDensity = density ?? menuDensity ?? "default";
 
-  /**
-   * undefined = no hay AppConfirmDialog provider.
-   * null / HTMLElement = sí estamos dentro de AppConfirmDialog.
-   *
-   * Dentro del dialog NO portaleamos el menú.
-   * ReactSelect + portal a AlertDialog.Content + fixed puede calcular mal posición.
-   */
-  // const isInsideAppDialog = contextMenuPortalTarget !== undefined;
+  // Dentro de un diálogo Radix (transformado y centrado) el portal con
+  // position: fixed desplaza el menú. Renderizarlo junto al control
+  // conserva la posición y permite seleccionar con teclado o puntero.
+  const isInsideAppDialog = contextMenuPortalTarget !== undefined;
 
   const selected = React.useMemo(() => {
     if (value === null || value === undefined) return null;
@@ -457,16 +453,10 @@ function AppSingleSelectInner<
     ],
   );
 
-  const hasPortalContext = contextMenuPortalTarget !== undefined;
-
   const resolvedMenuPortalTarget =
     menuPortalTarget ??
-    (portalToBody
-      ? hasPortalContext
-        ? (contextMenuPortalTarget ?? undefined)
-        : typeof document !== "undefined"
-          ? document.body
-          : undefined
+    (portalToBody && !isInsideAppDialog && typeof document !== "undefined"
+      ? document.body
       : undefined);
 
   const resolvedMenuPosition =

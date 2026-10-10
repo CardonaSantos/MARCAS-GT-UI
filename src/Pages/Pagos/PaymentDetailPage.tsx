@@ -253,7 +253,9 @@ export default function PaymentDetailPage() {
           title="Verificar pago"
           description={["PREPAGO", "CONTRAENTREGA"].includes(payment?.pedido?.condicionPago ?? "")
             ? "Confirma que el dinero fue recibido. El pedido reconocerá el pago automáticamente, sin otro cobro ni aplicación manual. Si ya existe una CxC directa compatible, se conciliará."
-            : "Confirma que el dinero realmente fue recibido. Después podrás aplicarlo a las cuentas por cobrar correspondientes."}
+            : payment?.pedido?.condicionPago === "MIXTO"
+              ? "Confirma la recepción del dinero. Si corresponde al anticipo, se conciliará automáticamente con su CxC; si corresponde a una cuota, deberás aplicarlo después en el plan de pagos."
+              : "Confirma que el dinero realmente fue recibido. Después podrás aplicarlo a las cuentas por cobrar correspondientes."}
           confirmText="Verificar pago"
           loadingText="Verificando..."
           onConfirm={confirmVerify}

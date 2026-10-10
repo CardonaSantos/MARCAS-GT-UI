@@ -75,7 +75,7 @@ export function CreditDetailSummary({ credit }: { credit: CreditDetail }) {
           </p>
           {credit.cuentasPorCobrar.cantidad === 0 ? (
             <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
-              Sin CxC generadas. Las cuotas se activarán tras entregar el pedido.
+              Sin CxC de cuotas. Se crean al activar manualmente el plan de pagos, sin esperar la entrega.
             </p>
           ) : null}
         </AppCard>

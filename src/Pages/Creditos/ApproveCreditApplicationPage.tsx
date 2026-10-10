@@ -236,7 +236,7 @@ export default function ApproveCreditApplicationPage() {
                       <AppAlert tone={validAdvance ? "info" : "warning"}
                         title={validAdvance ? "Anticipo y financiación separados" : "Revisa el anticipo"}
                         description={validAdvance
-                          ? "El anticipo se cobra desde Pagos; debe verificarse y aplicarse antes de entregar el pedido y activar las cuotas."
+                          ? "El anticipo se cobra desde Pagos y debe verificarse y aplicarse antes de activar las cuotas. La entrega es independiente."
                           : "Ingresa un anticipo mayor que Q0.00 y menor que el monto autorizado."} />
                     </div>
                   ) : null}
@@ -306,7 +306,7 @@ export default function ApproveCreditApplicationPage() {
                     " con anticipo de " + formatMoney(advance || 0) +
                     " y saldo financiado de " + (financed ? formatMoney(financed) : "—") +
                     " en " + installmentCount + " cuota(s). " +
-                    (isMixed ? "El anticipo debe quedar verificado y aplicado antes de la entrega." :
+                    (isMixed ? "El anticipo debe quedar verificado y aplicado antes de activar las cuotas, sin esperar la entrega." :
                       "Las cuotas se crearán cuando ADMIN o CONTABILIDAD active el plan.")}
                   preset="success"
                   confirmText="Aprobar y programar"

@@ -145,7 +145,7 @@ export default function CreditPortfolioDetailPage() {
               ? credit.cliente.nombreCompleto +
                 " · " +
                 credit.pedido.numero +
-                " · crédito concedido"
+                (credit.estado === "CERRADO" ? " · crédito liquidado" : " · crédito concedido")
               : undefined
           }
           backTo={backTo}

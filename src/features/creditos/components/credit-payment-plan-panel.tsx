@@ -369,9 +369,13 @@ export function CreditPaymentPlanPanel({
     return (
       <div className="space-y-4">
         <AppAlert
-          tone="info"
-          title="Plan activo"
-          description="Cada cuota está vinculada a una Cuenta por Cobrar. Los montos pagados y pendientes se derivan de aplicaciones financieras reales."
+          tone={existingPlan.cuotas.every((cuota) => Number(cuota.saldoPendiente) === 0) ? "success" : "info"}
+          title={existingPlan.cuotas.every((cuota) => Number(cuota.saldoPendiente) === 0)
+            ? "Plan liquidado"
+            : "Plan activo"}
+          description={existingPlan.cuotas.every((cuota) => Number(cuota.saldoPendiente) === 0)
+            ? "Todas las cuotas están pagadas y las cuentas por cobrar tienen saldo cero. El despacho y la entrega siguen su proceso por separado."
+            : "Cada cuota tiene su Cuenta por Cobrar. Puedes registrar, verificar y aplicar pagos sin esperar la entrega del pedido."}
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

@@ -67,7 +67,8 @@ export function CreditPortfolioPayments({
     (!!credit.anticipo?.pagoPendienteId ||
       credit.anticipo?.estado === "PAGADA" ||
       Number(credit.montos.anticipoAplicado) > 0);
-  const canRegisterNewPayment = !advanceAlreadyLinked;
+  const isSettled = credit.estado === "CERRADO";
+  const canRegisterNewPayment = !isSettled && !advanceAlreadyLinked;
   const banks = usePaymentBanks();
   const registerMutation = useRegisterPayment();
   const verifyMutation = useVerifyPayment();
@@ -278,7 +279,7 @@ export function CreditPortfolioPayments({
         <AppCard title="Pagos relacionados" icon={<Banknote />} size="sm">
           <p className="text-2xl font-semibold">{credit.pagos.length}</p>
         </AppCard>
-        <AppCard title="Verificado" size="sm">
+        <AppCard title="Total recibido y verificado" size="sm">
           <p className="text-2xl font-semibold">
             {formatMoney(credit.montos.pagadoVerificado)}
           </p>
@@ -291,7 +292,10 @@ export function CreditPortfolioPayments({
       </div>
 
       <div className="flex flex-wrap justify-end gap-2">
-        {advanceAlreadyLinked ? (
+        {isSettled ? (
+          <AppAlert tone="success" title="Crédito liquidado"
+            description="Todas las cuotas del crédito están pagadas. Se conservan los pagos para consulta; no se requieren nuevos cobros." />
+        ) : advanceAlreadyLinked ? (
           <AppAlert tone="info" title="Anticipo ya vinculado"
             description="No se puede registrar otro anticipo. Verifica el pago pendiente o activa el plan para cobrar cuotas." />
         ) : (
@@ -457,21 +461,16 @@ export function CreditPortfolioPayments({
         </AppCard>
       ) : null}
 
-      <AppAlert
-        tone={verifiedAvailable > 0 ? "warning" : "info"}
-        title={
-          verifiedAvailable > 0
-            ? "Tienes dinero listo para aplicar"
-            : "Verificado no significa aplicado"
-        }
-        description={
-          verifiedAvailable > 0
-            ? "Hay " +
-              formatMoney(verifiedAvailable) +
-              " verificados y todavía sin aplicar. Continúa en Plan de pagos para reducir el saldo de las cuotas."
-            : "Un pago verificado reconoce dinero recibido. Para reducir el saldo del crédito debes aplicarlo a una cuota en la pestaña Plan de pagos."
-        }
-      />
+      {!isSettled ? (
+        <AppAlert
+          tone={verifiedAvailable > 0 ? "warning" : "info"}
+          title={verifiedAvailable > 0 ? "Dinero disponible para aplicar" : "Verificar no equivale a aplicar"}
+          description={verifiedAvailable > 0
+            ? "Tienes " + formatMoney(verifiedAvailable) +
+              " verificados y pendientes de aplicar. Abre Plan de pagos para abonarlos a las cuotas."
+            : "Cuando verifiques un cobro destinado a cuotas, debes aplicarlo desde Plan de pagos para reducir el saldo."}
+        />
+      ) : null}
 
       {verifiedAvailable > 0 ? (
         <div className="flex justify-end">
@@ -509,7 +508,9 @@ export function CreditPortfolioPayments({
         }}
         preset="send"
         title="Confirmar registro del pago"
-        description="El pago se registrará PENDIENTE. ADMIN o CONTABILIDAD deberá verificarlo antes de aplicarlo a una cuota."
+        description={draftMixed
+          ? "Se registrará un único anticipo PENDIENTE. Al verificarlo se aplicará automáticamente a la CxC del anticipo."
+          : "El pago quedará PENDIENTE. ADMIN o CONTABILIDAD deberá verificarlo y después aplicarlo a una cuota."}
         confirmText="Registrar pago"
         loadingText="Registrando..."
         isLoading={registerMutation.isPending}
@@ -549,7 +550,9 @@ export function CreditPortfolioPayments({
         }}
         preset="success"
         title="Verificar pago"
-        description="Confirma que el dinero realmente fue recibido. El pago quedará disponible para aplicarlo a una cuota."
+        description={credit.anticipo?.pagoPendienteId === verifyPayment?.id
+          ? "Confirma que recibiste el anticipo. Al verificarlo quedará aplicado automáticamente a su cuenta."
+          : "Confirma que recibiste el dinero. Después podrás aplicar el pago a una cuota del plan."}
         confirmText="Verificar pago"
         loadingText="Verificando..."
         isLoading={verifyMutation.isPending}
