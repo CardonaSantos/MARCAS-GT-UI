@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   Pencil,
   Send,
+  Printer,
   Truck,
   WalletCards,
   XCircle,
@@ -163,6 +164,12 @@ export default function OrderDetailPage() {
           actions={
             order ? (
               <>
+                <AppButton asChild variant="secondary" size="sm">
+                  <Link to={"/marcas-gt/pedidos/" + id + "/guia-preparacion"}
+                    state={{ from: currentUrl }}>
+                    <Printer className="h-4 w-4" /> Imprimir pedido
+                  </Link>
+                </AppButton>
                 {order.acciones.puedeEditar && canWrite ? (
                   <AppButton asChild variant="secondary" size="sm">
                     <Link

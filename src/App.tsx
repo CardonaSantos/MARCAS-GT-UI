@@ -89,6 +89,7 @@ import TransferOperationsPage from "./Pages/Transferencias/TransferOperationsPag
 import OrdersPage from "./Pages/Pedidos/OrdersPage";
 import CreateOrderPage from "./Pages/Pedidos/CreateOrderPage";
 import OrderDetailPage from "./Pages/Pedidos/OrderDetailPage";
+import OrderPickingGuidePage from "./Pages/Pedidos/OrderPickingGuidePage";
 import EditOrderPage from "./Pages/Pedidos/EditOrderPage";
 import CancelOrderPage from "./Pages/Pedidos/CancelOrderPage";
 import CreditApplicationsPage from "./Pages/Creditos/CreditApplicationsPage";
@@ -506,6 +507,14 @@ function App() {
                   roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
                 >
                   <OrderDetailPage />
+                </ProtectedRouteRoles>
+              }
+            />
+            <Route
+              path="/marcas-gt/pedidos/:id/guia-preparacion"
+              element={
+                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}>
+                  <OrderPickingGuidePage />
                 </ProtectedRouteRoles>
               }
             />
