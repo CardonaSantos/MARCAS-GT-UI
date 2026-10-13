@@ -129,10 +129,6 @@ function dateInGuatemala(value: string | null | undefined) {
 }
 
 export function OrderPickingPdfDocument({ order, format }: Props) {
-  const blocked = order.estado === "BORRADOR" || order.estado === "PENDIENTE_VALIDACION";
-  const cancelled = order.estado === "CANCELADO";
-  const completed = !blocked && !cancelled && order.progreso.unidadesPendientesDespacho === 0;
-
   return (
     <Document
       title={"Guía de preparación - " + order.numero}
@@ -147,19 +143,12 @@ export function OrderPickingPdfDocument({ order, format }: Props) {
           <Text>Fecha: {dateInGuatemala(order.creadoEn)}</Text>
         </View>
 
-        {cancelled ? (
-          <Text style={styles.warning}>PEDIDO CANCELADO - No preparar mercancía.</Text>
-        ) : blocked ? (
-          <Text style={styles.warning}>PEDIDO SIN CONFIRMAR - No preparar mercancía.</Text>
-        ) : completed ? (
-          <Text style={styles.warning}>PEDIDO DESPACHADO - Sin unidades pendientes.</Text>
-        ) : null}
-
         <View style={styles.tableHeader} wrap={false}>
           <Text style={[styles.headerText, styles.code]}>CÓDIGO</Text>
           <Text style={[styles.headerText, styles.product]}>PRODUCTO</Text>
-          <Text style={[styles.headerText, styles.requested]}>PEDIDA</Text>
-          <Text style={[styles.headerText, styles.pending]}>PEND.</Text>
+
+          <Text style={[styles.headerText, styles.pending]}>PEDIDA</Text>
+
           <Text style={[styles.headerText, styles.check]}>REV.</Text>
         </View>
 
@@ -169,12 +158,15 @@ export function OrderPickingPdfDocument({ order, format }: Props) {
             <View style={styles.product}>
               <Text style={styles.name}>{line.producto.nombre}</Text>
               {line.observaciones ? (
-                <Text style={styles.productNote}>Nota: {line.observaciones}</Text>
+                <Text style={styles.productNote}>
+                  Nota: {line.observaciones}
+                </Text>
               ) : null}
             </View>
             <Text style={styles.requested}>{line.cantidadSolicitada}</Text>
-            <Text style={styles.pending}>{line.cantidadPendienteDespacho}</Text>
-            <View style={styles.check}><View style={styles.checkbox} /></View>
+            <View style={styles.check}>
+              <View style={styles.checkbox} />
+            </View>
           </View>
         ))}
 
