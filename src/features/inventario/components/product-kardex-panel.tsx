@@ -13,11 +13,7 @@ import { useInventoryKardex } from "../api/inventory.queries";
 import { InventoryBodegaSelect } from "./inventory-selects";
 import { InventoryMovementTable } from "./inventory-movement-table";
 
-export function ProductKardexPanel({
-  productoId,
-}: {
-  productoId: number;
-}) {
+export function ProductKardexPanel({ productoId }: { productoId: number }) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -60,16 +56,14 @@ export function ProductKardexPanel({
     return (
       <AppCard
         title="Selecciona una bodega"
-        description="El movimiento retornado por el backend no incluye la bodega en cada fila. Selecciona una bodega para mantener el kardex inequívoco."
+        description="El movimiento retornado no incluye la bodega en cada fila. Selecciona una bodega para mantener el kardex inequívoco."
         icon={<Warehouse />}
         size="sm"
       >
         <div className="max-w-md">
           <InventoryBodegaSelect
             value={null}
-            onChange={(value) =>
-              updateUrl({ bodegaId: value, page: 1 })
-            }
+            onChange={(value) => updateUrl({ bodegaId: value, page: 1 })}
             placeholder="Seleccionar bodega"
           />
         </div>
@@ -90,9 +84,7 @@ export function ProductKardexPanel({
         <div className="max-w-md">
           <InventoryBodegaSelect
             value={bodegaId}
-            onChange={(value) =>
-              updateUrl({ bodegaId: value, page: 1 })
-            }
+            onChange={(value) => updateUrl({ bodegaId: value, page: 1 })}
             placeholder="Bodega"
           />
         </div>

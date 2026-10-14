@@ -1,13 +1,10 @@
-// Sidebar organizado por grupos con accesibilidad y estética
 import {
   BarChart3,
   Boxes,
   Building2,
   Calendar,
   CalendarPlus,
-  CheckSquare,
   ClipboardList,
-  Clock,
   CreditCard,
   FileClock,
   FileSpreadsheet,
@@ -16,7 +13,6 @@ import {
   MapPinned,
   PackagePlus,
   PieChart,
-  ShoppingBag,
   Star,
   Tags,
   Truck,
@@ -67,11 +63,6 @@ const adminGroups = [
   {
     label: "Ventas y Clientes",
     items: [
-      {
-        icon: ShoppingBag,
-        label: "Nueva Venta",
-        href: "/marcas-gt/hacer-ventas",
-      },
       {
         icon: ClipboardList,
         label: "Historial de Ventas",
@@ -137,11 +128,6 @@ const adminGroups = [
         label: "Control de Asistencia",
         href: "/marcas-gt/historial-empleados-check",
       },
-      {
-        icon: Clock,
-        label: "Registro de Jornada",
-        href: "/marcas-gt/registrar-entrada-salida",
-      },
     ],
   },
   {
@@ -197,17 +183,9 @@ const vendedorRoutes = [
     label: "Inicio del Empleado",
     href: "/marcas-gt/dashboard-empleado",
   },
-  {
-    icon: ShoppingBag,
-    label: "Realizar Venta",
-    href: "/marcas-gt/hacer-ventas",
-  },
+
   { icon: Users, label: "Gestión de Clientes", href: "/marcas-gt/clientes" },
-  {
-    icon: CheckSquare,
-    label: "Registro de Entrada/Salida",
-    href: "/marcas-gt/registrar-entrada-salida",
-  },
+
   { icon: MapPin, label: "Registrar Visita", href: "/marcas-gt/visita" },
   { icon: Star, label: "Registrar Prospecto", href: "/marcas-gt/prospecto" },
   { icon: ShoppingCart, label: "Mis Ventas", href: "/marcas-gt/mis-ventas" },

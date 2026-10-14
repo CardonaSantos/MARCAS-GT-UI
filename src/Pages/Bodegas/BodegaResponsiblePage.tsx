@@ -115,19 +115,17 @@ export default function BodegaResponsiblePage() {
                 title={bodegaQuery.data?.nombre ?? "Bodega"}
                 description={
                   bodegaQuery.data?.responsable
-                    ? "Responsable actual: " + bodegaQuery.data.responsable.nombre
+                    ? "Responsable actual: " +
+                      bodegaQuery.data.responsable.nombre
                     : "Actualmente no tiene responsable asignado."
                 }
                 icon={<UserRound />}
                 size="sm"
               >
-                <AppFormSingleSelect<
-                  AssignBodegaResponsibleFormValues,
-                  number
-                >
+                <AppFormSingleSelect<AssignBodegaResponsibleFormValues, number>
                   name="responsableId"
                   label="Responsable"
-                  description="El backend permite únicamente usuarios activos con rol ADMIN o BODEGA."
+                  description="Se permite únicamente usuarios activos con rol ADMIN o BODEGA."
                   options={options}
                   isLoading={usersQuery.isLoading}
                   placeholder="Seleccionar responsable"

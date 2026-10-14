@@ -17,9 +17,7 @@ import SellerHistory from "./Pages/SellerHistory";
 import CreateProduct from "./Pages/CreateProduct";
 import StockPage from "./Pages/StockPage";
 import ViewProducts from "./Pages/ViewProducts";
-import MakeSale from "./Pages/MakeSale";
 import HistorialVentas from "./Pages/SaleCard";
-import CheckInCheckOut from "./Pages/CheckInCheckOut";
 import CrearCategoria from "./Pages/CrearCategoria";
 import CrearProveedor from "./Pages/CrearProveedor";
 import StockDeliveryRecords from "./Pages/StockDeliveryRecords";
@@ -513,7 +511,9 @@ function App() {
             <Route
               path="/marcas-gt/pedidos/:id/guia-preparacion"
               element={
-                <ProtectedRouteRoles roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}>
+                <ProtectedRouteRoles
+                  roles={["ADMIN", "VENDEDOR", "BODEGA", "CONTABILIDAD"]}
+                >
                   <OrderPickingGuidePage />
                 </ProtectedRouteRoles>
               }
@@ -1355,14 +1355,7 @@ function App() {
                 </ProtectedRouteAdmin>
               }
             />
-            <Route
-              path="/marcas-gt/hacer-ventas"
-              element={
-                <ProtectedRoute>
-                  <MakeSale />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/marcas-gt/historial-ventas"
               element={
@@ -1371,14 +1364,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/marcas-gt/registrar-entrada-salida"
-              element={
-                <ProtectedRoute>
-                  <CheckInCheckOut />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/marcas-gt/crear-categoria"
               element={

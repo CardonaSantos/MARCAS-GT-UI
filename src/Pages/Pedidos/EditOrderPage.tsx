@@ -134,7 +134,7 @@ export default function EditOrderPage() {
           ) : query.data ? (
             <AppCard
               title="El pedido ya no es editable"
-              description="El backend sólo permite modificar pedidos en estado BORRADOR y sin actividad operativa."
+              description="Sólo permite modificar pedidos en estado BORRADOR y sin actividad operativa."
               size="sm"
             />
           ) : null}
