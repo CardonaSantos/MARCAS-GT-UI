@@ -213,6 +213,11 @@ export function OrderFormFields() {
               availability && Number.isFinite(requested) && requested > 0 &&
               requested > availability.totales.disponible,
             );
+            const splitAcrossWarehouses = Boolean(
+              availability && Number.isFinite(requested) && requested > 0 &&
+              requested <= availability.totales.disponible &&
+              !availability.bodegas.some((warehouse) => warehouse.disponible >= requested),
+            );
 
             return (
               <div
@@ -312,6 +317,13 @@ export function OrderFormFields() {
                             Se solicitan {formatInteger(requested)} unidades, pero solo hay
                             {" "}{formatInteger(availability.totales.disponible)} disponibles entre bodegas.
                             El pedido puede guardarse; bodega deberá revisar la disponibilidad antes de prepararlo.
+                          </p>
+                        ) : null}
+                        {splitAcrossWarehouses ? (
+                          <p className="mt-2 text-xs font-medium text-amber-600">
+                            El total disponible alcanza, pero está repartido entre bodegas.
+                            Para preparar {formatInteger(requested)} unidades desde una sola bodega,
+                            podría ser necesario trasladar mercancía.
                           </p>
                         ) : null}
                       </>
