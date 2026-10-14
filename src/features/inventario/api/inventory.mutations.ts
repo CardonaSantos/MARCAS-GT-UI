@@ -22,12 +22,14 @@ function mutationError(error: unknown) {
 const inventoryInvalidations = [
   marcasQueryKeys.inventario.all,
   marcasQueryKeys.bodegas.all,
+  marcasQueryKeys.productos.custom("selectables"),
 ];
 
 const reservationInvalidations = [
   marcasQueryKeys.inventario.all,
   marcasQueryKeys.bodegas.all,
   marcasQueryKeys.pedidos.all,
+  marcasQueryKeys.productos.custom("selectables"),
 ];
 
 export function useRegisterInventoryEntry() {

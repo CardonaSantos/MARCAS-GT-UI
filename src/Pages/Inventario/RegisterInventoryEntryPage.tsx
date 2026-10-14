@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowDownToLine } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { ArrowDownToLine, RefreshCw } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
 import {
   Link,
   useLocation,
@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
+import { useProductSelectables } from "@/features/common/catalogs/catalog.queries";
 import {
   getListReturnRoute,
   getReturnRoute,
@@ -18,6 +19,7 @@ import { useIdempotencyKey } from "@/features/common/utils/idempotency";
 import { useRegisterInventoryEntry } from "@/features/inventario/api/inventory.mutations";
 import { toRegisterEntryPayload } from "@/features/inventario/common/inventory.mappers";
 import { InventoryReferenceFields } from "@/features/inventario/components/inventory-reference-fields";
+import { InventoryEntryAvailability } from "@/features/inventario/components/inventory-entry-availability";
 import {
   InventoryBodegaFormSelect,
   InventoryProductFormSelect,
@@ -48,6 +50,7 @@ export default function RegisterInventoryEntryPage() {
   const key = useIdempotencyKey("inventory-entry");
 
   const mutation = useRegisterInventoryEntry();
+  const productsQuery = useProductSelectables();
 
   const form = useForm<RegisterInventoryEntryFormValues>({
     resolver: zodResolver(registerInventoryEntrySchema),
@@ -62,6 +65,11 @@ export default function RegisterInventoryEntryPage() {
       referenciaId: "",
     },
     mode: "onTouched",
+  });
+
+  const [bodegaId, productoId, cantidad] = useWatch({
+    control: form.control,
+    name: ["bodegaId", "productoId", "cantidad"],
   });
 
   const onSubmit = async (values: RegisterInventoryEntryFormValues) => {
@@ -87,7 +95,23 @@ export default function RegisterInventoryEntryPage() {
 
         <AppForm form={form} onSubmit={onSubmit}>
           <AppStack gap="md">
-            <AppCard title="Existencia" size="sm">
+            <AppCard
+              title="Existencia"
+              size="sm"
+              action={
+                <AppButton
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<RefreshCw />}
+                  loading={productsQuery.isFetching}
+                  loadingText="Actualizando..."
+                  onClick={() => void productsQuery.refetch()}
+                >
+                  Actualizar existencias
+                </AppButton>
+              }
+            >
               <AppGrid cols={{ base: 1, md: 2 }} gap="md">
                 <InventoryBodegaFormSelect<RegisterInventoryEntryFormValues>
                   name="bodegaId"
@@ -101,6 +125,7 @@ export default function RegisterInventoryEntryPage() {
                   label="Producto"
                   required
                   placeholder="Seleccionar producto"
+                  showAvailability
                 />
 
                 <AppFormInput<RegisterInventoryEntryFormValues>
@@ -127,6 +152,12 @@ export default function RegisterInventoryEntryPage() {
                   isClearable
                 />
               </AppGrid>
+              <InventoryEntryAvailability
+                productoId={productoId}
+                bodegaId={bodegaId}
+                cantidad={cantidad}
+                productsQuery={productsQuery}
+              />
             </AppCard>
 
             <AppCard title="Referencia y observaciones" size="sm">
