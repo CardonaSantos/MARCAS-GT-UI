@@ -7,9 +7,7 @@ import {
   Building2,
   Calendar,
   CalendarPlus,
-  CheckSquare,
   ClipboardList,
-  Clock,
   CreditCard,
   FileClock,
   FileSpreadsheet,
@@ -115,11 +113,7 @@ const adminRoutes: MarcasRoute[] = [
         label: "Pedidos",
         href: "/marcas-gt/pedidos",
       },
-      {
-        icon: ShoppingBag,
-        label: "Nueva venta",
-        href: "/marcas-gt/hacer-ventas",
-      },
+
       {
         icon: ClipboardList,
         label: "Historial de ventas",
@@ -192,7 +186,10 @@ const adminRoutes: MarcasRoute[] = [
         label: "Existencias",
         href: "/marcas-gt/inventario",
         exactPaths: ["/marcas-gt/inventario"],
-        activePaths: ["/marcas-gt/inventario/stocks", "/marcas-gt/inventario/productos"],
+        activePaths: [
+          "/marcas-gt/inventario/stocks",
+          "/marcas-gt/inventario/productos",
+        ],
       },
       {
         icon: Boxes,
@@ -310,7 +307,10 @@ const adminRoutes: MarcasRoute[] = [
         label: "Pagos",
         href: "/marcas-gt/pagos",
         exactPaths: ["/marcas-gt/pagos"],
-        activePaths: ["/marcas-gt/pagos/registrar", "/marcas-gt/pagos/historial"],
+        activePaths: [
+          "/marcas-gt/pagos/registrar",
+          "/marcas-gt/pagos/historial",
+        ],
       },
       {
         icon: Building2,
@@ -348,12 +348,10 @@ const adminRoutes: MarcasRoute[] = [
         icon: FileClock,
         label: "Auditoría de jornadas",
         href: "/marcas-gt/tracking/historial",
-        activePaths: ["/marcas-gt/tracking/historial", "/marcas-gt/tracking/jornadas"],
-      },
-      {
-        icon: Clock,
-        label: "Registro de jornada",
-        href: "/marcas-gt/registrar-entrada-salida",
+        activePaths: [
+          "/marcas-gt/tracking/historial",
+          "/marcas-gt/tracking/jornadas",
+        ],
       },
     ],
   },
@@ -376,11 +374,7 @@ const sellerRoutes: MarcasRoute[] = [
     label: "Inicio del empleado",
     href: "/marcas-gt/dashboard-empleado",
   },
-  {
-    icon: ShoppingBag,
-    label: "Realizar venta",
-    href: "/marcas-gt/hacer-ventas",
-  },
+
   {
     icon: ShoppingCart,
     label: "Pedidos",
@@ -427,7 +421,7 @@ const sellerRoutes: MarcasRoute[] = [
     label: "Solicitudes de crédito",
     href: "/marcas-gt/creditos",
     exactPaths: ["/marcas-gt/creditos"],
-        activePaths: ["/marcas-gt/creditos/solicitudes"],
+    activePaths: ["/marcas-gt/creditos/solicitudes"],
   },
   {
     icon: Landmark,
@@ -451,11 +445,7 @@ const sellerRoutes: MarcasRoute[] = [
     label: "Disponibilidad de productos",
     href: "/marcas-gt/inventario/disponibilidad",
   },
-  {
-    icon: CheckSquare,
-    label: "Registro de entrada/salida",
-    href: "/marcas-gt/registrar-entrada-salida",
-  },
+
   {
     icon: MapPin,
     label: "Registrar visita",
@@ -745,11 +735,6 @@ const deliveryRoutes: MarcasRoute[] = [
     icon: PackageCheck,
     label: "Mis entregas",
     href: "/marcas-gt/entregas",
-  },
-  {
-    icon: CheckSquare,
-    label: "Registro de entrada/salida",
-    href: "/marcas-gt/registrar-entrada-salida",
   },
 ];
 

@@ -17,11 +17,7 @@ import {
   shipmentLoadSchema,
   type ShipmentLoadFormValues,
 } from "@/features/transporte/schemas/transport.schemas";
-import {
-  AppForm,
-  AppFormInput,
-  AppFormSubmit,
-} from "@/ui/components/app/form";
+import { AppForm, AppFormInput, AppFormSubmit } from "@/ui/components/app/form";
 import { AppAlert } from "@/ui/components/app/primitives/app-alert";
 import { AppButton } from "@/ui/components/app/primitives/app-button";
 import { AppCard } from "@/ui/components/app/primitives/app-card";
@@ -110,7 +106,7 @@ export default function ConfirmShipmentLoadPage() {
                 <AppAlert
                   tone="warning"
                   title="La carga debe existir físicamente"
-                  description="El backend valida que cada cantidad no exceda lo planificado ni lo ya despachado físicamente desde Bodega."
+                  description="Se valida que cada cantidad no exceda lo planificado ni lo ya despachado físicamente desde Bodega."
                 />
 
                 {query.data.paradas.map((stop) => (

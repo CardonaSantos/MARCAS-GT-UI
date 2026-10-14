@@ -25,7 +25,8 @@ export function useProductSelectables(enabled = true) {
     endpoint: marcasEndpoints.products.inventoryCatalog,
     options: {
       enabled,
-      staleTime: 5 * 60_000,
+      staleTime: 20_000,
+      refetchOnWindowFocus: true,
       select: (products) =>
         products
           .map((product) => ({
@@ -33,6 +34,9 @@ export function useProductSelectables(enabled = true) {
             codigo: product.codigoProducto,
             nombre: product.nombre,
             precio: Number(product.precio).toFixed(2),
+            inventario: product.inventario?.fuente === "STOCK_BODEGA"
+              ? product.inventario
+              : null,
           }))
           .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
     },

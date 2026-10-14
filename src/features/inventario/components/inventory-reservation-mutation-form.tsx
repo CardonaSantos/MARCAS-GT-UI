@@ -85,9 +85,7 @@ export function InventoryReservationMutationForm({
             <AppFormInput<ReservationMutationFormValues>
               name="cantidad"
               label="Cantidad"
-              description={
-                "Pendiente actual: " + reservation.cantidadPendiente
-              }
+              description={"Pendiente actual: " + reservation.cantidadPendiente}
               type="number"
               min={1}
               max={reservation.cantidadPendiente}
@@ -107,7 +105,7 @@ export function InventoryReservationMutationForm({
 
         <AppCard
           title="Referencia"
-          description="Opcional. Si no se indica, el backend utilizará el detalle de pedido de la reserva."
+          description="Opcional. Si no se indica, el  utilizará el detalle de pedido de la reserva."
           size="sm"
         >
           <InventoryReferenceFields<ReservationMutationFormValues> />

@@ -5,7 +5,6 @@ import {
   Bell,
   User,
   LogOut,
-  ShoppingBag,
   MailIcon,
   UserCheck,
   UserPlus,
@@ -128,12 +127,6 @@ export default function Layout({ children }: LayoutProps) {
   // path="/historial-visitas"
 
   const menuItems = [
-    // { icon: Home, label: "Home", href: "/" },
-    {
-      icon: ShoppingBag,
-      label: "Hacer venta",
-      href: "/marcas-gt/hacer-ventas",
-    },
     { icon: Users, label: "Clientes", href: "/marcas-gt/clientes" },
     {
       icon: UserPlus,
@@ -163,11 +156,7 @@ export default function Layout({ children }: LayoutProps) {
       label: "Check Empleados",
       href: "/marcas-gt/historial-empleados-check",
     },
-    {
-      icon: CheckSquare,
-      label: "Check",
-      href: "/marcas-gt/registrar-entrada-salida",
-    },
+
     { icon: Shirt, label: "Productos", href: "/marcas-gt/ver-productos" },
     {
       icon: PlusSquare,
@@ -189,11 +178,6 @@ export default function Layout({ children }: LayoutProps) {
   const vendedorMenuItems = [
     { icon: Home, label: "Dashboard", href: "/marcas-gt/dashboard-empleado" },
 
-    {
-      icon: ShoppingBag,
-      label: "Hacer venta",
-      href: "/marcas-gt/hacer-ventas",
-    },
     { icon: Users, label: "Clientes", href: "/marcas-gt/clientes" },
     {
       icon: CheckSquare,
@@ -286,7 +270,7 @@ export default function Layout({ children }: LayoutProps) {
     if (tokenUser?.rol === "ADMIN") {
       try {
         const response = await axios.get(
-          `${API_URL}/notifications/notifications/for-admin/${tokenUser.sub}`
+          `${API_URL}/notifications/notifications/for-admin/${tokenUser.sub}`,
         );
         if (response.status === 200) {
           setNotifications(response.data);
@@ -302,7 +286,7 @@ export default function Layout({ children }: LayoutProps) {
       if (tokenUser?.rol === "ADMIN") {
         try {
           const response = await axios.get(
-            `${API_URL}/notifications/notifications/for-admin/${tokenUser.sub}`
+            `${API_URL}/notifications/notifications/for-admin/${tokenUser.sub}`,
           );
           if (response.status === 200) {
             setNotifications(response.data);
@@ -323,7 +307,7 @@ export default function Layout({ children }: LayoutProps) {
         `${API_URL}/notifications/update-notify/${notificationId}`,
         {
           usuarioId: tokenUser?.sub,
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -338,7 +322,7 @@ export default function Layout({ children }: LayoutProps) {
   const handleDeleteAllNotifications = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}/notifications/delete-all-notifications-admin/${tokenUser?.sub}`
+        `${API_URL}/notifications/delete-all-notifications-admin/${tokenUser?.sub}`,
       );
       if (response.status === 200) {
         toast.success("Notificaciones eliminadas");
@@ -356,7 +340,7 @@ export default function Layout({ children }: LayoutProps) {
       socket.on("newNotificationToSeller", (newNotification) => {
         console.log(
           "La notificación entrante para vendedor es: ",
-          newNotification
+          newNotification,
         );
 
         setNotifications((previaNotification) => [
@@ -426,7 +410,7 @@ export default function Layout({ children }: LayoutProps) {
                       .sort(
                         (a, b) =>
                           new Date(b.creadoEn).getTime() -
-                          new Date(a.creadoEn).getTime()
+                          new Date(a.creadoEn).getTime(),
                       )
                       .map((not) => (
                         <div
@@ -448,7 +432,7 @@ export default function Layout({ children }: LayoutProps) {
                                       dateStyle: "short",
                                       timeStyle: "short",
                                       hour12: true,
-                                    }
+                                    },
                                   )
                                 : ""}
                             </p>

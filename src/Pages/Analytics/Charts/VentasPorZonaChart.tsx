@@ -17,7 +17,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,11 +33,10 @@ function VentasPorZonaChart() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Función para obtener los datos del backend
     const fetchData = async () => {
       try {
         const response = await axios.get<ZonaData[]>(
-          `${API_URL}/analytics/get-ventas-por-zona`
+          `${API_URL}/analytics/get-ventas-por-zona`,
         );
         setDataZonas(response.data);
         setLoading(false);

@@ -84,7 +84,7 @@ export default function CancelShipmentPage() {
                 <AppAlert
                   tone="warning"
                   title="Cancelación logística"
-                  description="Sólo se permite cancelar envíos PROGRAMADO o ASIGNADO. Si es interno y ya tiene recursos asignados, el backend los libera automáticamente."
+                  description="Sólo se permite cancelar envíos PROGRAMADO o ASIGNADO. Si es interno y ya tiene recursos asignados, se libera automáticamente."
                 />
                 <AppCard title="Motivo" size="sm">
                   <AppFormTextarea<ShipmentCancelFormValues>

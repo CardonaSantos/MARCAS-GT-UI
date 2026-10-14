@@ -1,4 +1,5 @@
 import type { FieldValues } from "react-hook-form";
+import { formatInteger } from "@/features/common/formatters/value.formatters";
 
 import { useBodegaSelectables } from "@/features/bodegas/api/bodega.queries";
 import {
@@ -77,7 +78,10 @@ export function InventoryProductSelect(props: RawSelectProps) {
 
 export function InventoryProductFormSelect<
   TFieldValues extends FieldValues,
->(props: FormSelectProps<TFieldValues>) {
+>({
+  showAvailability = false,
+  ...props
+}: FormSelectProps<TFieldValues> & { showAvailability?: boolean }) {
   const query = useProductSelectables();
 
   return (
@@ -85,7 +89,11 @@ export function InventoryProductFormSelect<
       {...props}
       options={(query.data ?? []).map((product) => ({
         value: product.id,
-        label: `${product.codigo} · ${product.nombre}`,
+        label: `${product.codigo} · ${product.nombre}${showAvailability
+          ? " · " + (product.inventario
+            ? "Disp. " + formatInteger(product.inventario.totales.disponible)
+            : "Stock por consultar")
+          : ""}`,
       }))}
       isLoading={query.isLoading}
       noOptionsText="No hay productos disponibles"

@@ -108,7 +108,7 @@ export default function CancelDispatchPage() {
                 <AppAlert
                   tone="warning"
                   title="Cancelación operativa"
-                  description="Si la preparación ya reservó inventario, el backend genera LIBERACION_RESERVA y sólo cancela después de reconciliar Inventario y Pedido. Una orden con salida física no puede cancelarse."
+                  description="Si la preparación ya reservó inventario, se genera LIBERACION_RESERVA y sólo cancela después de reconciliar Inventario y Pedido. Una orden con salida física no puede cancelarse."
                 />
 
                 <AppCard title="Motivo" size="sm">
@@ -138,8 +138,7 @@ export default function CancelDispatchPage() {
                     loadingText="Cancelando..."
                     disableWhenInvalid
                     disabled={
-                      !query.data.acciones.puedeCancelar ||
-                      blockedByFailure
+                      !query.data.acciones.puedeCancelar || blockedByFailure
                     }
                   >
                     Cancelar despacho

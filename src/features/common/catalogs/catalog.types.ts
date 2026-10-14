@@ -1,8 +1,23 @@
+export interface OrderProductInventoryAvailability {
+  fuente: "STOCK_BODEGA";
+  totales: { real: number; reservado: number; disponible: number };
+  bodegas: Array<{
+    id: number;
+    codigo: string;
+    nombre: string;
+    esPrincipal: boolean;
+    real: number;
+    reservado: number;
+    disponible: number;
+  }>;
+}
+
 export interface ProductSelectable {
   id: number;
   codigo: string;
   nombre: string;
   precio: string;
+  inventario?: OrderProductInventoryAvailability | null;
 }
 
 export interface ProviderSelectable {
@@ -54,6 +69,8 @@ export interface LegacyProductRecord {
   codigoProducto: string;
   nombre: string;
   precio: string | number;
+  // El campo estará disponible después de actualizar MARCAS-GT-SERVER.
+  inventario?: OrderProductInventoryAvailability;
 }
 
 export interface LegacyProviderRecord {

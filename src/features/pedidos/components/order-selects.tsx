@@ -8,7 +8,7 @@ import {
   useUserSelectables,
   useVisitSelectables,
 } from "@/features/common/catalogs/catalog.queries";
-import { formatDateTime, formatMoney } from "@/features/common/formatters/value.formatters";
+import { formatDateTime, formatInteger, formatMoney } from "@/features/common/formatters/value.formatters";
 import {
   AppFormSingleSelect,
   type AppFormSingleSelectProps,
@@ -169,7 +169,7 @@ export function useOrderProductOptions() {
     ...query,
     options: (query.data ?? []).map((product) => ({
       value: product.id,
-      label: `${product.codigo} · ${product.nombre} · ${formatMoney(product.precio)}`,
+      label: `${product.codigo} · ${product.nombre} · ${formatMoney(product.precio)} · ${product.inventario ? "Disp. " + formatInteger(product.inventario.totales.disponible) : "Disponibilidad por consultar"}`,
     })),
   };
 }

@@ -1,12 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { XCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { FeaturePageHeader } from "@/features/common/components/feature-page-header";
 import {
@@ -113,7 +108,7 @@ export default function CancelInventoryReservationPage() {
 
                 <AppCard
                   title="Referencia"
-                  description="Opcional. Si se omite, el backend utilizará el detalle de pedido."
+                  description="Opcional. Si se omite, se utilizará el detalle de pedido."
                   size="sm"
                 >
                   <InventoryReferenceFields<CancelReservationFormValues> />
