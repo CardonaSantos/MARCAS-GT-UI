@@ -17,7 +17,7 @@ export interface ProductSelectable {
   codigo: string;
   nombre: string;
   precio: string;
-  inventario: OrderProductInventoryAvailability | null;
+  inventario?: OrderProductInventoryAvailability | null;
 }
 
 export interface ProviderSelectable {
