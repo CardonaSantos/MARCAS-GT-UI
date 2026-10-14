@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 
@@ -155,26 +155,39 @@ export function OrderFormFields() {
 
       <AppCard
         title="Productos"
-        description="El precio mostrado es informativo. El backend toma el precio vigente al guardar el pedido."
+        description="El precio es estimado. La disponibilidad se consulta en las bodegas activas y puede cambiar hasta que se prepare el despacho."
         size="sm"
         action={
-          <AppButton
-            type="button"
-            variant="secondary"
-            size="sm"
-            leftIcon={<Plus />}
-            disabled={fields.length >= 200}
-            onClick={() =>
-              append({
-                productoId: null,
-                cantidadSolicitada: "1",
-                descuento: "",
-                observaciones: "",
-              })
-            }
-          >
-            Agregar producto
-          </AppButton>
+          <div className="flex flex-wrap items-center gap-2">
+            <AppButton
+              type="button"
+              variant="secondary"
+              size="sm"
+              leftIcon={<RefreshCw />}
+              loading={productsQuery.isFetching}
+              loadingText="Actualizando..."
+              onClick={() => void productsQuery.refetch()}
+            >
+              Actualizar existencias
+            </AppButton>
+            <AppButton
+              type="button"
+              variant="secondary"
+              size="sm"
+              leftIcon={<Plus />}
+              disabled={fields.length >= 200}
+              onClick={() =>
+                append({
+                  productoId: null,
+                  cantidadSolicitada: "1",
+                  descuento: "",
+                  observaciones: "",
+                })
+              }
+            >
+              Agregar producto
+            </AppButton>
+          </div>
         }
       >
         <AppStack gap="sm">
@@ -193,6 +206,13 @@ export function OrderFormFields() {
               observaciones: "",
             };
             const amounts = orderDraftLineAmounts(line, products);
+            const product = products.find((item) => item.id === line.productoId);
+            const availability = product?.inventario;
+            const requested = Number(line.cantidadSolicitada);
+            const insufficient = Boolean(
+              availability && Number.isFinite(requested) && requested > 0 &&
+              requested > availability.totales.disponible,
+            );
 
             return (
               <div
@@ -255,6 +275,57 @@ export function OrderFormFields() {
                     </AppButton>
                   </div>
                 </div>
+
+                {line.productoId ? (
+                  <div
+                    className="mt-3 rounded-md border border-[hsl(var(--app-border))] px-3 py-2 text-sm"
+                    aria-live="polite"
+                  >
+                    {productsQuery.isError ? (
+                      <p className="text-amber-600">
+                        No se pudo consultar el inventario. Actualiza las existencias antes de confirmar cantidades.
+                      </p>
+                    ) : availability ? (
+                      <>
+                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+                          <span>Real: <strong className="tabular-nums">{formatInteger(availability.totales.real)}</strong></span>
+                          <span>Reservado: <strong className="tabular-nums">{formatInteger(availability.totales.reservado)}</strong></span>
+                          <span>Disponible: <strong className="tabular-nums">{formatInteger(availability.totales.disponible)}</strong></span>
+                        </div>
+                        {availability.bodegas.length > 0 ? (
+                          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[hsl(var(--app-muted-foreground))]">
+                            {availability.bodegas.map((warehouse) => (
+                              <span key={warehouse.id}>
+                                {warehouse.nombre}{warehouse.esPrincipal ? " (principal)" : ""}:
+                                {" "}<strong className="tabular-nums">{formatInteger(warehouse.disponible)}</strong> disponibles
+                                {" "}(real {formatInteger(warehouse.real)}, reservado {formatInteger(warehouse.reservado)})
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="mt-1 text-xs text-[hsl(var(--app-muted-foreground))]">
+                            Sin existencias registradas en bodegas activas.
+                          </p>
+                        )}
+                        {insufficient ? (
+                          <p className="mt-2 text-xs font-medium text-amber-600">
+                            Se solicitan {formatInteger(requested)} unidades, pero solo hay
+                            {" "}{formatInteger(availability.totales.disponible)} disponibles entre bodegas.
+                            El pedido puede guardarse; bodega deberá revisar la disponibilidad antes de prepararlo.
+                          </p>
+                        ) : null}
+                      </>
+                    ) : productsQuery.isLoading || productsQuery.isFetching ? (
+                      <p className="text-xs text-[hsl(var(--app-muted-foreground))]">
+                        Consultando existencias...
+                      </p>
+                    ) : (
+                      <p className="text-xs text-amber-600">
+                        La disponibilidad aún no está disponible. Comprueba que el servidor tenga la actualización de inventario.
+                      </p>
+                    )}
+                  </div>
+                ) : null}
 
                 <div className="mt-3">
                   <AppFormInput<OrderFormValues>
